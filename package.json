@@ -1,0 +1,11 @@
+{
+  "name": "interview-preparation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interview Preparation notes with web viewer",
+  "scripts": {
+    "start": "cd web-viewer && npm start",
+    "dev": "cd web-viewer && npm run dev",
+    "install-viewer": "cd web-viewer && npm install"
+  }
+}

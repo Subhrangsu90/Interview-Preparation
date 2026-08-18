@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview Prep Notes — Handwritten Reader</title>
+  <meta name="description" content="Beautiful handwritten-style reader for Interview Preparation notes with syntax highlighting and live file watching.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500;600;700&family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+
+  <!-- Prism.js for syntax highlighting (Monokai theme) -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📖</text></svg>">
+</head>
+<body>
+  <div class="app-container" id="app">
+
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">
+          📂 Explorer
+        </div>
+        <div class="sidebar-stats" id="sidebar-stats"></div>
+      </div>
+      <div class="file-tree-container" id="file-tree"></div>
+    </aside>
+
+    <!-- ─── MAIN ─── -->
+    <div class="main-content">
+
+      <!-- ─── HEADER ─── -->
+      <header class="header">
+        <button class="btn-icon" id="toggle-sidebar" title="Toggle Sidebar">
+          ☰
+        </button>
+
+        <div class="header-logo">
+          <span class="logo-icon">📖</span>
+          <div>
+            <h1>Interview Prep Notes</h1>
+            <div class="subtitle">handwritten reader</div>
+          </div>
+        </div>
+
+        <div class="search-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="search-input" id="search-input" placeholder="Search notes, code, topics...">
+          <div class="search-results" id="search-results"></div>
+        </div>
+
+        <div class="header-actions">
+          <!-- Font size controls -->
+          <div class="font-size-controls">
+            <button class="font-size-btn" id="font-decrease" title="Decrease font size">A−</button>
+            <span class="font-size-label" id="font-size-label">16</span>
+            <button class="font-size-btn" id="font-increase" title="Increase font size">A+</button>
+          </div>
+
+          <!-- Notebook lines toggle -->
+          <button class="btn-icon" id="toggle-lines" title="Toggle notebook lines">
+            ≡
+          </button>
+
+          <!-- Theme switcher -->
+          <div class="theme-dropdown">
+            <button class="btn-icon" id="theme-toggle" title="Switch theme">
+              🎨
+            </button>
+            <div class="theme-menu" id="theme-menu">
+              <button class="theme-option active" data-theme="paper">
+                <span class="theme-swatch" style="background:#fdf8f0; border-color:#d4a56a;"></span>
+                Paper Warm
+              </button>
+              <button class="theme-option" data-theme="sepia">
+                <span class="theme-swatch" style="background:#f4e8d1; border-color:#c09050;"></span>
+                Sepia Soft
+              </button>
+              <button class="theme-option" data-theme="dark">
+                <span class="theme-swatch" style="background:#1a1a2e; border-color:#6060b0;"></span>
+                Midnight Dark
+              </button>
+            </div>
+          </div>
+
+          <!-- Live indicator -->
+          <div class="live-indicator" id="live-indicator">
+            <span class="live-dot" id="live-dot"></span>
+            <span>Live</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ─── BREADCRUMB ─── -->
+      <div class="breadcrumb-bar" id="breadcrumb-bar">
+        <span class="breadcrumb-item" data-path="">📁 Interview Preparation</span>
+      </div>
+
+      <!-- ─── CONTENT ─── -->
+      <div class="content-area" id="content-area">
+        <div class="content-inner" id="content-inner">
+          <!-- Welcome screen -->
+          <div class="welcome-screen" id="welcome-screen">
+            <div class="welcome-icon">✏️</div>
+            <h2 class="welcome-title">Welcome to your Notes</h2>
+            <p class="welcome-subtitle">
+              Pick a file from the sidebar to start reading.<br>
+              Your notes render beautifully with syntax highlighting, markdown, and images.
+            </p>
+            <div class="welcome-hint">
+              💡 New files you create will appear automatically!
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TABLE OF CONTENTS ─── -->
+    <div class="toc-container" id="toc-container" style="display:none;"></div>
+
+  </div>
+
+  <!-- ─── TOAST CONTAINER ─── -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Prism.js core + languages -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-jsx.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+
+  <!-- Marked.js for markdown -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+
+  <!-- Monaco Editor (VS Code engine) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+
+  <!-- App -->
+  <script src="app.js"></script>
+</body>
+</html>
