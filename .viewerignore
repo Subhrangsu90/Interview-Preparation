@@ -1,0 +1,16 @@
+# Files & Folders hidden from the Web Viewer UI
+.git
+.gitignore
+.viewerignore
+node_modules
+web-viewer
+dist
+.dist
+.vercel
+api
+vercel.json
+vite.config.js
+package.json
+package-lock.json
+.DS_Store
+Thumbs.db

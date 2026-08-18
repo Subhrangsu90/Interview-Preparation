@@ -851,14 +851,33 @@
   // ═══════════════════════════════════
   // LIVE RELOAD (SSE)
   // ═══════════════════════════════════
+  // ─── Live Reload (SSE) ───
   function connectLiveReload() {
-    const evtSource = new EventSource("/api/watch");
+    // If deployed on Vercel or production static host, live watch is not applicable
+    if (window.location.hostname.includes("vercel.app") || window.location.hostname.includes("vercel")) {
+      if (dom.liveIndicator) dom.liveIndicator.style.display = "none";
+      return;
+    }
+
+    let evtSource;
+    try {
+      evtSource = new EventSource("/api/watch");
+    } catch {
+      if (dom.liveIndicator) dom.liveIndicator.style.display = "none";
+      return;
+    }
 
     evtSource.onopen = () => {
       dom.liveDot.classList.remove("disconnected");
     };
 
     evtSource.onmessage = (event) => {
+      if (event.data === "disabled-on-vercel") {
+        if (dom.liveIndicator) dom.liveIndicator.style.display = "none";
+        evtSource.close();
+        return;
+      }
+
       if (event.data === "connected" || event.data === "chokidar-not-available") return;
 
       try {
@@ -882,11 +901,14 @@
 
     evtSource.onerror = () => {
       dom.liveDot.classList.add("disconnected");
-      // Reconnect after 3s
-      setTimeout(() => {
-        evtSource.close();
-        connectLiveReload();
-      }, 3000);
+      evtSource.close();
+
+      // Only retry on local environment
+      if (!window.location.hostname.includes("vercel")) {
+        setTimeout(() => {
+          connectLiveReload();
+        }, 5000);
+      }
     };
   }
 

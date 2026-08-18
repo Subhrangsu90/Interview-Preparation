@@ -9,8 +9,27 @@ const PORT = 3000;
 // Root of the Interview Preparation repo (parent of web-viewer/)
 const REPO_ROOT = path.resolve(__dirname, "..");
 
-// Folders/files to ignore
-const IGNORED = new Set([".git", "node_modules", "web-viewer", ".DS_Store", "Thumbs.db","package.json"]);
+// Dynamic .viewerignore parser
+function getIgnoredSet() {
+  const defaultIgnored = [
+    ".git", ".gitignore", ".viewerignore", "node_modules", "web-viewer",
+    "dist", ".dist", ".vercel", "api", "vercel.json", "vite.config.js",
+    "package.json", "package-lock.json", ".DS_Store", "Thumbs.db"
+  ];
+
+  const ignoreFilePath = path.join(REPO_ROOT, ".viewerignore");
+  if (fs.existsSync(ignoreFilePath)) {
+    try {
+      const content = fs.readFileSync(ignoreFilePath, "utf-8");
+      const lines = content
+        .split("\n")
+        .map(line => line.trim())
+        .filter(line => line && !line.startsWith("#"));
+      return new Set([...defaultIgnored, ...lines]);
+    } catch { /* fallback */ }
+  }
+  return new Set(defaultIgnored);
+}
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -40,11 +59,12 @@ app.post("/api/save", (req, res) => {
 
 // ─── API: Recursive file tree ───
 function buildTree(dirPath, relativeTo) {
+  const ignored = getIgnoredSet();
   const entries = fs.readdirSync(dirPath, { withFileTypes: true });
   const tree = [];
 
   for (const entry of entries) {
-    if (IGNORED.has(entry.name)) continue;
+    if (ignored.has(entry.name)) continue;
     if (entry.name.startsWith(".")) continue;
 
     const fullPath = path.join(dirPath, entry.name);
@@ -141,10 +161,12 @@ app.get("/api/search", (req, res) => {
 
   const results = [];
 
+  const ignored = getIgnoredSet();
+
   function searchDir(dirPath) {
     const entries = fs.readdirSync(dirPath, { withFileTypes: true });
     for (const entry of entries) {
-      if (IGNORED.has(entry.name) || entry.name.startsWith(".")) continue;
+      if (ignored.has(entry.name) || entry.name.startsWith(".")) continue;
       const fullPath = path.join(dirPath, entry.name);
       const relPath = path.relative(REPO_ROOT, fullPath).replace(/\\/g, "/");
 
@@ -190,39 +212,50 @@ app.get("/api/search", (req, res) => {
 app.get("/api/watch", (req, res) => {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
-    "Cache-Control": "no-cache",
+    "Cache-Control": "no-cache, no-transform",
     Connection: "keep-alive",
   });
-  res.write("data: connected\n\n");
+
+  // Serverless / Vercel deployment check: disable live watch gracefully
+  if (process.env.VERCEL) {
+    res.write("data: disabled-on-vercel\n\n");
+    return res.end();
+  }
 
   let chokidar;
   try {
     chokidar = require("chokidar");
   } catch {
     res.write("data: chokidar-not-available\n\n");
-    return;
+    return res.end();
   }
 
-  const watcher = chokidar.watch(REPO_ROOT, {
-    ignored: /(^|[\/\\])(\.|node_modules|web-viewer|\.git)/,
-    persistent: true,
-    ignoreInitial: true,
-  });
+  try {
+    res.write("data: connected\n\n");
+    const watcher = chokidar.watch(REPO_ROOT, {
+      ignored: /(^|[\/\\])(\.|node_modules|web-viewer|\.git)/,
+      persistent: true,
+      ignoreInitial: true,
+    });
 
-  const sendEvent = (event, filePath) => {
-    const relPath = path.relative(REPO_ROOT, filePath).replace(/\\/g, "/");
-    res.write(`data: ${JSON.stringify({ event, path: relPath })}\n\n`);
-  };
+    const sendEvent = (event, filePath) => {
+      const relPath = path.relative(REPO_ROOT, filePath).replace(/\\/g, "/");
+      res.write(`data: ${JSON.stringify({ event, path: relPath })}\n\n`);
+    };
 
-  watcher.on("add", (p) => sendEvent("add", p));
-  watcher.on("change", (p) => sendEvent("change", p));
-  watcher.on("unlink", (p) => sendEvent("unlink", p));
-  watcher.on("addDir", (p) => sendEvent("addDir", p));
-  watcher.on("unlinkDir", (p) => sendEvent("unlinkDir", p));
+    watcher.on("add", (p) => sendEvent("add", p));
+    watcher.on("change", (p) => sendEvent("change", p));
+    watcher.on("unlink", (p) => sendEvent("unlink", p));
+    watcher.on("addDir", (p) => sendEvent("addDir", p));
+    watcher.on("unlinkDir", (p) => sendEvent("unlinkDir", p));
 
-  req.on("close", () => {
-    watcher.close();
-  });
+    req.on("close", () => {
+      watcher.close();
+    });
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+    res.end();
+  }
 });
 
 // ─── Fallback: serve index.html ───
