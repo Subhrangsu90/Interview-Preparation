@@ -230,10 +230,14 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`\n  ✏️  Interview Prep Viewer`);
-  console.log(`  ────────────────────────`);
-  console.log(`  📖  Open: http://localhost:${PORT}`);
-  console.log(`  📂  Watching: ${REPO_ROOT}`);
-  console.log(`  🔄  Live reload enabled\n`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n  ✏️  Interview Prep Viewer`);
+    console.log(`  ────────────────────────`);
+    console.log(`  📖  Open: http://localhost:${PORT}`);
+    console.log(`  📂  Watching: ${REPO_ROOT}`);
+    console.log(`  🔄  Live reload enabled\n`);
+  });
+}
+
+module.exports = app;
