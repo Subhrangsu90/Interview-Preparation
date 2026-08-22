@@ -5,7 +5,12 @@
   "outputDirectory": "dist",
   "functions": {
     "api/index.js": {
-      "includeFiles": ["JavaScript/**", "TypeScripts/**"]
+      "includeFiles": [
+        "JavaScript/**",
+        "TypeScripts/**",
+        "web-viewer/server.js",
+        "web-viewer/public/**"
+      ]
     }
   },
   "rewrites": [

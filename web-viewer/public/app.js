@@ -105,6 +105,9 @@
   async function loadTree() {
     try {
       const res = await fetch("/api/tree");
+      if (!res.ok) {
+        throw new Error(`Tree request failed (${res.status})`);
+      }
       const data = await res.json();
       state.tree = data.tree;
       renderTree();
