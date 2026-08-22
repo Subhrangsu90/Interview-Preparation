@@ -170,6 +170,172 @@
     <!-- ─── TABLE OF CONTENTS ─── -->
     <div class="toc-container hidden" id="toc-container"></div>
 
+    <!-- ─── FLOATING ASSISTANT BUTTON ─── -->
+    <button class="assistant-floating-btn" id="toggle-assistant-btn" title="Open AI Interview Coach (A2UI)">
+      <span class="assistant-btn-sparkle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </span>
+      <span>AI Coach</span>
+    </button>
+
+    <!-- ─── A2UI ASSISTANT DRAWER ─── -->
+    <aside class="assistant-drawer hidden" id="assistant-drawer">
+      <!-- Left Edge Resize Handle -->
+      <div class="drawer-resize-handle" id="drawer-resize-handle" title="Drag to resize assistant"></div>
+
+      <div class="assistant-header">
+        <div class="assistant-title-group">
+          <div class="assistant-badge">A2UI</div>
+          <div>
+            <div class="assistant-title">AI Interview Coach</div>
+            <div class="assistant-provider-label" id="assistant-provider-label">Provider: Gemini / OpenAI</div>
+          </div>
+        </div>
+        <div class="assistant-header-actions">
+          <button class="btn-icon" id="assistant-expand-btn" title="Toggle Full / Half Screen Width">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <polyline points="9 21 3 21 3 15"></polyline>
+              <line x1="21" y1="3" x2="14" y2="10"></line>
+              <line x1="3" y1="21" x2="10" y2="14"></line>
+            </svg>
+          </button>
+          <button class="btn-icon" id="assistant-settings-btn" title="Configure AI Key (Gemini / OpenAI)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+          <button class="btn-icon" id="assistant-clear-btn" title="Clear Chat History">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+          <button class="btn-icon" id="assistant-close-btn" title="Close Drawer">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Study Scoreboard Bar -->
+      <div class="assistant-scoreboard" id="assistant-scoreboard">
+        <div class="score-stat-chip" title="Total score earned from correct answers">
+          <span class="score-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+          </span>
+          <span class="score-val" id="score-pts">0</span>
+          <span class="score-lbl">Pts</span>
+        </div>
+        <div class="score-stat-chip" title="Quiz accuracy">
+          <span class="score-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          </span>
+          <span class="score-val" id="score-accuracy">0%</span>
+          <span class="score-lbl">Acc</span>
+        </div>
+        <div class="score-stat-chip" title="Current streak">
+          <span class="score-icon">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </span>
+          <span class="score-val" id="score-streak">0</span>
+          <span class="score-lbl">Streak</span>
+        </div>
+        <button class="score-reset-btn" id="score-reset-btn" title="Reset Score & Stats">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+      </div>
+
+      <!-- Quick Action Chips -->
+      <div class="assistant-quick-actions">
+        <button class="quick-chip" data-action="quiz">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          <span>Quiz File</span>
+        </button>
+        <button class="quick-chip" data-action="flashcard">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <span>Flashcards</span>
+        </button>
+        <button class="quick-chip" data-action="playground">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>Code Challenge</span>
+        </button>
+        <button class="quick-chip" data-action="explain">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Key Concepts</span>
+        </button>
+      </div>
+
+      <!-- Active File Context Bar -->
+      <div class="assistant-context-bar" id="assistant-context-bar">
+        <span class="context-dot"></span>
+        <span class="context-file-label" id="context-file-label">Workspace Context: No file selected</span>
+      </div>
+
+      <!-- Chat Stream Container -->
+      <div class="assistant-chat-body" id="assistant-chat-body">
+        <div class="assistant-welcome-msg">
+          <div class="welcome-sparkle">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h3>Welcome to your A2UI Assistant</h3>
+          <p>I can quiz you on your notes, create interactive flashcards, run live code playgrounds, and answer technical interview questions using Gemini or OpenAI.</p>
+        </div>
+      </div>
+
+      <!-- Input Bar -->
+      <div class="assistant-input-container">
+        <form class="assistant-form" id="assistant-form">
+          <textarea class="assistant-input" id="assistant-input" rows="1" placeholder="Ask anything, request a quiz, or test code..."></textarea>
+          <button type="submit" class="assistant-send-btn" id="assistant-send-btn" title="Send (Enter)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- ─── ASSISTANT SETTINGS MODAL ─── -->
+    <div class="assistant-modal-backdrop hidden" id="assistant-settings-modal">
+      <div class="assistant-modal-card">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <h3>AI Assistant Settings</h3>
+          </div>
+          <button class="btn-icon" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="setting-provider">AI Provider</label>
+            <select id="setting-provider" class="modal-select">
+              <option value="gemini">Google Gemini (Recommended)</option>
+              <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
+              <option value="mock">Offline / Local Workspace Mode</option>
+            </select>
+          </div>
+          <div class="form-group" id="api-key-group">
+            <label for="setting-api-key">API Key</label>
+            <input type="password" id="setting-api-key" class="modal-input" placeholder="Paste your Gemini or OpenAI API Key">
+            <p class="modal-hint">Key is saved securely in your browser's localStorage for this session.</p>
+          </div>
+          <div class="form-group">
+            <label for="setting-model">Model</label>
+            <input type="text" id="setting-model" class="modal-input" placeholder="e.g., gemini-2.5-flash or gpt-4o-mini" value="gemini-2.5-flash">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn secondary" id="modal-cancel-btn">Cancel</button>
+          <button class="modal-btn primary" id="modal-save-btn">Save Settings</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ─── TOAST CONTAINER ─── -->

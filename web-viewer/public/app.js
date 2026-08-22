@@ -99,6 +99,45 @@
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   }
 
+  // ─── Toast Notification System ───
+  function showToast(msg, type = "info") {
+    const container = dom.toastContainer || document.getElementById("toast-container");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+
+    let iconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+    if (type === "success") {
+      iconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+    } else if (type === "error") {
+      iconSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+    }
+
+    toast.innerHTML = `
+      <span class="toast-icon">${iconSvg}</span>
+      <div class="toast-content">${msg}</div>
+      <button class="toast-close" title="Dismiss">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="toast-timer"></div>
+    `;
+
+    const closeBtn = toast.querySelector(".toast-close");
+    let timer = null;
+
+    const dismiss = () => {
+      clearTimeout(timer);
+      toast.classList.add("toast-exit");
+      setTimeout(() => toast.remove(), 250);
+    };
+
+    closeBtn.addEventListener("click", dismiss);
+    timer = setTimeout(dismiss, 3500);
+
+    container.appendChild(toast);
+  }
+
   // ═══════════════════════════════════
   // FILE TREE
   // ═══════════════════════════════════
@@ -217,6 +256,11 @@
 
     // Update breadcrumb
     updateBreadcrumb(filePath);
+
+    // Update Assistant Context
+    if (typeof updateAssistantContext === "function") {
+      updateAssistantContext(filePath);
+    }
 
     // Hide welcome
     if (dom.welcomeScreen) dom.welcomeScreen.classList.add('hidden');
@@ -1082,6 +1126,9 @@
     // Connect live reload
     connectLiveReload();
 
+    // Initialize A2UI Assistant
+    initAssistant();
+
     // Create mobile backdrop element if missing
     let backdrop = document.getElementById("sidebar-backdrop");
     if (!backdrop) {
@@ -1186,6 +1233,731 @@
     });
   }
 
+  // ═══════════════════════════════════
+  // A2UI ASSISTANT & GENERATIVE UI ENGINE
+  // ═══════════════════════════════════
+  let updateAssistantContext = null;
+
+  function initAssistant() {
+    const toggleBtn = $("#toggle-assistant-btn");
+    const drawer = $("#assistant-drawer");
+    const resizeHandle = $("#drawer-resize-handle");
+    const expandBtn = $("#assistant-expand-btn");
+    const closeBtn = $("#assistant-close-btn");
+    const clearBtn = $("#assistant-clear-btn");
+    const settingsBtn = $("#assistant-settings-btn");
+    const settingsModal = $("#assistant-settings-modal");
+    const modalCloseBtn = $("#modal-close-btn");
+    const modalCancelBtn = $("#modal-cancel-btn");
+    const modalSaveBtn = $("#modal-save-btn");
+    const providerSelect = $("#setting-provider");
+    const apiKeyInput = $("#setting-api-key");
+    const modelInput = $("#setting-model");
+    const chatBody = $("#assistant-chat-body");
+    const form = $("#assistant-form");
+    const input = $("#assistant-input");
+    const contextLabel = $("#context-file-label");
+    const providerLabel = $("#assistant-provider-label");
+    const quickChips = $$(".quick-chip");
+
+    let history = [];
+
+    // State settings
+    let aiSettings = {
+      provider: localStorage.getItem("ip-ai-provider") || "gemini",
+      apiKey: localStorage.getItem("ip-ai-key") || "",
+      model: localStorage.getItem("ip-ai-model") || "gemini-2.5-flash",
+    };
+
+    // Restore saved custom drawer width on desktop
+    const savedDrawerWidth = localStorage.getItem("ip-drawer-width");
+    if (savedDrawerWidth && drawer && window.innerWidth > 768) {
+      drawer.style.width = savedDrawerWidth;
+    }
+
+    // Responsive window resize listener
+    window.addEventListener("resize", () => {
+      if (window.innerWidth <= 768 && drawer) {
+        drawer.style.width = "";
+      } else if (drawer && savedDrawerWidth) {
+        drawer.style.width = savedDrawerWidth;
+      }
+    });
+
+    // ─── Resizable Drawer (Drag Handle) ───
+    if (resizeHandle && drawer) {
+      let isDragging = false;
+      let startX = 0;
+      let startWidth = 0;
+
+      resizeHandle.addEventListener("mousedown", (e) => {
+        if (window.innerWidth <= 768) return;
+        e.preventDefault();
+        isDragging = true;
+        startX = e.clientX;
+        startWidth = drawer.getBoundingClientRect().width;
+        drawer.classList.add("resizing");
+        document.body.style.cursor = "ew-resize";
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging || window.innerWidth <= 768) return;
+        const deltaX = startX - e.clientX;
+        const newWidth = Math.min(window.innerWidth - 30, Math.max(360, startWidth + deltaX));
+        drawer.style.width = `${newWidth}px`;
+        drawer.classList.remove("expanded-half", "expanded-full");
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (isDragging) {
+          isDragging = false;
+          drawer.classList.remove("resizing");
+          document.body.style.cursor = "";
+          if (window.innerWidth > 768) {
+            localStorage.setItem("ip-drawer-width", drawer.style.width);
+          }
+        }
+      });
+    }
+
+    // ─── Expand / Full-Screen Toggle ───
+    if (expandBtn && drawer) {
+      let expandState = 0; // 0: standard, 1: 55vw, 2: 90vw
+      expandBtn.addEventListener("click", () => {
+        expandState = (expandState + 1) % 3;
+        drawer.classList.remove("expanded-half", "expanded-full");
+
+        if (expandState === 1) {
+          drawer.classList.add("expanded-half");
+          showToast("Assistant width: 55% Split View", "info");
+        } else if (expandState === 2) {
+          drawer.classList.add("expanded-full");
+          showToast("Assistant width: 90% Full View", "info");
+        } else {
+          const w = localStorage.getItem("ip-drawer-width") || "500px";
+          drawer.style.width = w;
+          showToast("Assistant width: Standard", "info");
+        }
+      });
+    }
+
+    // ─── Study Stats & Scoreboard State ───
+    function getQuizStats() {
+      try {
+        return JSON.parse(localStorage.getItem("ip-quiz-stats")) || {
+          pts: 0,
+          total: 0,
+          correct: 0,
+          streak: 0,
+          topicMastery: {}
+        };
+      } catch {
+        return { pts: 0, total: 0, correct: 0, streak: 0, topicMastery: {} };
+      }
+    }
+
+    function updateScoreboardUI() {
+      const stats = getQuizStats();
+      const ptsEl = $("#score-pts");
+      const accEl = $("#score-accuracy");
+      const streakEl = $("#score-streak");
+
+      if (ptsEl) ptsEl.textContent = stats.pts || 0;
+      if (accEl) {
+        const acc = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+        accEl.textContent = `${acc}%`;
+      }
+      if (streakEl) streakEl.textContent = stats.streak || 0;
+    }
+    updateScoreboardUI();
+
+    const resetScoreBtn = $("#score-reset-btn");
+    if (resetScoreBtn) {
+      resetScoreBtn.addEventListener("click", () => {
+        if (confirm("Reset your study score and accuracy stats?")) {
+          localStorage.removeItem("ip-quiz-stats");
+          updateScoreboardUI();
+          showToast("Study statistics reset", "info");
+        }
+      });
+    }
+
+    function updateProviderBadge() {
+      if (providerLabel) {
+        const provName = aiSettings.provider === "gemini" ? "Gemini" : (aiSettings.provider === "openai" ? "OpenAI" : "Offline Workspace");
+        const status = aiSettings.apiKey ? "🔑 Configured" : "⚡ Ready";
+        providerLabel.textContent = `Provider: ${provName} (${status})`;
+      }
+    }
+    updateProviderBadge();
+
+    // Context Updater
+    updateAssistantContext = function (filePath) {
+      if (contextLabel) {
+        const fileName = filePath.split("/").pop();
+        contextLabel.textContent = `Active File: ${fileName}`;
+        contextLabel.title = filePath;
+      }
+    };
+
+    // Toggle drawer
+    if (toggleBtn && drawer) {
+      toggleBtn.addEventListener("click", () => {
+        drawer.classList.toggle("hidden");
+        if (!drawer.classList.contains("hidden") && input) {
+          input.focus();
+        }
+      });
+    }
+
+    if (closeBtn && drawer) {
+      closeBtn.addEventListener("click", () => {
+        drawer.classList.add("hidden");
+      });
+    }
+
+    // Clear Chat
+    if (clearBtn && chatBody) {
+      clearBtn.addEventListener("click", () => {
+        history = [];
+        chatBody.innerHTML = `
+          <div class="assistant-welcome-msg">
+            <div class="welcome-sparkle">✨</div>
+            <h3>Welcome to your A2UI Assistant</h3>
+            <p>I can quiz you on your notes, create interactive flashcards, run live code playgrounds, and answer technical interview questions using Gemini or OpenAI.</p>
+          </div>
+        `;
+        showToast("Chat history reset", "info");
+      });
+    }
+
+    // Settings Modal
+    if (settingsBtn && settingsModal) {
+      settingsBtn.addEventListener("click", () => {
+        if (providerSelect) providerSelect.value = aiSettings.provider;
+        if (apiKeyInput) apiKeyInput.value = aiSettings.apiKey;
+        if (modelInput) modelInput.value = aiSettings.model;
+        settingsModal.classList.remove("hidden");
+      });
+
+      const closeModal = () => settingsModal.classList.add("hidden");
+      if (modalCloseBtn) modalCloseBtn.addEventListener("click", closeModal);
+      if (modalCancelBtn) modalCancelBtn.addEventListener("click", closeModal);
+
+      if (modalSaveBtn) {
+        modalSaveBtn.addEventListener("click", () => {
+          aiSettings.provider = providerSelect.value;
+          aiSettings.apiKey = apiKeyInput.value.trim();
+          aiSettings.model = modelInput.value.trim() || (aiSettings.provider === "gemini" ? "gemini-2.5-flash" : "gpt-4o-mini");
+
+          localStorage.setItem("ip-ai-provider", aiSettings.provider);
+          localStorage.setItem("ip-ai-key", aiSettings.apiKey);
+          localStorage.setItem("ip-ai-model", aiSettings.model);
+
+          updateProviderBadge();
+          closeModal();
+          showToast("AI Settings saved successfully!", "success");
+        });
+      }
+    }
+
+    // Quick Action Chips
+    quickChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const action = chip.dataset.action;
+        let promptText = "";
+        const file = state.currentFile ? `for ${state.currentFile.split("/").pop()}` : "for JavaScript/TypeScript";
+
+        if (action === "quiz") {
+          promptText = `Generate an interactive multiple-choice technical interview quiz ${file}.`;
+        } else if (action === "flashcard") {
+          promptText = `Generate 3 interactive interview flashcards with key takeaways ${file}.`;
+        } else if (action === "playground") {
+          promptText = `Generate an interactive code challenge and playground ${file}.`;
+        } else if (action === "explain") {
+          promptText = `Explain the core concepts, runtime mechanics, and common interview questions ${file}.`;
+        }
+
+        if (drawer.classList.contains("hidden")) {
+          drawer.classList.remove("hidden");
+        }
+        sendAssistantMessage(promptText);
+      });
+    });
+
+    // Handle Form Submit
+    if (form && input) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const query = input.value.trim();
+        if (!query) return;
+        input.value = "";
+        sendAssistantMessage(query);
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          form.dispatchEvent(new Event("submit"));
+        }
+      });
+    }
+
+    // ─── Send Message & Process A2UI Payload ───
+    async function sendAssistantMessage(query) {
+      // Remove welcome message if present
+      const welcome = chatBody.querySelector(".assistant-welcome-msg");
+      if (welcome) welcome.remove();
+
+      // Append user bubble
+      appendUserMessage(query);
+
+      // Loading bubble
+      const loadingEl = document.createElement("div");
+      loadingEl.className = "chat-msg assistant";
+      loadingEl.innerHTML = `
+        <div class="loading-spinner" style="padding: 10px 14px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-light); width: fit-content;">
+          <div class="spinner" style="width: 14px; height: 14px;"></div>
+          <span style="font-size: 12px;">AI Assistant generating A2UI components...</span>
+        </div>
+      `;
+      chatBody.appendChild(loadingEl);
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      try {
+        const response = await fetch("/api/assistant/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query,
+            currentFilePath: state.currentFile,
+            conversationHistory: history,
+            provider: aiSettings.provider,
+            apiKey: aiSettings.apiKey,
+            model: aiSettings.model,
+          }),
+        });
+
+        loadingEl.remove();
+
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}`);
+        }
+
+        const payload = await response.json();
+        renderA2UIResponse(payload);
+
+        // Update history
+        history.push({ role: "user", content: query });
+        history.push({ role: "assistant", content: JSON.stringify(payload) });
+      } catch (err) {
+        loadingEl.remove();
+        const errEl = document.createElement("div");
+        errEl.className = "chat-msg assistant";
+        errEl.innerHTML = `
+          <div class="chat-bubble-assistant">
+            <div class="a2ui-text-card" style="border-color: #e74c3c; color: #e74c3c;">
+              <strong>Error:</strong> Failed to fetch assistant response (${err.message}).
+            </div>
+          </div>
+        `;
+        chatBody.appendChild(errEl);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+    }
+
+    function appendUserMessage(text) {
+      const msg = document.createElement("div");
+      msg.className = "chat-msg user";
+      msg.innerHTML = `<div class="chat-bubble-user">${escapeHtml(text)}</div>`;
+      chatBody.appendChild(msg);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // ─── A2UI Declarative Component Renderer ───
+    function renderA2UIResponse(payload) {
+      const assistantMsg = document.createElement("div");
+      assistantMsg.className = "chat-msg assistant";
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble-assistant";
+
+      const components = payload.components || [
+        { type: "text", content: typeof payload === "string" ? payload : JSON.stringify(payload) },
+      ];
+
+      components.forEach((comp) => {
+        if (comp.type === "text") {
+          bubble.appendChild(createA2UIText(comp));
+        } else if (comp.type === "quiz") {
+          bubble.appendChild(createA2UIQuiz(comp));
+        } else if (comp.type === "flashcard") {
+          bubble.appendChild(createA2UIFlashcard(comp));
+        } else if (comp.type === "playground") {
+          bubble.appendChild(createA2UIPlayground(comp));
+        } else if (comp.type === "progress") {
+          bubble.appendChild(createA2UIProgress(comp));
+        }
+      });
+
+      assistantMsg.appendChild(bubble);
+      chatBody.appendChild(assistantMsg);
+
+      // Highlight code blocks
+      if (window.Prism) {
+        Prism.highlightAllUnder(assistantMsg);
+      }
+
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // Component: Text
+    function createA2UIText(comp) {
+      const card = document.createElement("div");
+      card.className = "a2ui-text-card";
+      if (window.marked) {
+        card.innerHTML = marked.parse(comp.content || "");
+      } else {
+        card.textContent = comp.content || "";
+      }
+
+      // Enhance code blocks with copy buttons
+      card.querySelectorAll("pre").forEach((pre) => {
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "quick-chip";
+        copyBtn.style.cssText = "position:absolute; right:8px; top:8px; font-size:10.5px; padding:2px 8px; opacity:0.8;";
+        copyBtn.textContent = "📋 Copy";
+        pre.style.position = "relative";
+
+        copyBtn.addEventListener("click", () => {
+          const code = pre.querySelector("code")?.textContent || pre.textContent;
+          navigator.clipboard.writeText(code).then(() => {
+            copyBtn.textContent = "✓ Copied!";
+            setTimeout(() => (copyBtn.textContent = "📋 Copy"), 2000);
+            showToast("Code copied to clipboard!", "info");
+          });
+        });
+
+        pre.appendChild(copyBtn);
+      });
+
+      return card;
+    }
+
+    // Component: Quiz
+    function createA2UIQuiz(comp) {
+      const card = document.createElement("div");
+      card.className = "a2ui-quiz-card";
+
+      const header = document.createElement("div");
+      header.className = "a2ui-quiz-header";
+      header.innerHTML = `
+        <span class="a2ui-quiz-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+          ${escapeHtml(comp.title || "Interview Quiz")}
+        </span>
+      `;
+      card.appendChild(header);
+
+      const q = document.createElement("div");
+      q.className = "a2ui-quiz-question";
+      q.textContent = comp.question || "";
+      card.appendChild(q);
+
+      if (comp.code) {
+        const codeEl = document.createElement("pre");
+        codeEl.className = "a2ui-quiz-code";
+        codeEl.innerHTML = `<code class="language-javascript">${escapeHtml(comp.code)}</code>`;
+        card.appendChild(codeEl);
+      }
+
+      const optionsContainer = document.createElement("div");
+      optionsContainer.className = "a2ui-quiz-options";
+
+      (comp.options || []).forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = "a2ui-option-btn";
+        btn.innerHTML = `
+          <span class="a2ui-option-id">${opt.id}.</span>
+          <span class="a2ui-option-text">${escapeHtml(opt.text)}</span>
+        `;
+
+        btn.addEventListener("click", () => {
+          // Disable all buttons in this quiz
+          optionsContainer.querySelectorAll(".a2ui-option-btn").forEach((b) => (b.disabled = true));
+
+          const isCorrect = opt.id === comp.correctOptionId;
+
+          // 1. Update stats & scoreboard
+          const stats = getQuizStats();
+          stats.total += 1;
+          if (isCorrect) {
+            stats.correct += 1;
+            stats.pts += 10;
+            stats.streak += 1;
+          } else {
+            stats.streak = 0;
+          }
+
+          const topicKey = comp.title || (state.currentFile ? state.currentFile.split("/").pop() : "JavaScript");
+          if (!stats.topicMastery[topicKey]) {
+            stats.topicMastery[topicKey] = { correct: 0, total: 0 };
+          }
+          stats.topicMastery[topicKey].total += 1;
+          if (isCorrect) stats.topicMastery[topicKey].correct += 1;
+
+          localStorage.setItem("ip-quiz-stats", JSON.stringify(stats));
+          updateScoreboardUI();
+
+          // 2. Button feedback
+          if (isCorrect) {
+            btn.classList.add("selected-correct");
+            showToast("Correct Answer! +10 Points earned", "success");
+          } else {
+            btn.classList.add("selected-wrong");
+            // Highlight the correct one
+            optionsContainer.querySelectorAll(".a2ui-option-btn").forEach((b) => {
+              if (b.querySelector(".a2ui-option-id").textContent.startsWith(comp.correctOptionId)) {
+                b.classList.add("selected-correct");
+              }
+            });
+            showToast("Incorrect answer. Review the explanation!", "error");
+          }
+
+          // 3. Explanation
+          if (comp.explanation) {
+            const exp = document.createElement("div");
+            exp.className = "a2ui-quiz-explanation";
+            exp.innerHTML = `<span style="display:inline-flex; align-items:center; gap:4px; font-weight:700; color:var(--accent-primary);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Explanation:</span> ${escapeHtml(comp.explanation)}`;
+            card.appendChild(exp);
+          }
+
+          // 4. INSTANT Quiz Progress Banner
+          const topicStats = stats.topicMastery[topicKey];
+          const topicPct = Math.round((topicStats.correct / topicStats.total) * 100);
+          const overallAcc = Math.round((stats.correct / stats.total) * 100);
+
+          const progressBanner = document.createElement("div");
+          progressBanner.className = "a2ui-quiz-progress-banner";
+          progressBanner.innerHTML = `
+            <div class="a2ui-qpb-header">
+              <span class="a2ui-qpb-tag ${isCorrect ? 'correct' : 'wrong'}">
+                ${isCorrect ? '✓ +10 Points Earned' : '✕ Review Recommended'}
+              </span>
+              <span style="font-size:11px; font-weight:700; color:var(--accent-primary);">
+                ${topicPct}% Topic Mastery
+              </span>
+            </div>
+            <div class="a2ui-qpb-bar-bg">
+              <div class="a2ui-qpb-bar-fill" style="width: ${topicPct}%;"></div>
+            </div>
+            <div class="a2ui-qpb-stats">
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> Acc: ${overallAcc}%</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Streak: ${stats.streak}</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg> Score: ${stats.pts} Pts</span>
+            </div>
+            <div class="a2ui-qpb-actions">
+              <button class="a2ui-btn-next-quiz">
+                <span>Next Question</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+          `;
+
+          progressBanner.querySelector(".a2ui-btn-next-quiz").addEventListener("click", () => {
+            sendAssistantMessage(`Generate another technical interview quiz question for ${topicKey}.`);
+          });
+
+          card.appendChild(progressBanner);
+          chatBody.scrollTop = chatBody.scrollHeight;
+        });
+
+        optionsContainer.appendChild(btn);
+      });
+
+      card.appendChild(optionsContainer);
+      return card;
+    }
+
+    // Component: Flashcard
+    function createA2UIFlashcard(comp) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "a2ui-text-card";
+      wrapper.style.padding = "10px";
+
+      const cards = comp.cards || [];
+      let currentIndex = 0;
+
+      const title = document.createElement("div");
+      title.style.cssText = "display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--accent-primary); margin-bottom:8px;";
+      title.innerHTML = `
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        <span>Flashcards: ${escapeHtml(comp.topic || "Review")}</span>
+      `;
+      wrapper.appendChild(title);
+
+      const container = document.createElement("div");
+      container.className = "a2ui-flashcard-container";
+
+      function renderCard(idx) {
+        const item = cards[idx] || { front: "No cards", back: "No cards", keyTakeaway: "" };
+        container.innerHTML = `
+          <div class="a2ui-flashcard-inner" id="fc-inner">
+            <div class="a2ui-card-front">
+              <div style="font-weight:600; font-size:14px; margin-bottom:6px;">${escapeHtml(item.front)}</div>
+              <span class="a2ui-card-hint">Click to flip card</span>
+            </div>
+            <div class="a2ui-card-back">
+              <div style="font-size:13px; line-height:1.5;">${escapeHtml(item.back)}</div>
+              ${item.keyTakeaway ? `
+                <div class="a2ui-card-takeaway" style="display:flex; align-items:center; gap:4px; margin-top:8px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>${escapeHtml(item.keyTakeaway)}</span>
+                </div>
+              ` : ""}
+            </div>
+          </div>
+        `;
+
+        const inner = container.querySelector("#fc-inner");
+        inner.addEventListener("click", () => inner.classList.toggle("is-flipped"));
+      }
+
+      renderCard(0);
+      wrapper.appendChild(container);
+
+      if (cards.length > 1) {
+        const controls = document.createElement("div");
+        controls.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-top:8px;";
+
+        const prevBtn = document.createElement("button");
+        prevBtn.className = "quick-chip";
+        prevBtn.textContent = "← Prev";
+
+        const counter = document.createElement("span");
+        counter.style.cssText = "font-size:11px; color:var(--text-muted);";
+        counter.textContent = `1 / ${cards.length}`;
+
+        const nextBtn = document.createElement("button");
+        nextBtn.className = "quick-chip";
+        nextBtn.textContent = "Next →";
+
+        prevBtn.addEventListener("click", () => {
+          if (currentIndex > 0) {
+            currentIndex--;
+            renderCard(currentIndex);
+            counter.textContent = `${currentIndex + 1} / ${cards.length}`;
+          }
+        });
+
+        nextBtn.addEventListener("click", () => {
+          if (currentIndex < cards.length - 1) {
+            currentIndex++;
+            renderCard(currentIndex);
+            counter.textContent = `${currentIndex + 1} / ${cards.length}`;
+          }
+        });
+
+        controls.appendChild(prevBtn);
+        controls.appendChild(counter);
+        controls.appendChild(nextBtn);
+        wrapper.appendChild(controls);
+      }
+
+      return wrapper;
+    }
+
+    // Component: Code Playground
+    function createA2UIPlayground(comp) {
+      const card = document.createElement("div");
+      card.className = "a2ui-playground-card";
+
+      card.innerHTML = `
+        <div class="a2ui-pg-header">
+          <span class="a2ui-pg-title" style="display:inline-flex; align-items:center; gap:5px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>${escapeHtml(comp.title || "Code Challenge")}</span>
+          </span>
+          <span class="a2ui-quiz-badge">${comp.language || "javascript"}</span>
+        </div>
+        <p style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">${escapeHtml(comp.instructions || "")}</p>
+        <textarea class="a2ui-pg-editor">${escapeHtml(comp.starterCode || "")}</textarea>
+        <div class="a2ui-pg-actions">
+          <button class="a2ui-btn-run">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Run Code</span>
+          </button>
+        </div>
+        <div class="a2ui-pg-output">Ready to execute...</div>
+      `;
+
+      const editor = card.querySelector(".a2ui-pg-editor");
+      const runBtn = card.querySelector(".a2ui-btn-run");
+      const output = card.querySelector(".a2ui-pg-output");
+
+      runBtn.addEventListener("click", () => {
+        output.textContent = "Executing...\n";
+        const logs = [];
+
+        // Sandboxed logger
+        const originalLog = console.log;
+        console.log = (...args) => {
+          logs.push(args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" "));
+        };
+
+        try {
+          // Execute in isolated function context
+          const fn = new Function(editor.value);
+          fn();
+          output.textContent = logs.length ? logs.join("\n") : "Code executed successfully with 0 logs.";
+          output.style.color = "#a6e22e";
+          showToast("Code executed successfully!", "success");
+        } catch (err) {
+          output.textContent = `Error: ${err.message}`;
+          output.style.color = "#f92672";
+        } finally {
+          console.log = originalLog;
+        }
+      });
+
+      return card;
+    }
+
+    // Component: Progress
+    function createA2UIProgress(comp) {
+      const card = document.createElement("div");
+      card.className = "a2ui-progress-card";
+
+      const score = Math.min(100, Math.max(0, comp.readinessScore || 70));
+      card.innerHTML = `
+        <div class="a2ui-progress-header">
+          <span style="display:inline-flex; align-items:center; gap:5px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span>Readiness: ${escapeHtml(comp.topic || "JavaScript")}</span>
+          </span>
+          <span style="color:var(--accent-primary);">${score}%</span>
+        </div>
+        <div class="a2ui-progress-bar-bg">
+          <div class="a2ui-progress-bar-fill" style="width: ${score}%;"></div>
+        </div>
+        <div style="font-size:11.5px; color:var(--text-secondary);">
+          <strong>Level:</strong> ${escapeHtml(comp.masteryLevel || "Intermediate")}
+          ${(comp.recommendations || []).length ? `<br><strong>Key Next Steps:</strong> ${escapeHtml(comp.recommendations.join(", "))}` : ""}
+        </div>
+      `;
+      return card;
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   // ─── Start ───
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
@@ -1193,3 +1965,4 @@
     init();
   }
 })();
+

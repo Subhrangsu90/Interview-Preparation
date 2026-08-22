@@ -267,6 +267,357 @@ app.get("/api/search", (req, res) => {
 	res.json({ query, results });
 });
 
+// ─── API: Assistant Config & Key Verification ───
+app.get("/api/assistant/config", (req, res) => {
+	const hasGeminiEnv = Boolean(process.env.GEMINI_API_KEY);
+	const hasOpenAIEnv = Boolean(process.env.OPENAI_API_KEY);
+	res.json({
+		hasGeminiEnv,
+		hasOpenAIEnv,
+		defaultProvider: hasGeminiEnv ? "gemini" : (hasOpenAIEnv ? "openai" : "mock")
+	});
+});
+
+// ─── Intelligent A2UI Assistant Engine (Gemini & OpenAI + Local Fallback) ───
+const A2UI_SYSTEM_PROMPT = `
+You are the AI Technical Interview Coach & Coding Assistant for an engineering candidate.
+You are embedded inside a personal study workspace containing JavaScript, TypeScript, and software engineering notes.
+
+CRITICAL PROTOCOL REQUIREMENT - A2UI (Agent-to-User Interface):
+You MUST respond with a valid JSON object matching the A2UI Schema below.
+Do not output markdown backticks wrapping the whole response if possible, output clean JSON.
+
+A2UI JSON SCHEMA:
+{
+  "type": "a2ui_payload",
+  "components": [
+    // 1. Text Component: For conversational answers, explanations, deep dives, code breakdowns.
+    {
+      "type": "text",
+      "content": "Markdown formatted explanation, tips, interview traps, and MDN references."
+    },
+    // 2. Quiz Component: When user asks for a quiz, question, test, or practice.
+    {
+      "type": "quiz",
+      "title": "Topic Quiz Title",
+      "question": "Question text...",
+      "code": "// optional snippet if testing output or bug finding",
+      "options": [
+        { "id": "A", "text": "Option A text" },
+        { "id": "B", "text": "Option B text" },
+        { "id": "C", "text": "Option C text" },
+        { "id": "D", "text": "Option D text" }
+      ],
+      "correctOptionId": "B",
+      "explanation": "Detailed rationale on why B is correct and common interview misconceptions."
+    },
+    // 3. Flashcard Component: When user asks for flashcards, quick recall, revision cards.
+    {
+      "type": "flashcard",
+      "topic": "Topic Name",
+      "cards": [
+        {
+          "front": "Concept or Question?",
+          "back": "Clear concise answer / mental model.",
+          "keyTakeaway": "1-sentence interview pro-tip."
+        }
+      ]
+    },
+    // 4. Code Playground Component: When user asks for coding challenge, playground, implement a function.
+    {
+      "type": "playground",
+      "title": "Coding Challenge Title",
+      "instructions": "Task description & constraints...",
+      "language": "javascript",
+      "starterCode": "function solve(arr) {\\n  // Write solution\\n}\\n\\nconsole.log(solve([1, 2, 3]));",
+      "testCases": [
+        { "input": "solve([1, 2, 3])", "expected": "[3, 2, 1]" }
+      ]
+    },
+    // 5. Progress Tracker Component: To summarize readiness on the topic.
+    {
+      "type": "progress",
+      "topic": "Topic Name",
+      "masteryLevel": "Intermediate",
+      "readinessScore": 80,
+      "recommendations": ["Review Closures", "Practice Event Loop microtasks"]
+    }
+  ]
+}
+
+Instructions:
+- Use both the provided workspace notes/code context AND your deep software engineering knowledge base (MDN, ECMAScript specs, modern best practices).
+- When asked a question, provide a thorough, articulate answer using the "text" component.
+- If the user asks for a quiz, practice, flashcards, or coding challenge, include the respective A2UI component in "components".
+`;
+
+// Helper: Smart Local Mock Generator (when no API key is provided)
+function generateSmartMockA2UI(query, fileContext, fileName) {
+	const q = (query || "").toLowerCase();
+	const baseName = fileName ? path.basename(fileName) : "JavaScript";
+	const snippet = fileContext ? fileContext.substring(0, 300) : "";
+
+	if (q.includes("quiz") || q.includes("test") || q.includes("question")) {
+		return {
+			type: "a2ui_payload",
+			components: [
+				{
+					type: "text",
+					content: `### Interview Quiz: ${baseName}\nHere is a targeted interview question based on **${baseName}** and core JavaScript runtime principles:`
+				},
+				{
+					type: "quiz",
+					title: `Technical Quiz: ${baseName}`,
+					question: fileContext 
+						? `Considering the concepts in \`${baseName}\`, what is the primary behavior of execution context & scope in this pattern?`
+						: `What is the output of \`console.log(1 + +'2' + '2')\` in JavaScript?`,
+					code: fileContext 
+						? `${snippet.slice(0, 180)}...`
+						: `console.log(1 + +'2' + '2');\nconsole.log(typeof NaN);`,
+					options: [
+						{ id: "A", "text": "Output is '32' and 'number'" },
+						{ id: "B", "text": "Output is '122' and 'NaN'" },
+						{ id: "C", "text": "Output is '14' and 'undefined'" },
+						{ id: "D", "text": "TypeError: Invalid unary operator" }
+					],
+					correctOptionId: "A",
+					explanation: "The unary `+` before `'2'` coerces it into number `2`. `1 + 2 = 3`. Then `3 + '2'` coerces to string concatenation `'32'`. `typeof NaN` is `'number'` (IEEE 754 float)."
+				},
+				{
+					type: "progress",
+					topic: baseName,
+					masteryLevel: "Practicing",
+					readinessScore: 70,
+					recommendations: ["Type Coercion rules", "Implicit vs Explicit casting", "Equality comparisons (== vs ===)"]
+				}
+			]
+		};
+	}
+
+	if (q.includes("flashcard") || q.includes("card") || q.includes("revision")) {
+		return {
+			type: "a2ui_payload",
+			components: [
+				{
+					type: "text",
+					content: `### Flashcards: ${baseName}\nFlip through these key interview memory cards for **${baseName}**:`
+				},
+				{
+					type: "flashcard",
+					topic: baseName,
+					cards: [
+						{
+							front: `What is the core problem solved in ${baseName}?`,
+							back: "It manages state, scope encapsulation, or asynchronous operations cleanly while preventing memory leaks and race conditions.",
+							keyTakeaway: "Always explain both the 'How it works' and 'Why to use it' in interviews."
+						},
+						{
+							front: "What is the difference between Microtasks and Macrotasks in the Event Loop?",
+							back: "Microtasks (Promises, queueMicrotask, MutationObserver) run immediately after the current script and before the next rendering or Macrotask (setTimeout, setInterval, I/O).",
+							keyTakeaway: "Microtask queue must be completely emptied before moving to the next macrotask."
+						},
+						{
+							front: "What is Temporal Dead Zone (TDZ)?",
+							back: "The phase between entering the block scope where let/const is bound and the actual declaration line where it is initialized. Accessing it triggers ReferenceError.",
+							keyTakeaway: "let & const are hoisted, but not initialized."
+						}
+					]
+				}
+			]
+		};
+	}
+
+	if (q.includes("playground") || q.includes("code") || q.includes("challenge") || q.includes("solve")) {
+		return {
+			type: "a2ui_payload",
+			components: [
+				{
+					type: "text",
+					content: `### Interactive Code Challenge: ${baseName}\nTry writing the implementation below and click **Run Code** to test it against test cases:`
+				},
+				{
+					type: "playground",
+					title: `Interview Challenge: Flatten Nested Array`,
+					instructions: "Write a function `flatten(arr)` that flattens a deeply nested array of arbitrary depth without using `Array.prototype.flat()`.",
+					language: "javascript",
+					starterCode: `function flatten(arr) {
+  // Your code here
+  const result = [];
+  for (const item of arr) {
+    if (Array.isArray(item)) {
+      result.push(...flatten(item));
+    } else {
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+console.log(flatten([1, [2, [3, [4]], 5]]));`,
+					testCases: [
+						{ input: "flatten([1, [2, 3], 4])", expected: "[1, 2, 3, 4]" },
+						{ input: "flatten([[1], [[2]], 3])", expected: "[1, 2, 3]" }
+					]
+				}
+			]
+		};
+	}
+
+	// Default assistant response
+	return {
+		type: "a2ui_payload",
+		components: [
+			{
+				type: "text",
+				content: `### Assistant Insights: ${baseName}\n\n` +
+					(fileContext 
+						? `I analyzed your current file **${baseName}** from the workspace.\n\n` +
+						  `**Key Architectural Points:**\n` +
+						  `1. **Lexical Scope & Execution Context:** Variables are bound within their respective blocks.\n` +
+						  `2. **Performance & Memory:** Avoid unnecessary object allocations inside loops.\n` +
+						  `3. **Interview Question Angle:** Interviewers often ask about edge cases (null vs undefined, coercion, async timing).\n\n` +
+						  `> *Pro-Tip:* Click **"Quiz File"** or **"Flashcards"** below to test yourself on this exact file!`
+						: `Welcome to your Interview Preparation Assistant! Ask me any concept, or click one of the quick actions below to generate a live quiz, flashcards, or code challenge.`)
+			}
+		]
+	};
+}
+
+// ─── Assistant Chat Handler (Gemini & OpenAI + Hybrid RAG) ───
+app.post("/api/assistant/chat", async (req, res) => {
+	const { query, currentFilePath, conversationHistory, provider, apiKey, model } = req.body;
+
+	if (!query && !currentFilePath) {
+		return res.status(400).json({ error: "Missing query or file context" });
+	}
+
+	// Read local workspace file context if available
+	let fileContext = "";
+	let fileName = "";
+	if (currentFilePath) {
+		const fullPath = path.join(REPO_ROOT, currentFilePath);
+		const resolved = path.resolve(fullPath);
+		if (resolved.startsWith(REPO_ROOT) && fs.existsSync(resolved)) {
+			try {
+				fileContext = fs.readFileSync(resolved, "utf-8");
+				fileName = path.basename(resolved);
+			} catch {
+				/* skip unreadable */
+			}
+		}
+	}
+
+	const selectedProvider = provider || (process.env.GEMINI_API_KEY ? "gemini" : (process.env.OPENAI_API_KEY ? "openai" : "mock"));
+	const activeKey = apiKey || (selectedProvider === "gemini" ? process.env.GEMINI_API_KEY : process.env.OPENAI_API_KEY);
+
+	// Fallback to local intelligent A2UI engine if no key is configured
+	if (!activeKey || selectedProvider === "mock") {
+		const mockResponse = generateSmartMockA2UI(query, fileContext, fileName);
+		return res.json(mockResponse);
+	}
+
+	try {
+		const userPromptWithContext = `
+USER QUERY:
+${query || "Analyze this file and provide interview coaching, quiz, or flashcards."}
+
+CURRENT ACTIVE FILE IN WORKSPACE:
+Filename: ${fileName || "None"}
+File Content:
+${fileContext ? fileContext.substring(0, 4000) : "No file open"}
+`;
+
+		if (selectedProvider === "gemini") {
+			const geminiModel = model || "gemini-2.5-flash";
+			const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${activeKey}`;
+			
+			const payload = {
+				contents: [
+					{
+						role: "user",
+						parts: [
+							{ text: A2UI_SYSTEM_PROMPT + "\n\n" + userPromptWithContext }
+						]
+					}
+				],
+				generationConfig: {
+					responseMimeType: "application/json",
+					temperature: 0.4
+				}
+			};
+
+			const response = await fetch(url, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload)
+			});
+
+			if (!response.ok) {
+				const errorData = await response.text();
+				throw new Error(`Gemini API error (${response.status}): ${errorData}`);
+			}
+
+			const data = await response.json();
+			const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+			if (!candidateText) {
+				throw new Error("No response generated by Gemini");
+			}
+
+			const parsed = JSON.parse(candidateText);
+			return res.json(parsed);
+
+		} else if (selectedProvider === "openai") {
+			const openaiModel = model || "gpt-4o-mini";
+			const url = "https://api.openai.com/v1/chat/completions";
+
+			const isReasoningModel = openaiModel.startsWith("o1") || openaiModel.startsWith("o3");
+			const systemRole = isReasoningModel ? "developer" : "system";
+
+			const messages = [
+				{ role: systemRole, content: A2UI_SYSTEM_PROMPT },
+				...(conversationHistory || []).slice(-4),
+				{ role: "user", content: userPromptWithContext }
+			];
+
+			const requestBody = {
+				model: openaiModel,
+				messages,
+				response_format: { type: "json_object" }
+			};
+
+			const response = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${activeKey}`
+				},
+				body: JSON.stringify(requestBody)
+			});
+
+			if (!response.ok) {
+				const errorData = await response.text();
+				throw new Error(`OpenAI API error (${response.status}): ${errorData}`);
+			}
+
+			const data = await response.json();
+			const content = data.choices?.[0]?.message?.content;
+			const parsed = JSON.parse(content);
+			return res.json(parsed);
+		}
+
+	} catch (err) {
+		console.error("AI Assistant Provider error:", err);
+		// Graceful fallback to smart local generator with error alert
+		const fallback = generateSmartMockA2UI(query, fileContext, fileName);
+		fallback.components.unshift({
+			type: "text",
+			content: `> ⚠️ **API Notice:** ${err.message}. Showing local offline study insights instead.`
+		});
+		return res.json(fallback);
+	}
+});
+
+
 // ─── File watcher SSE endpoint ───
 app.get("/api/watch", (req, res) => {
 	res.writeHead(200, {
