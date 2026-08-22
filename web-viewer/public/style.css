@@ -325,7 +325,6 @@ body {
   width: 34px;
   height: 34px;
   border: 1.5px solid var(--border-light);
-  border-radius: var(--radius-sm);
   background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
@@ -834,7 +833,6 @@ body {
   padding: 0;
   background: #1e1e2e;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   position: relative;
@@ -935,7 +933,6 @@ body {
 .rendered-content img {
   max-width: 100%;
   height: auto;
-  border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   margin: 18px 0;
   display: block;
@@ -1065,7 +1062,6 @@ body {
 .image-viewer img {
   max-width: 100%;
   max-height: 70vh;
-  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   object-fit: contain;
 }
@@ -1271,7 +1267,6 @@ body {
   gap: 2px;
   padding: 2px;
   background: var(--bg-secondary);
-  border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
   flex-shrink: 0;
 }
@@ -1468,7 +1463,6 @@ body {
 
   .vscode-container {
     height: calc(100vh - var(--header-height) - 50px);
-    border-radius: var(--radius-sm);
   }
 
   .vscode-topbar {
@@ -1917,7 +1911,6 @@ body::before {
   height: calc(100vh - var(--header-height) - 65px);
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   overflow: hidden;
   animation: fadeIn 0.3s ease;
@@ -1973,7 +1966,6 @@ body::before {
   padding: 4px 10px;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
   font-family: var(--font-reading);
   font-size: 11.5px;
   font-weight: 600;
