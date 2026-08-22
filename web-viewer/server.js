@@ -28,8 +28,8 @@ function getIgnoredSet() {
 		".DS_Store",
 		"Thumbs.db",
 		// Vercel runtime bundle metadata; not part of the workspace.
-		"__vc",
-		"__env.encrypted",
+		"___vc",
+		"___env.encrypted",
 		"scripts",
 	];
 
