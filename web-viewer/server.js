@@ -27,6 +27,9 @@ function getIgnoredSet() {
 		"package-lock.json",
 		".DS_Store",
 		"Thumbs.db",
+		// Vercel runtime bundle metadata; not part of the workspace.
+		"__vc",
+		"__env.encrypted",
 		"scripts",
 	];
 
