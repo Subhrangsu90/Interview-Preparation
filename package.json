@@ -5,10 +5,15 @@
   "description": "Interview Preparation notes with web viewer and VS Code editor",
   "scripts": {
     "start": "cd web-viewer && node server.js",
-    "dev": "vite",
+    "dev": "node scripts/dev.js",
     "build": "vite build",
     "preview": "vite preview",
     "install-viewer": "cd web-viewer && npm install"
+  },
+  "dependencies": {
+    "chokidar": "^3.6.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0"
   },
   "devDependencies": {
     "vite": "^5.4.21"

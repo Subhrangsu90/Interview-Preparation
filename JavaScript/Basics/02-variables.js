@@ -31,7 +31,6 @@
  * ============================================================
  */
 
-
 /* ============================================================
  * 🔹 SECTION 1: var
  * ============================================================
@@ -68,7 +67,6 @@ console.log("Updated Ship Name:", shipName);
 // NOTE: With `let` or `const`, doing this again would throw:
 //       SyntaxError: Identifier 'shipName' has already been declared
 
-
 /* ============================================================
  * 🔹 SECTION 2: let
  * ============================================================
@@ -98,7 +96,6 @@ captainName = "Davy Jones"; // Updating (reassigning) is allowed
 console.log("Updated Captain Name:", captainName);
 // Output: Davy Jones
 
-
 // ---------------- Block Scope Example ----------------
 // WHAT is block scope? A "block" is anything inside { } — if, for, while, etc.
 // A `let`/`const` declared inside a block ONLY exists inside that block.
@@ -113,7 +110,6 @@ console.log("Outer Captain Name:", captainName);
 // Output: Davy Jones
 // WHY? The outer captainName was never touched — the inner one
 // only lived and died inside the if-block.
-
 
 // ---------------- Loop Scope Example (let vs var) ----------------
 // WHY THIS MATTERS: This is the #1 real-world reason `let` replaced `var`.
@@ -137,7 +133,6 @@ console.log("Final value of j after loop:", j);
 // WHY? `var` is FUNCTION-scoped, not block-scoped.
 // The for-loop is just a block, so `j` "leaks" out of the loop
 // and keeps its final value (3) even after the loop finishes.
-
 
 /* ============================================================
  * 🔹 SECTION 3: const
@@ -171,7 +166,6 @@ console.log("Value of PI:", PI);
 // Output if uncommented: TypeError: Assignment to constant variable.
 // WHY? Once bound, a const variable can never point to a new value.
 
-
 // ----------------- const with Objects -----------------
 // WHY this works: `shipDetails` is a constant REFERENCE (a fixed address
 // in memory pointing to an object). The object's properties can still
@@ -194,7 +188,6 @@ console.log("Updated Ship Details:", shipDetails);
 // WHY? This tries to make `shipDetails` point to a BRAND NEW object,
 // which breaks the const rule (reassigning the reference itself).
 
-
 // ----------------- const with Arrays -----------------
 // Same rule as objects: array CONTENTS can change, but the variable
 // itself can never be reassigned to a new array.
@@ -214,7 +207,6 @@ console.log("Modified Ship Names:", shipNames);
 // shipNames = ["HMS Victory"];
 // Output if uncommented: TypeError: Assignment to constant variable.
 // WHY? This reassigns the WHOLE array reference — not allowed with const.
-
 
 /* ============================================================
  * 🔹 SECTION 4: SCOPE — Deep Explanation
@@ -295,7 +287,6 @@ console.log("Modified Ship Names:", shipNames);
  *   shadowed the outer one without changing it.)
  */
 
-
 /* ============================================================
  * 🔹 SECTION 5: TEMPORAL DEAD ZONE (TDZ) — Deep Explanation
  * ============================================================
@@ -338,6 +329,10 @@ console.log("Modified Ship Names:", shipNames);
  *   console.log(b); // ReferenceError (let: hoisted but in TDZ)
  *   let b = 2;
  *
+ * console.log(typeof undeclaredVar); // "undefined" — no error
+ * console.log(typeof tdzVar); // ReferenceError: tdzVar is not defined — TDZ variables are the ONE exception
+ * let tdzVar = 5;
+ *
  * WHY THIS IS USEFUL:
  *   The TDZ turns a silent, hard-to-spot bug (using a variable
  *   before it has a real value, which happens with var) into a
@@ -351,7 +346,6 @@ console.log("Modified Ship Names:", shipNames);
  *     var          -> usable immediately, value = undefined
  *     let / const  -> NOT usable at all until declared (TDZ)
  */
-
 
 /* ============================================================
  * 🔹 SECTION 6: HOISTING — Deep Explanation
@@ -407,7 +401,6 @@ console.log("Modified Ship Names:", shipNames);
  *   shipName = "Black Pearl"; // <-- assignment happens here (execution phase)
  */
 
-
 /* ============================================================
  * 🔹 SECTION 7: COMPARISON TABLE
  * ============================================================
@@ -424,7 +417,6 @@ console.log("Modified Ship Names:", shipNames);
  *  Introduced in          | ES1 (1997)    | ES6 (2015)     | ES6 (2015)
  *  Recommended usage       | Avoid (legacy)| Use for values that change | Use by default for everything else
  */
-
 
 /* ============================================================
  * 🔹 SECTION 8: WHEN TO USE WHAT (Best Practice)

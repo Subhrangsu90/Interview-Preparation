@@ -9,7 +9,9 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
-    port: 3000,
+    // Express serves the API on 3000. Keep Vite on a separate port so API
+    // requests do not proxy back into Vite and recurse indefinitely.
+    port: 5173,
     proxy: {
       "/api": {
         target: "http://localhost:3000",

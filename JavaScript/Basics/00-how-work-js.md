@@ -254,6 +254,95 @@ They don't. Primitives (numbers, strings, booleans) are copied — the function 
 **"Setting a variable to `null` immediately frees its memory."**
 Not immediately. It removes the last reference, making the object _eligible_ for garbage collection — but the actual reclaiming happens later, whenever the garbage collector next runs.
 
-## 9. The one-paragraph summary
+## 9. `var` vs `let` vs `const` — and the Temporal Dead Zone
+
+We touched on hoisting differences back in section 4, but this deserves its own close look — it's one of the most common sources of confusing bugs, and it all comes down to what the creation phase does with each keyword.
+
+### Scope: function vs block
+
+`var` is **function-scoped**. It doesn't care about `{ }` blocks — only function boundaries (or the global scope) contain it.
+
+```js
+if (true) {
+	var x = 10;
+}
+console.log(x); // 10 — leaked right out of the if-block
+```
+
+`let` and `const` are **block-scoped**. Any `{ }` — an `if`, a `for`, a bare block — creates a new boundary they can't escape.
+
+```js
+if (true) {
+	let y = 10;
+}
+console.log(y); // ReferenceError: y is not defined
+```
+
+### Redeclaration and reassignment
+
+| Keyword | Redeclare in same scope? | Reassign?      |
+| ------- | ------------------------ | -------------- |
+| `var`   | Yes                      | Yes            |
+| `let`   | No (SyntaxError)         | Yes            |
+| `const` | No (SyntaxError)         | No (TypeError) |
+
+One nuance worth flagging: `const` doesn't make a value immutable — it makes the _binding_ immutable. You can't point `const obj` at a different object, but you can still mutate what it points to:
+
+```js
+const obj = { count: 1 };
+obj.count = 2; // fine — the object is mutated, not reassigned
+obj = {}; // TypeError — this IS a reassignment
+```
+
+That's the same stack-vs-heap split from section 3 showing up again: `const` freezes the reference sitting on the stack, not the data sitting in the heap.
+
+### How each one behaves during the creation phase
+
+This is the part that actually explains _why_ they behave differently, tying straight back into hoisting from section 4:
+
+- **`var`** — hoisted and immediately initialized to `undefined`. It's fully usable (if empty) from the very top of its scope.
+- **`function`** — hoisted with its entire body attached, as covered earlier.
+- **`let` and `const`** — hoisted, but _not_ initialized. The engine reserves the name in memory but refuses to let you touch it until execution actually reaches its declaration line.
+
+That gap — between the variable existing in memory and the variable becoming accessible — is the **Temporal Dead Zone (TDZ)**.
+
+### The Temporal Dead Zone, precisely
+
+Every `let`/`const` variable has a TDZ that starts at the top of its scope and ends the instant its declaration line finishes executing.
+
+```js
+console.log(a); // undefined — var is hoisted AND initialized
+console.log(b); // ReferenceError — b is in the TDZ
+
+var a = 1;
+let b = 2;
+```
+
+Notice the error type: it's a `ReferenceError`, not `undefined`. That's the tell. `undefined` means "this variable exists but nobody's assigned it a value yet." A TDZ `ReferenceError` means "this variable exists in memory, but the engine is deliberately refusing to hand it to you yet."
+
+Why does the TDZ exist at all? It's a safety net. Before `let`/`const`, `var`'s "hoist to `undefined`" behavior let you silently read a variable before its logical declaration and get a nonsensical value instead of a clear error. The TDZ turns that silent bug into a loud, immediate one.
+
+```js
+function example() {
+	// TDZ for `count` starts here
+	console.log(count); // ReferenceError
+	let count = 5; // TDZ for `count` ends here
+	console.log(count); // 5 — fine now
+}
+```
+
+The TDZ isn't about _position in the file_ — it's about _execution order relative to the declaration line_. A `let` declared later in a function can still be read safely if you don't actually reach the read until after the declaration has run.
+
+### Quick summary table
+
+| Behavior                  | `var`       | `let` / `const`     |
+| ------------------------- | ----------- | ------------------- |
+| Scope                     | Function    | Block               |
+| Hoisted?                  | Yes         | Yes                 |
+| Initial value on hoist    | `undefined` | Uninitialized (TDZ) |
+| Access before declaration | `undefined` | `ReferenceError`    |
+| Redeclare in same scope   | Allowed     | SyntaxError         |
+
+## 10. The one-paragraph summary
 
 JavaScript runs on a single thread using a call stack. The engine starts by creating a global execution context and hoisting your declarations. Every function call creates a brand-new execution context — with its own private memory — that gets pushed on top of the stack and popped off the moment it returns. Primitives live and die on the stack, deterministically, the instant their context is popped; objects live in the heap and stick around for as long as something can still reach them, with the garbage collector reclaiming the rest on its own schedule. Nothing runs in parallel; everything is a controlled sequence of pushing contexts on, running them, and taking them back off. Once you can trace that push-and-pop rhythm — and follow where each value actually lives — the rest of JavaScript's quirks stop feeling like magic and start feeling like straightforward consequences of this one mechanism.
