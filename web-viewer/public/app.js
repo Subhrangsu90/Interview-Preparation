@@ -1260,7 +1260,26 @@
     const providerLabel = $("#assistant-provider-label");
     const quickChips = $$(".quick-chip");
 
+    // Refine UI Elements
+    const promptRefineBtn = $("#assistant-prompt-refine-btn");
+    const promptRefinePresets = $$(".refine-preset-btn");
+    const promptRefinePreview = $("#prompt-refine-preview");
+    const refineModeTag = $("#refine-mode-tag");
+    const refineReason = $("#refine-reason");
+    const refineContent = $("#refine-content");
+    const refineTags = $("#refine-tags");
+    const refineCloseBtn = $("#refine-close-btn");
+    const refineDiscardBtn = $("#refine-discard-btn");
+    const refineCopyBtn = $("#refine-copy-btn");
+    const refineApplyBtn = $("#refine-apply-btn");
+    const refineSendNowBtn = $("#refine-send-now-btn");
+    const charCountEl = $("#prompt-char-count");
+    const welcomeSuggestions = $$(".suggestion-chip");
+
     let history = [];
+    let selectedRefineMode = "auto";
+    let activeAbortController = null;
+    let lastUserQuery = "";
 
     // State settings
     let aiSettings = {
@@ -1289,6 +1308,7 @@
       let isDragging = false;
       let startX = 0;
       let startWidth = 0;
+      let animationFrameId = null;
 
       resizeHandle.addEventListener("mousedown", (e) => {
         if (window.innerWidth <= 768) return;
@@ -1304,8 +1324,12 @@
         if (!isDragging || window.innerWidth <= 768) return;
         const deltaX = startX - e.clientX;
         const newWidth = Math.min(window.innerWidth - 30, Math.max(360, startWidth + deltaX));
-        drawer.style.width = `${newWidth}px`;
-        drawer.classList.remove("expanded-half", "expanded-full");
+        
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(() => {
+          drawer.style.width = `${newWidth}px`;
+          drawer.classList.remove("expanded-half", "expanded-full");
+        });
       });
 
       window.addEventListener("mouseup", () => {
@@ -1422,11 +1446,19 @@
         history = [];
         chatBody.innerHTML = `
           <div class="assistant-welcome-msg">
-            <div class="welcome-sparkle">✨</div>
+            <div class="welcome-sparkle">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
             <h3>Welcome to your A2UI Assistant</h3>
             <p>I can quiz you on your notes, create interactive flashcards, run live code playgrounds, and answer technical interview questions using Gemini or OpenAI.</p>
+            <div class="welcome-prompt-suggestions" id="welcome-prompt-suggestions">
+              <button class="suggestion-chip" data-prompt="Explain JavaScript Event Loop with microtasks & macrotasks execution order">🔄 Event Loop & Microtasks</button>
+              <button class="suggestion-chip" data-prompt="Generate a senior interview quiz on Closures, Lexical Scope, and Memory Leaks">🧠 Closures & Memory Trap</button>
+              <button class="suggestion-chip" data-prompt="Create an interactive coding challenge to implement Promise.all() from scratch">⚡ Implement Promise.all</button>
+            </div>
           </div>
         `;
+        bindWelcomeSuggestions();
         showToast("Chat history reset", "info");
       });
     }
@@ -1485,22 +1517,190 @@
       });
     });
 
-    // Handle Form Submit
+    // ─── Auto-Resizing Textarea & Character Count ───
+    function autoResizeInput() {
+      if (!input) return;
+      input.style.height = "auto";
+      const newHeight = Math.min(120, Math.max(24, input.scrollHeight));
+      input.style.height = `${newHeight}px`;
+      if (charCountEl) {
+        const len = input.value.length;
+        charCountEl.textContent = `${len} char${len === 1 ? "" : "s"}`;
+      }
+    }
+
+    // ─── Welcome Suggestions Click Binding ───
+    function bindWelcomeSuggestions() {
+      $$(".suggestion-chip").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const prompt = btn.dataset.prompt;
+          if (prompt) {
+            sendAssistantMessage(prompt);
+          }
+        });
+      });
+    }
+    bindWelcomeSuggestions();
+
+    // ─── Prompt Refinement Mode Selection ───
+    promptRefinePresets.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        promptRefinePresets.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedRefineMode = btn.dataset.mode || "auto";
+        showToast(`Refine mode: ${btn.textContent.trim()}`, "info");
+
+        // If user already has text in input or preview is open, offer immediate re-refine
+        if (input && input.value.trim()) {
+          triggerPromptRefine();
+        }
+      });
+    });
+
+    // ─── Trigger Prompt Refinement Logic ───
+    async function triggerPromptRefine() {
+      const rawPrompt = (input ? input.value.trim() : "") || (state.currentFile ? `Analyze and review ${state.currentFile.split("/").pop()}` : "");
+      if (!rawPrompt) {
+        showToast("Type a prompt or open a workspace file to refine", "warning");
+        if (input) input.focus();
+        return;
+      }
+
+      if (promptRefineBtn) {
+        promptRefineBtn.classList.add("loading");
+        promptRefineBtn.innerHTML = `
+          <div class="spinner" style="width: 12px; height: 12px; border-width: 1.5px;"></div>
+          <span>Refining...</span>
+        `;
+      }
+
+      try {
+        const res = await fetch("/api/assistant/refine-prompt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: rawPrompt,
+            mode: selectedRefineMode,
+            currentFilePath: state.currentFile,
+            provider: aiSettings.provider,
+            apiKey: aiSettings.apiKey,
+            model: aiSettings.model,
+          }),
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        // Render preview banner
+        if (promptRefinePreview) {
+          if (refineModeTag) refineModeTag.textContent = `${data.mode || selectedRefineMode} mode`;
+          if (refineReason) refineReason.textContent = data.explanation || "Refined for higher technical clarity and interview rigor.";
+          if (refineContent) refineContent.textContent = data.refinedPrompt || rawPrompt;
+          
+          if (refineTags) {
+            refineTags.innerHTML = (data.tags || []).map((t) => `<span class="refine-tag-pill">${escapeHtml(t)}</span>`).join("");
+          }
+
+          promptRefinePreview.classList.remove("hidden");
+        }
+
+        showToast("Prompt successfully refined with AI ✨", "success");
+      } catch (err) {
+        console.error("Refine prompt error:", err);
+        showToast(`Prompt refine failed: ${err.message}`, "error");
+      } finally {
+        if (promptRefineBtn) {
+          promptRefineBtn.classList.remove("loading");
+          promptRefineBtn.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Refine</span>
+          `;
+        }
+      }
+    }
+
+    // Prompt Refine Action Buttons
+    if (promptRefineBtn) {
+      promptRefineBtn.addEventListener("click", () => triggerPromptRefine());
+    }
+
+    const closeRefinePreview = () => {
+      if (promptRefinePreview) promptRefinePreview.classList.add("hidden");
+    };
+
+    if (refineCloseBtn) refineCloseBtn.addEventListener("click", closeRefinePreview);
+    if (refineDiscardBtn) refineDiscardBtn.addEventListener("click", closeRefinePreview);
+
+    if (refineCopyBtn) {
+      refineCopyBtn.addEventListener("click", () => {
+        const text = refineContent ? refineContent.textContent : "";
+        if (text) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast("Refined prompt copied to clipboard!", "success");
+          });
+        }
+      });
+    }
+
+    if (refineApplyBtn) {
+      refineApplyBtn.addEventListener("click", () => {
+        const text = refineContent ? refineContent.textContent : "";
+        if (text && input) {
+          input.value = text;
+          autoResizeInput();
+          input.focus();
+          closeRefinePreview();
+          showToast("Applied to input prompt box!", "info");
+        }
+      });
+    }
+
+    if (refineSendNowBtn) {
+      refineSendNowBtn.addEventListener("click", () => {
+        const text = refineContent ? refineContent.textContent : "";
+        if (text) {
+          closeRefinePreview();
+          if (input) input.value = "";
+          autoResizeInput();
+          sendAssistantMessage(text);
+        }
+      });
+    }
+
+    // ─── Handle Form Submit & Input Listeners ───
     if (form && input) {
+      input.addEventListener("input", autoResizeInput);
+
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const query = input.value.trim();
         if (!query) return;
         input.value = "";
+        autoResizeInput();
+        closeRefinePreview();
         sendAssistantMessage(query);
       });
 
       input.addEventListener("keydown", (e) => {
+        // Submit on Enter (without Shift)
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
           form.dispatchEvent(new Event("submit"));
         }
+        // Refine on Ctrl+R or Cmd+R
+        else if ((e.ctrlKey || e.metaKey) && (e.key === "r" || e.key === "R")) {
+          e.preventDefault();
+          triggerPromptRefine();
+        }
       });
+    }
+
+    // ─── Format Time Helper ───
+    function getMessageTimestamp() {
+      const d = new Date();
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
     // ─── Send Message & Process A2UI Payload ───
@@ -1509,25 +1709,99 @@
       const welcome = chatBody.querySelector(".assistant-welcome-msg");
       if (welcome) welcome.remove();
 
+      lastUserQuery = query;
+
       // Append user bubble
       appendUserMessage(query);
 
-      // Loading bubble
+      // Cancel previous pending request if any
+      if (activeAbortController) {
+        activeAbortController.abort();
+      }
+      activeAbortController = new AbortController();
+
+      // ─── Multi-Stage Advanced Loading Card ───
       const loadingEl = document.createElement("div");
       loadingEl.className = "chat-msg assistant";
       loadingEl.innerHTML = `
-        <div class="loading-spinner" style="padding: 10px 14px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-light); width: fit-content;">
-          <div class="spinner" style="width: 14px; height: 14px;"></div>
-          <span style="font-size: 12px;">AI Assistant generating A2UI components...</span>
+        <div class="a2ui-loading-card">
+          <div class="loading-header">
+            <div class="loading-agent-status">
+              <div class="ai-pulse-orb">
+                <span class="ai-pulse-orb-sparkle">✨</span>
+              </div>
+              <div class="loading-status-text-wrap">
+                <span class="loading-phase-title" id="loading-phase-title">Analyzing Workspace Context...</span>
+                <span class="loading-phase-detail" id="loading-phase-detail">Inspecting active code AST & interview notes...</span>
+              </div>
+            </div>
+            <div class="loading-meta-controls">
+              <span class="loading-timer-badge" id="loading-timer-badge">0.0s</span>
+              <button class="loading-cancel-btn" id="loading-cancel-btn" title="Cancel Generation">Cancel</button>
+            </div>
+          </div>
+          <div class="skeleton-container">
+            <div class="skeleton-shimmer-bar skeleton-w-100"></div>
+            <div class="skeleton-shimmer-bar skeleton-w-85"></div>
+            <div class="skeleton-shimmer-bar skeleton-w-70"></div>
+            <div class="skeleton-card-preview">
+              <div class="skeleton-shimmer-bar skeleton-w-50" style="height: 10px;"></div>
+              <div class="skeleton-pill-grid">
+                <div class="skeleton-pill"></div>
+                <div class="skeleton-pill"></div>
+                <div class="skeleton-pill"></div>
+                <div class="skeleton-pill"></div>
+              </div>
+            </div>
+          </div>
         </div>
       `;
       chatBody.appendChild(loadingEl);
       chatBody.scrollTop = chatBody.scrollHeight;
 
+      // Dynamic Stages & Timer Controller
+      const startTime = performance.now();
+      const timerBadge = loadingEl.querySelector("#loading-timer-badge");
+      const phaseTitle = loadingEl.querySelector("#loading-phase-title");
+      const phaseDetail = loadingEl.querySelector("#loading-phase-detail");
+      const cancelBtn = loadingEl.querySelector("#loading-cancel-btn");
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener("click", () => {
+          if (activeAbortController) {
+            activeAbortController.abort();
+            showToast("Assistant generation cancelled", "info");
+          }
+        });
+      }
+
+      const timerInterval = setInterval(() => {
+        const elapsedSec = ((performance.now() - startTime) / 1000).toFixed(1);
+        if (timerBadge) timerBadge.textContent = `${elapsedSec}s`;
+
+        const sec = parseFloat(elapsedSec);
+        if (phaseTitle && phaseDetail) {
+          if (sec < 1.2) {
+            phaseTitle.textContent = "Analyzing Context...";
+            phaseDetail.textContent = "Scanning active code, symbols & interview context...";
+          } else if (sec < 2.8) {
+            phaseTitle.textContent = "Reasoning Architecture...";
+            phaseDetail.textContent = "Evaluating ECMAScript runtime mechanics & interview traps...";
+          } else if (sec < 4.5) {
+            phaseTitle.textContent = "Synthesizing A2UI Widgets...";
+            phaseDetail.textContent = "Generating interactive quiz, flashcards & sandbox...";
+          } else {
+            phaseTitle.textContent = "Polishing Response Layout...";
+            phaseDetail.textContent = "Applying syntax highlights and reactive components...";
+          }
+        }
+      }, 100);
+
       try {
         const response = await fetch("/api/assistant/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          signal: activeAbortController.signal,
           body: JSON.stringify({
             query,
             currentFilePath: state.currentFile,
@@ -1538,6 +1812,7 @@
           }),
         });
 
+        clearInterval(timerInterval);
         loadingEl.remove();
 
         if (!response.ok) {
@@ -1545,13 +1820,30 @@
         }
 
         const payload = await response.json();
-        renderA2UIResponse(payload);
+        renderA2UIResponse(payload, query);
 
         // Update history
         history.push({ role: "user", content: query });
         history.push({ role: "assistant", content: JSON.stringify(payload) });
       } catch (err) {
+        clearInterval(timerInterval);
         loadingEl.remove();
+
+        if (err.name === "AbortError") {
+          const cancelEl = document.createElement("div");
+          cancelEl.className = "chat-msg assistant";
+          cancelEl.innerHTML = `
+            <div class="chat-bubble-assistant">
+              <div class="a2ui-text-card" style="border-style:dashed; color:var(--text-muted);">
+                ⚡ <em>Response generation cancelled by user.</em>
+              </div>
+            </div>
+          `;
+          chatBody.appendChild(cancelEl);
+          chatBody.scrollTop = chatBody.scrollHeight;
+          return;
+        }
+
         const errEl = document.createElement("div");
         errEl.className = "chat-msg assistant";
         errEl.innerHTML = `
@@ -1563,21 +1855,47 @@
         `;
         chatBody.appendChild(errEl);
         chatBody.scrollTop = chatBody.scrollHeight;
+      } finally {
+        activeAbortController = null;
       }
     }
 
     function appendUserMessage(text) {
       const msg = document.createElement("div");
       msg.className = "chat-msg user";
-      msg.innerHTML = `<div class="chat-bubble-user">${escapeHtml(text)}</div>`;
+      const time = getMessageTimestamp();
+      msg.innerHTML = `
+        <div class="chat-msg-meta">
+          <span class="chat-msg-author">You</span>
+          <span>${time}</span>
+        </div>
+        <div class="chat-bubble-user">${escapeHtml(text)}</div>
+      `;
       chatBody.appendChild(msg);
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
     // ─── A2UI Declarative Component Renderer ───
-    function renderA2UIResponse(payload) {
+    function renderA2UIResponse(payload, originalQuery) {
       const assistantMsg = document.createElement("div");
       assistantMsg.className = "chat-msg assistant";
+      const time = getMessageTimestamp();
+
+      const meta = document.createElement("div");
+      meta.className = "chat-msg-meta";
+      meta.innerHTML = `
+        <span class="chat-msg-author" style="color:var(--accent-primary);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          A2UI Assistant
+        </span>
+        <div class="chat-msg-actions">
+          <span>${time}</span>
+          <button class="msg-action-btn copy-msg-btn" title="Copy Response Text">📋 Copy</button>
+          <button class="msg-action-btn retry-msg-btn" title="Regenerate Response">🔄 Retry</button>
+        </div>
+      `;
+      assistantMsg.appendChild(meta);
+
       const bubble = document.createElement("div");
       bubble.className = "chat-bubble-assistant";
 
@@ -1601,6 +1919,30 @@
 
       assistantMsg.appendChild(bubble);
       chatBody.appendChild(assistantMsg);
+
+      // Copy Entire Message Content Action
+      const copyBtn = assistantMsg.querySelector(".copy-msg-btn");
+      if (copyBtn) {
+        copyBtn.addEventListener("click", () => {
+          const textToCopy = components.map((c) => c.content || c.question || c.title || "").filter(Boolean).join("\n\n");
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            copyBtn.textContent = "✓ Copied!";
+            setTimeout(() => (copyBtn.textContent = "📋 Copy"), 2000);
+            showToast("Assistant response copied!", "success");
+          });
+        });
+      }
+
+      // Retry / Regenerate Action
+      const retryBtn = assistantMsg.querySelector(".retry-msg-btn");
+      if (retryBtn) {
+        retryBtn.addEventListener("click", () => {
+          const queryToRetry = originalQuery || lastUserQuery;
+          if (queryToRetry) {
+            sendAssistantMessage(queryToRetry);
+          }
+        });
+      }
 
       // Highlight code blocks
       if (window.Prism) {
@@ -1782,16 +2124,20 @@
     function createA2UIFlashcard(comp) {
       const wrapper = document.createElement("div");
       wrapper.className = "a2ui-text-card";
-      wrapper.style.padding = "10px";
+      wrapper.style.padding = "12px";
 
       const cards = comp.cards || [];
+      const topicKey = comp.topic || (state.currentFile ? state.currentFile.split("/").pop() : "JavaScript");
       let currentIndex = 0;
 
       const title = document.createElement("div");
-      title.style.cssText = "display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--accent-primary); margin-bottom:8px;";
+      title.style.cssText = "display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;";
       title.innerHTML = `
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-        <span>Flashcards: ${escapeHtml(comp.topic || "Review")}</span>
+        <span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; color:var(--accent-primary);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          Flashcards: ${escapeHtml(topicKey)}
+        </span>
+        <span class="a2ui-fc-counter" id="fc-counter-badge">${cards.length > 0 ? `1 / ${cards.length}` : '0 / 0'}</span>
       `;
       wrapper.appendChild(title);
 
@@ -1799,69 +2145,149 @@
       container.className = "a2ui-flashcard-container";
 
       function renderCard(idx) {
-        const item = cards[idx] || { front: "No cards", back: "No cards", keyTakeaway: "" };
+        const item = cards[idx] || { front: "No flashcards available.", back: "Ask assistant to generate flashcards for this topic.", keyTakeaway: "" };
         container.innerHTML = `
           <div class="a2ui-flashcard-inner" id="fc-inner">
             <div class="a2ui-card-front">
-              <div style="font-weight:600; font-size:14px; margin-bottom:6px;">${escapeHtml(item.front)}</div>
-              <span class="a2ui-card-hint">Click to flip card</span>
+              <div style="font-weight:600; font-size:14px; line-height:1.45; margin-bottom:8px; text-align:center;">${escapeHtml(item.front)}</div>
+              <span class="a2ui-card-hint">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Click to flip card
+              </span>
             </div>
             <div class="a2ui-card-back">
-              <div style="font-size:13px; line-height:1.5;">${escapeHtml(item.back)}</div>
+              <div style="font-size:13px; line-height:1.55; text-align:center; width:100%;">${escapeHtml(item.back)}</div>
               ${item.keyTakeaway ? `
-                <div class="a2ui-card-takeaway" style="display:flex; align-items:center; gap:4px; margin-top:8px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <div class="a2ui-card-takeaway">
+                  <span style="display:inline-flex; align-items:center; gap:4px; font-weight:700;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    Pro-Tip:
+                  </span>
                   <span>${escapeHtml(item.keyTakeaway)}</span>
                 </div>
               ` : ""}
+              <span class="a2ui-card-hint" style="margin-top:8px;">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                Click to flip back
+              </span>
             </div>
           </div>
         `;
 
         const inner = container.querySelector("#fc-inner");
-        inner.addEventListener("click", () => inner.classList.toggle("is-flipped"));
+        if (inner) {
+          inner.addEventListener("click", () => inner.classList.toggle("is-flipped"));
+        }
       }
 
       renderCard(0);
       wrapper.appendChild(container);
 
-      if (cards.length > 1) {
-        const controls = document.createElement("div");
-        controls.style.cssText = "display:flex; justify-content:space-between; align-items:center; margin-top:8px;";
+      // Controls Bar & Finish Banner Container
+      const controls = document.createElement("div");
+      controls.className = "a2ui-fc-controls";
 
-        const prevBtn = document.createElement("button");
-        prevBtn.className = "quick-chip";
-        prevBtn.textContent = "← Prev";
+      const prevBtn = document.createElement("button");
+      prevBtn.className = "quick-chip";
+      prevBtn.textContent = "← Prev";
 
-        const counter = document.createElement("span");
-        counter.style.cssText = "font-size:11px; color:var(--text-muted);";
-        counter.textContent = `1 / ${cards.length}`;
+      const counterBadge = title.querySelector("#fc-counter-badge");
 
-        const nextBtn = document.createElement("button");
-        nextBtn.className = "quick-chip";
-        nextBtn.textContent = "Next →";
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "quick-chip";
+      nextBtn.textContent = cards.length <= 1 ? "⚡ Next Flashcards" : "Next →";
+      if (cards.length <= 1) nextBtn.classList.add("a2ui-fc-btn-next-set");
 
-        prevBtn.addEventListener("click", () => {
-          if (currentIndex > 0) {
-            currentIndex--;
-            renderCard(currentIndex);
-            counter.textContent = `${currentIndex + 1} / ${cards.length}`;
+      const finishBanner = document.createElement("div");
+      finishBanner.className = "a2ui-fc-finish-banner";
+      finishBanner.innerHTML = `
+        <div class="a2ui-fc-finish-header">
+          <span class="a2ui-fc-finish-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            Deck Finished! Ready for next step?
+          </span>
+        </div>
+        <div class="a2ui-fc-finish-actions">
+          <button class="quick-chip a2ui-fc-btn-next-set" id="fc-action-next-set">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <span>Next 3 Flashcards</span>
+          </button>
+          <button class="quick-chip" id="fc-action-quiz">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            <span>Test with Quiz</span>
+          </button>
+          <button class="quick-chip" id="fc-action-restart" title="Review this deck from card 1">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <span>Restart</span>
+          </button>
+        </div>
+      `;
+
+      function updateControlsState() {
+        if (counterBadge) {
+          counterBadge.textContent = `${currentIndex + 1} / ${cards.length}`;
+        }
+
+        prevBtn.disabled = currentIndex === 0;
+        prevBtn.style.opacity = currentIndex === 0 ? "0.5" : "1";
+        prevBtn.style.cursor = currentIndex === 0 ? "not-allowed" : "pointer";
+
+        const isLastCard = currentIndex >= cards.length - 1;
+        if (isLastCard) {
+          nextBtn.textContent = "⚡ Next Set";
+          nextBtn.classList.add("a2ui-fc-btn-next-set");
+          if (!wrapper.contains(finishBanner)) {
+            wrapper.appendChild(finishBanner);
           }
-        });
-
-        nextBtn.addEventListener("click", () => {
-          if (currentIndex < cards.length - 1) {
-            currentIndex++;
-            renderCard(currentIndex);
-            counter.textContent = `${currentIndex + 1} / ${cards.length}`;
+        } else {
+          nextBtn.textContent = "Next →";
+          nextBtn.classList.remove("a2ui-fc-btn-next-set");
+          if (wrapper.contains(finishBanner)) {
+            finishBanner.remove();
           }
-        });
-
-        controls.appendChild(prevBtn);
-        controls.appendChild(counter);
-        controls.appendChild(nextBtn);
-        wrapper.appendChild(controls);
+        }
       }
+
+      prevBtn.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          renderCard(currentIndex);
+          updateControlsState();
+        }
+      });
+
+      nextBtn.addEventListener("click", () => {
+        if (currentIndex < cards.length - 1) {
+          currentIndex++;
+          renderCard(currentIndex);
+          updateControlsState();
+        } else {
+          // On last card, clicking Next Set triggers next flashcard request
+          sendAssistantMessage(`Generate another set of 3 advanced technical interview flashcards for ${topicKey}.`);
+        }
+      });
+
+      // Finish Banner Actions
+      finishBanner.querySelector("#fc-action-next-set").addEventListener("click", () => {
+        sendAssistantMessage(`Generate another set of 3 advanced technical interview flashcards for ${topicKey}.`);
+      });
+
+      finishBanner.querySelector("#fc-action-quiz").addEventListener("click", () => {
+        sendAssistantMessage(`Generate an interactive technical interview quiz for ${topicKey}.`);
+      });
+
+      finishBanner.querySelector("#fc-action-restart").addEventListener("click", () => {
+        currentIndex = 0;
+        renderCard(0);
+        updateControlsState();
+        showToast("Flashcard deck restarted", "info");
+      });
+
+      controls.appendChild(prevBtn);
+      controls.appendChild(nextBtn);
+      wrapper.appendChild(controls);
+
+      updateControlsState();
 
       return wrapper;
     }

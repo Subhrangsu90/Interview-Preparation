@@ -283,20 +283,75 @@
           </div>
           <h3>Welcome to your A2UI Assistant</h3>
           <p>I can quiz you on your notes, create interactive flashcards, run live code playgrounds, and answer technical interview questions using Gemini or OpenAI.</p>
+          <div class="welcome-prompt-suggestions" id="welcome-prompt-suggestions">
+            <button class="suggestion-chip" data-prompt="Explain JavaScript Event Loop with microtasks & macrotasks execution order">🔄 Event Loop & Microtasks</button>
+            <button class="suggestion-chip" data-prompt="Generate a senior interview quiz on Closures, Lexical Scope, and Memory Leaks">🧠 Closures & Memory Trap</button>
+            <button class="suggestion-chip" data-prompt="Create an interactive coding challenge to implement Promise.all() from scratch">⚡ Implement Promise.all</button>
+          </div>
         </div>
       </div>
 
-      <!-- Input Bar -->
+      <!-- Refined Prompt Preview Banner (Shown when user refines prompt) -->
+      <div class="prompt-refine-preview hidden" id="prompt-refine-preview">
+        <div class="refine-preview-header">
+          <div class="refine-badge-group">
+            <span class="refine-sparkle-icon">✨</span>
+            <span class="refine-title">AI Refined Prompt</span>
+            <span class="refine-mode-tag" id="refine-mode-tag">Depth Mode</span>
+          </div>
+          <button class="btn-icon-sm" id="refine-close-btn" title="Discard Refinement">&times;</button>
+        </div>
+        <div class="refine-reason" id="refine-reason">Upgraded to senior technical interview depth with runtime mechanics.</div>
+        <div class="refine-content" id="refine-content"></div>
+        <div class="refine-tags" id="refine-tags"></div>
+        <div class="refine-actions">
+          <button class="refine-btn secondary" id="refine-discard-btn">Discard</button>
+          <button class="refine-btn secondary" id="refine-copy-btn">📋 Copy</button>
+          <button class="refine-btn primary" id="refine-apply-btn">✓ Apply to Input</button>
+          <button class="refine-btn accent" id="refine-send-now-btn">⚡ Send Directly</button>
+        </div>
+      </div>
+
+      <!-- Input Bar with Refine Toolbar -->
       <div class="assistant-input-container">
+        <!-- Prompt Refine Presets Bar -->
+        <div class="prompt-refine-presets" id="prompt-refine-presets">
+          <span class="refine-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Refine:
+          </span>
+          <button class="refine-preset-btn active" data-mode="auto" title="Intelligent automatic prompt enhancement">Auto ✨</button>
+          <button class="refine-preset-btn" data-mode="depth" title="Add deep ECMAScript specs, runtime nuances & interview traps">🎯 Deep-Dive</button>
+          <button class="refine-preset-btn" data-mode="quiz" title="Transform into interactive test with code edge cases">🧪 Quiz Mode</button>
+          <button class="refine-preset-btn" data-mode="challenge" title="Transform into coding challenge with constraints & tests">⚡ Challenge</button>
+          <button class="refine-preset-btn" data-mode="optimize" title="Deep code profiling, memory leak and architecture review">🔍 Optimize</button>
+          <button class="refine-preset-btn" data-mode="eli5" title="Intuitive mental models and analogies">💡 ELI5</button>
+        </div>
+
         <form class="assistant-form" id="assistant-form">
-          <textarea class="assistant-input" id="assistant-input" rows="1" placeholder="Ask anything, request a quiz, or test code..."></textarea>
-          <button type="submit" class="assistant-send-btn" id="assistant-send-btn" title="Send (Enter)">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-          </button>
+          <textarea class="assistant-input" id="assistant-input" rows="1" placeholder="Ask anything, request a quiz, or type rough thoughts & click Refine..."></textarea>
+          
+          <div class="assistant-input-actions">
+            <button type="button" class="assistant-refine-btn" id="assistant-prompt-refine-btn" title="Refine & Polish Prompt with AI (Ctrl+R / Cmd+R)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <span>Refine</span>
+            </button>
+
+            <button type="submit" class="assistant-send-btn" id="assistant-send-btn" title="Send Message (Enter)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
         </form>
+        
+        <div class="assistant-input-footer">
+          <span class="shortcut-tip">⏎ Send &bull; ⇧⏎ New line &bull; ⌃R Refine Prompt</span>
+          <span class="prompt-char-count" id="prompt-char-count">0 chars</span>
+        </div>
       </div>
     </aside>
 

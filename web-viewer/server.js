@@ -617,6 +617,207 @@ ${fileContext ? fileContext.substring(0, 4000) : "No file open"}
 	}
 });
 
+// ─── Smart Heuristic Prompt Refiner (Offline / Fast Fallback) ───
+function smartHeuristicRefine(rawPrompt, mode, fileName, fileContext) {
+	const trimmed = (rawPrompt || "").trim();
+	const baseName = fileName ? path.basename(fileName) : "";
+	const fileTarget = baseName ? `specifically in the context of \`${baseName}\`` : "with modern JavaScript/TypeScript standards";
+
+	let targetMode = mode || "auto";
+	if (targetMode === "auto") {
+		const lower = trimmed.toLowerCase();
+		if (lower.includes("quiz") || lower.includes("test") || lower.includes("question")) targetMode = "quiz";
+		else if (lower.includes("code") || lower.includes("implement") || lower.includes("function") || lower.includes("challenge")) targetMode = "challenge";
+		else if (lower.includes("fix") || lower.includes("optimize") || lower.includes("performance") || lower.includes("leak")) targetMode = "optimize";
+		else if (lower.includes("simple") || lower.includes("beginner") || lower.includes("explain") || lower.includes("eli5")) targetMode = "eli5";
+		else targetMode = "depth";
+	}
+
+	let refined = "";
+	let reason = "";
+	let tags = [];
+
+	switch (targetMode) {
+		case "quiz":
+			refined = `Create an interactive senior-level technical interview quiz on "${trimmed || baseName || 'JavaScript core mechanics'}" ${fileTarget}. Include tricky edge-case code snippets, common candidate misconceptions, and detailed rationale for each option.`;
+			reason = "Refactored into a rigorous interview quiz with edge cases and distractor analysis.";
+			tags = ["#interview-quiz", "#edge-cases", "#mechanics"];
+			break;
+		case "challenge":
+			refined = `Provide an algorithmic coding challenge based on "${trimmed || baseName || 'Data structures & algorithms'}" ${fileTarget}. Include explicit constraints, Big-O time and space requirements, starter boilerplate, and multiple unit test cases with corner cases.`;
+			reason = "Structured as a full technical interview coding problem with constraints and verification test cases.";
+			tags = ["#coding-challenge", "#big-o", "#test-cases"];
+			break;
+		case "optimize":
+			refined = `Perform a senior engineer code review and optimization analysis on "${trimmed || baseName || 'the current code'}" ${fileTarget}. Analyze runtime complexity, potential memory leaks (closures, dangling listeners), event loop blocking, and propose a clean, modern refactoring.`;
+			reason = "Enhanced for deep performance profiling, memory diagnostics, and clean architecture.";
+			tags = ["#optimization", "#memory-leaks", "#code-review"];
+			break;
+		case "eli5":
+			refined = `Explain "${trimmed || baseName || 'this technical concept'}" ${fileTarget} using an intuitive real-world analogy and visual mental model, followed by a crisp breakdown of how the JavaScript engine executes it under the hood.`;
+			reason = "Transformed into a dual-layer explanation (intuitive mental model + runtime spec).";
+			tags = ["#mental-model", "#eli5", "#visual-analogy"];
+			break;
+		case "depth":
+		default:
+			refined = `Provide a comprehensive technical interview deep-dive on "${trimmed || baseName || 'Core JavaScript mechanics'}" ${fileTarget}. Cover underlying ECMAScript specification behavior, execution contexts, common interview traps, and production best practices.`;
+			reason = "Upgraded to senior interview depth with ECMAScript spec references and practical pitfalls.";
+			tags = ["#interview-depth", "#ecmascript-spec", "#runtime-internals"];
+			break;
+	}
+
+	return {
+		refinedPrompt: refined,
+		originalPrompt: trimmed,
+		mode: targetMode,
+		explanation: reason,
+		tags
+	};
+}
+
+// ─── Assistant Prompt Refine Handler ───
+app.post("/api/assistant/refine-prompt", async (req, res) => {
+	const { prompt, mode, currentFilePath, provider, apiKey, model } = req.body;
+
+	if (!prompt && !currentFilePath) {
+		return res.status(400).json({ error: "Missing prompt or file context to refine" });
+	}
+
+	// Read local workspace file context if available
+	let fileContext = "";
+	let fileName = "";
+	if (currentFilePath) {
+		const fullPath = path.join(REPO_ROOT, currentFilePath);
+		const resolved = path.resolve(fullPath);
+		if (resolved.startsWith(REPO_ROOT) && fs.existsSync(resolved)) {
+			try {
+				fileContext = fs.readFileSync(resolved, "utf-8");
+				fileName = path.basename(resolved);
+			} catch {
+				/* skip unreadable */
+			}
+		}
+	}
+
+	const selectedProvider = provider || (process.env.GEMINI_API_KEY ? "gemini" : (process.env.OPENAI_API_KEY ? "openai" : "mock"));
+	const activeKey = apiKey || (selectedProvider === "gemini" ? process.env.GEMINI_API_KEY : process.env.OPENAI_API_KEY);
+
+	// Fallback to smart heuristic refiner if offline
+	if (!activeKey || selectedProvider === "mock") {
+		const heuristic = smartHeuristicRefine(prompt, mode, fileName, fileContext);
+		return res.json(heuristic);
+	}
+
+	try {
+		const systemInstruction = `
+You are an expert Prompt Engineer specializing in Technical Interview Preparation and Computer Science coaching.
+Your job is to transform a user's rough or basic question into an exceptionally clear, structured, high-signal, expert-level prompt tailored for software engineering study.
+
+Refinement Mode requested: ${mode || 'auto'}
+- depth: Ask for deep ECMAScript specs, runtime mechanics, and tricky interview traps.
+- quiz: Request interactive multiple-choice questions with edge-case code.
+- challenge: Request a coding challenge with constraints, Big-O targets, and unit tests.
+- optimize: Request performance profiling, memory leak diagnostics, and cleaner refactoring.
+- eli5: Request an intuitive real-world analogy and visual mental model.
+- auto: Detect best direction based on context.
+
+JSON SCHEMA REQUIREMENT:
+You must respond ONLY with valid JSON matching:
+{
+  "refinedPrompt": "Refined clear, comprehensive prompt string",
+  "explanation": "Brief 1-sentence explanation of what was improved",
+  "tags": ["#tag1", "#tag2", "#tag3"],
+  "mode": "${mode || 'auto'}"
+}
+`;
+
+		const userContext = `
+RAW USER PROMPT:
+${prompt || "Explain key concepts from this file."}
+
+ACTIVE WORKSPACE FILE:
+Filename: ${fileName || "None"}
+Snippet: ${fileContext ? fileContext.substring(0, 1500) : "None"}
+`;
+
+		if (selectedProvider === "gemini") {
+			const geminiModel = model || "gemini-2.5-flash";
+			const url = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${activeKey}`;
+
+			const payload = {
+				contents: [
+					{
+						role: "user",
+						parts: [{ text: systemInstruction + "\n\n" + userContext }]
+					}
+				],
+				generationConfig: {
+					responseMimeType: "application/json",
+					temperature: 0.3
+				}
+			};
+
+			const response = await fetch(url, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload)
+			});
+
+			if (!response.ok) {
+				throw new Error(`Gemini Refine error (${response.status})`);
+			}
+
+			const data = await response.json();
+			const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+			if (candidateText) {
+				const parsed = JSON.parse(candidateText);
+				parsed.originalPrompt = prompt;
+				return res.json(parsed);
+			}
+		} else if (selectedProvider === "openai") {
+			const openaiModel = model || "gpt-4o-mini";
+			const url = "https://api.openai.com/v1/chat/completions";
+
+			const isReasoningModel = openaiModel.startsWith("o1") || openaiModel.startsWith("o3");
+			const systemRole = isReasoningModel ? "developer" : "system";
+
+			const response = await fetch(url, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${activeKey}`
+				},
+				body: JSON.stringify({
+					model: openaiModel,
+					messages: [
+						{ role: systemRole, content: systemInstruction },
+						{ role: "user", content: userContext }
+					],
+					response_format: { type: "json_object" }
+				})
+			});
+
+			if (!response.ok) {
+				throw new Error(`OpenAI Refine error (${response.status})`);
+			}
+
+			const data = await response.json();
+			const content = data.choices?.[0]?.message?.content;
+			if (content) {
+				const parsed = JSON.parse(content);
+				parsed.originalPrompt = prompt;
+				return res.json(parsed);
+			}
+		}
+
+		// Fallback
+		return res.json(smartHeuristicRefine(prompt, mode, fileName, fileContext));
+	} catch (err) {
+		console.warn("Prompt refine provider fallback:", err.message);
+		return res.json(smartHeuristicRefine(prompt, mode, fileName, fileContext));
+	}
+});
+
 
 // ─── File watcher SSE endpoint ───
 app.get("/api/watch", (req, res) => {
