@@ -1,5 +1,5 @@
 /* ============================================================
- * 📘 JAVASCRIPT VARIABLES — COMPLETE NOTES
+ * JAVASCRIPT VARIABLES
  * ============================================================
  *
  * WHAT is a variable?
@@ -32,7 +32,7 @@
  */
 
 /* ============================================================
- * 🔹 SECTION 1: var
+ *  SECTION 1: var
  * ============================================================
  *
  * WHAT: var is the original way to declare variables in JS (since 1995).
@@ -68,7 +68,7 @@ console.log("Updated Ship Name:", shipName);
 //       SyntaxError: Identifier 'shipName' has already been declared
 
 /* ============================================================
- * 🔹 SECTION 2: let
+ *  SECTION 2: let
  * ============================================================
  *
  * WHAT: let was introduced in ES6 (2015) as a safer replacement for var.
@@ -135,7 +135,7 @@ console.log("Final value of j after loop:", j);
 // and keeps its final value (3) even after the loop finishes.
 
 /* ============================================================
- * 🔹 SECTION 3: const
+ *  SECTION 3: const
  * ============================================================
  *
  * WHAT: const (short for "constant") was also introduced in ES6.
@@ -209,7 +209,7 @@ console.log("Modified Ship Names:", shipNames);
 // WHY? This reassigns the WHOLE array reference — not allowed with const.
 
 /* ============================================================
- * 🔹 SECTION 4: SCOPE — Deep Explanation
+ *  SECTION 4: SCOPE — Deep Explanation
  * ============================================================
  *
  * WHAT is scope?
@@ -288,7 +288,7 @@ console.log("Modified Ship Names:", shipNames);
  */
 
 /* ============================================================
- * 🔹 SECTION 5: TEMPORAL DEAD ZONE (TDZ) — Deep Explanation
+ *  SECTION 5: TEMPORAL DEAD ZONE (TDZ) — Deep Explanation
  * ============================================================
  *
  * WHAT is the Temporal Dead Zone?
@@ -348,7 +348,7 @@ console.log("Modified Ship Names:", shipNames);
  */
 
 /* ============================================================
- * 🔹 SECTION 6: HOISTING — Deep Explanation
+ *  SECTION 6: HOISTING — Deep Explanation
  * ============================================================
  *
  * WHAT is hoisting?
@@ -402,7 +402,7 @@ console.log("Modified Ship Names:", shipNames);
  */
 
 /* ============================================================
- * 🔹 SECTION 7: COMPARISON TABLE
+ *  SECTION 7: COMPARISON TABLE
  * ============================================================
  *
  *  Feature              |   var          |   let          |   const
@@ -419,7 +419,7 @@ console.log("Modified Ship Names:", shipNames);
  */
 
 /* ============================================================
- * 🔹 SECTION 8: WHEN TO USE WHAT (Best Practice)
+ *  SECTION 8: WHEN TO USE WHAT (Best Practice)
  * ============================================================
  *
  *   ✅ Use `const` by DEFAULT for everything

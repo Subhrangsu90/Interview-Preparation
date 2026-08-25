@@ -100,15 +100,39 @@
             <div class="theme-menu" id="theme-menu">
               <button class="theme-option active" data-theme="paper">
                 <span class="theme-swatch" style="background:#fdf8f0; border-color:#d4a56a;"></span>
-                Paper Warm
+                <span class="theme-name">Paper Warm</span>
+                <span class="theme-check-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
               </button>
               <button class="theme-option" data-theme="sepia">
                 <span class="theme-swatch" style="background:#f4e8d1; border-color:#c09050;"></span>
-                Sepia Soft
+                <span class="theme-name">Sepia Soft</span>
+                <span class="theme-check-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
               </button>
               <button class="theme-option" data-theme="dark">
                 <span class="theme-swatch" style="background:#1a1a2e; border-color:#6060b0;"></span>
-                Midnight Dark
+                <span class="theme-name">Midnight Dark</span>
+                <span class="theme-check-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
+              </button>
+              <button class="theme-option" data-theme="japanese">
+                <span class="theme-swatch" style="background:#fcf6f5; border-color:#d6456e;"></span>
+                <span class="theme-name">Japanese Sakura</span>
+                <span class="theme-check-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                </span>
               </button>
             </div>
           </div>
@@ -170,22 +194,22 @@
     <!-- ─── TABLE OF CONTENTS ─── -->
     <div class="toc-container hidden" id="toc-container"></div>
 
-    <!-- ─── FLOATING ASSISTANT BUTTON ─── -->
-    <button class="assistant-floating-btn" id="toggle-assistant-btn" title="Open AI Interview Coach (A2UI)">
+    <!-- ─── AI ASSISTANT FLOATING TRIGGER BUTTON ─── -->
+    <button class="assistant-floating-btn" id="toggle-assistant-btn" title="Open AI Interview Coach">
       <span class="assistant-btn-sparkle">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </span>
       <span>AI Coach</span>
     </button>
 
-    <!-- ─── A2UI ASSISTANT DRAWER ─── -->
+    <!-- ─── AI ASSISTANT DRAWER ─── -->
     <aside class="assistant-drawer hidden" id="assistant-drawer">
       <!-- Left Edge Resize Handle -->
       <div class="drawer-resize-handle" id="drawer-resize-handle" title="Drag to resize assistant"></div>
 
       <div class="assistant-header">
         <div class="assistant-title-group">
-          <div class="assistant-badge">A2UI</div>
+          <div class="assistant-badge">AI</div>
           <div>
             <div class="assistant-title">AI Interview Coach</div>
             <div class="assistant-provider-label" id="assistant-provider-label">Provider: Gemini / OpenAI</div>
@@ -281,12 +305,21 @@
           <div class="welcome-sparkle">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </div>
-          <h3>Welcome to your A2UI Assistant</h3>
+          <h3>Welcome to your AI Interview Coach</h3>
           <p>I can quiz you on your notes, create interactive flashcards, run live code playgrounds, and answer technical interview questions using Gemini or OpenAI.</p>
           <div class="welcome-prompt-suggestions" id="welcome-prompt-suggestions">
-            <button class="suggestion-chip" data-prompt="Explain JavaScript Event Loop with microtasks & macrotasks execution order">🔄 Event Loop & Microtasks</button>
-            <button class="suggestion-chip" data-prompt="Generate a senior interview quiz on Closures, Lexical Scope, and Memory Leaks">🧠 Closures & Memory Trap</button>
-            <button class="suggestion-chip" data-prompt="Create an interactive coding challenge to implement Promise.all() from scratch">⚡ Implement Promise.all</button>
+            <button class="suggestion-chip" data-prompt="Explain JavaScript Event Loop with microtasks & macrotasks execution order">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              <span>Event Loop & Microtasks</span>
+            </button>
+            <button class="suggestion-chip" data-prompt="Generate a senior interview quiz on Closures, Lexical Scope, and Memory Leaks">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/></svg>
+              <span>Closures & Memory Trap</span>
+            </button>
+            <button class="suggestion-chip" data-prompt="Create an interactive coding challenge to implement Promise.all() from scratch">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Implement Promise.all</span>
+            </button>
           </div>
         </div>
       </div>
@@ -295,7 +328,9 @@
       <div class="prompt-refine-preview hidden" id="prompt-refine-preview">
         <div class="refine-preview-header">
           <div class="refine-badge-group">
-            <span class="refine-sparkle-icon">✨</span>
+            <span class="refine-sparkle-icon">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </span>
             <span class="refine-title">AI Refined Prompt</span>
             <span class="refine-mode-tag" id="refine-mode-tag">Depth Mode</span>
           </div>
@@ -306,9 +341,18 @@
         <div class="refine-tags" id="refine-tags"></div>
         <div class="refine-actions">
           <button class="refine-btn secondary" id="refine-discard-btn">Discard</button>
-          <button class="refine-btn secondary" id="refine-copy-btn">📋 Copy</button>
-          <button class="refine-btn primary" id="refine-apply-btn">✓ Apply to Input</button>
-          <button class="refine-btn accent" id="refine-send-now-btn">⚡ Send Directly</button>
+          <button class="refine-btn secondary" id="refine-copy-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>Copy</span>
+          </button>
+          <button class="refine-btn primary" id="refine-apply-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Apply to Input</span>
+          </button>
+          <button class="refine-btn accent" id="refine-send-now-btn">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Send Directly</span>
+          </button>
         </div>
       </div>
 
@@ -320,12 +364,30 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             Refine:
           </span>
-          <button class="refine-preset-btn active" data-mode="auto" title="Intelligent automatic prompt enhancement">Auto ✨</button>
-          <button class="refine-preset-btn" data-mode="depth" title="Add deep ECMAScript specs, runtime nuances & interview traps">🎯 Deep-Dive</button>
-          <button class="refine-preset-btn" data-mode="quiz" title="Transform into interactive test with code edge cases">🧪 Quiz Mode</button>
-          <button class="refine-preset-btn" data-mode="challenge" title="Transform into coding challenge with constraints & tests">⚡ Challenge</button>
-          <button class="refine-preset-btn" data-mode="optimize" title="Deep code profiling, memory leak and architecture review">🔍 Optimize</button>
-          <button class="refine-preset-btn" data-mode="eli5" title="Intuitive mental models and analogies">💡 ELI5</button>
+          <button class="refine-preset-btn active" data-mode="auto" title="Intelligent automatic prompt enhancement">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Auto</span>
+          </button>
+          <button class="refine-preset-btn" data-mode="depth" title="Add deep ECMAScript specs, runtime nuances & interview traps">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            <span>Deep-Dive</span>
+          </button>
+          <button class="refine-preset-btn" data-mode="quiz" title="Transform into interactive test with code edge cases">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v4l-4 12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l-4-12V2"/><line x1="8" y1="2" x2="16" y2="2"/><line x1="7" y1="14" x2="17" y2="14"/></svg>
+            <span>Quiz Mode</span>
+          </button>
+          <button class="refine-preset-btn" data-mode="challenge" title="Transform into coding challenge with constraints & tests">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span>Challenge</span>
+          </button>
+          <button class="refine-preset-btn" data-mode="optimize" title="Deep code profiling, memory leak and architecture review">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Optimize</span>
+          </button>
+          <button class="refine-preset-btn" data-mode="eli5" title="Intuitive mental models and analogies">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"/></svg>
+            <span>ELI5</span>
+          </button>
         </div>
 
         <form class="assistant-form" id="assistant-form">

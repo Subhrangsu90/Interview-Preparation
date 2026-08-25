@@ -66,6 +66,18 @@
       'hash':         `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>`,
       'globe':        `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
       'timer':        `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+      'sparkle':      `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+      'sparkles':     `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+      'brain':        `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/></svg>`,
+      'check':        `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+      'x':            `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+      'key':          `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5L11 9l-1 1-1.5-1.5-1.5 1.5 1.5 1.5L4.5 14.5a5 5 0 1 0 7-7l3-3"/><circle cx="7.5" cy="16.5" r="1.5"/></svg>`,
+      'arrow-right':  `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+      'arrow-left':   `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
+      'target':       `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+      'flask':        `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v4l-4 12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l-4-12V2"/><line x1="8" y1="2" x2="16" y2="2"/><line x1="7" y1="14" x2="17" y2="14"/></svg>`,
+      'search':       `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+      'lightbulb':    `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"/></svg>`,
     };
     return icons[name] || '';
   }
@@ -974,16 +986,34 @@
   // THEME
   // ═══════════════════════════════════
   function applyTheme(theme) {
-    state.theme = theme;
-    if (theme === "paper") {
+    state.theme = theme || "paper";
+    if (state.theme === "paper") {
       document.documentElement.removeAttribute("data-theme");
     } else {
-      document.documentElement.setAttribute("data-theme", theme);
+      document.documentElement.setAttribute("data-theme", state.theme);
     }
-    localStorage.setItem("ip-theme", theme);
+    localStorage.setItem("ip-theme", state.theme);
+
+    if (window.monaco && monacoEditorInstance) {
+      monaco.editor.setTheme(state.theme === "dark" ? "vs-dark" : "vs");
+    }
+
+    const themeNames = {
+      paper: "Paper Warm",
+      sepia: "Sepia Soft",
+      dark: "Midnight Dark",
+      japanese: "Japanese Sakura",
+    };
+
+    const toggleBtn = $("#theme-toggle");
+    if (toggleBtn) {
+      toggleBtn.title = `Switch theme (Current: ${themeNames[state.theme] || state.theme})`;
+    }
 
     $$(".theme-option").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.theme === theme);
+      const isSelected = btn.dataset.theme === state.theme;
+      btn.classList.toggle("active", isSelected);
+      btn.setAttribute("aria-selected", isSelected ? "true" : "false");
     });
   }
 
@@ -1409,7 +1439,7 @@
     function updateProviderBadge() {
       if (providerLabel) {
         const provName = aiSettings.provider === "gemini" ? "Gemini" : (aiSettings.provider === "openai" ? "OpenAI" : "Offline Workspace");
-        const status = aiSettings.apiKey ? "🔑 Configured" : "⚡ Ready";
+        const status = aiSettings.apiKey ? "Configured" : "Ready";
         providerLabel.textContent = `Provider: ${provName} (${status})`;
       }
     }
@@ -1449,12 +1479,21 @@
             <div class="welcome-sparkle">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
-            <h3>Welcome to your A2UI Assistant</h3>
+            <h3>Welcome to your AI Interview Coach</h3>
             <p>I can quiz you on your notes, create interactive flashcards, run live code playgrounds, and answer technical interview questions using Gemini or OpenAI.</p>
             <div class="welcome-prompt-suggestions" id="welcome-prompt-suggestions">
-              <button class="suggestion-chip" data-prompt="Explain JavaScript Event Loop with microtasks & macrotasks execution order">🔄 Event Loop & Microtasks</button>
-              <button class="suggestion-chip" data-prompt="Generate a senior interview quiz on Closures, Lexical Scope, and Memory Leaks">🧠 Closures & Memory Trap</button>
-              <button class="suggestion-chip" data-prompt="Create an interactive coding challenge to implement Promise.all() from scratch">⚡ Implement Promise.all</button>
+              <button class="suggestion-chip" data-prompt="Explain JavaScript Event Loop with microtasks & macrotasks execution order">
+                ${svg('refresh', 12)}
+                <span>Event Loop & Microtasks</span>
+              </button>
+              <button class="suggestion-chip" data-prompt="Generate a senior interview quiz on Closures, Lexical Scope, and Memory Leaks">
+                ${svg('brain', 12)}
+                <span>Closures & Memory Trap</span>
+              </button>
+              <button class="suggestion-chip" data-prompt="Create an interactive coding challenge to implement Promise.all() from scratch">
+                ${svg('zap', 12)}
+                <span>Implement Promise.all</span>
+              </button>
             </div>
           </div>
         `;
@@ -1604,7 +1643,7 @@
           promptRefinePreview.classList.remove("hidden");
         }
 
-        showToast("Prompt successfully refined with AI ✨", "success");
+        showToast("Prompt successfully refined with AI", "success");
       } catch (err) {
         console.error("Refine prompt error:", err);
         showToast(`Prompt refine failed: ${err.message}`, "error");
@@ -1728,7 +1767,7 @@
           <div class="loading-header">
             <div class="loading-agent-status">
               <div class="ai-pulse-orb">
-                <span class="ai-pulse-orb-sparkle">✨</span>
+                <span class="ai-pulse-orb-sparkle">${svg('sparkle', 14)}</span>
               </div>
               <div class="loading-status-text-wrap">
                 <span class="loading-phase-title" id="loading-phase-title">Analyzing Workspace Context...</span>
@@ -1788,7 +1827,7 @@
             phaseTitle.textContent = "Reasoning Architecture...";
             phaseDetail.textContent = "Evaluating ECMAScript runtime mechanics & interview traps...";
           } else if (sec < 4.5) {
-            phaseTitle.textContent = "Synthesizing A2UI Widgets...";
+            phaseTitle.textContent = "Synthesizing Interactive Content...";
             phaseDetail.textContent = "Generating interactive quiz, flashcards & sandbox...";
           } else {
             phaseTitle.textContent = "Polishing Response Layout...";
@@ -1835,7 +1874,7 @@
           cancelEl.innerHTML = `
             <div class="chat-bubble-assistant">
               <div class="a2ui-text-card" style="border-style:dashed; color:var(--text-muted);">
-                ⚡ <em>Response generation cancelled by user.</em>
+                <span style="display:inline-flex; align-items:center; gap:4px;">${svg('zap', 13)} <em>Response generation cancelled by user.</em></span>
               </div>
             </div>
           `;
@@ -1886,12 +1925,12 @@
       meta.innerHTML = `
         <span class="chat-msg-author" style="color:var(--accent-primary);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          A2UI Assistant
+          AI Coach
         </span>
         <div class="chat-msg-actions">
           <span>${time}</span>
-          <button class="msg-action-btn copy-msg-btn" title="Copy Response Text">📋 Copy</button>
-          <button class="msg-action-btn retry-msg-btn" title="Regenerate Response">🔄 Retry</button>
+          <button class="msg-action-btn copy-msg-btn" title="Copy Response Text">${svg('copy', 12)} <span>Copy</span></button>
+          <button class="msg-action-btn retry-msg-btn" title="Regenerate Response">${svg('refresh', 12)} <span>Retry</span></button>
         </div>
       `;
       assistantMsg.appendChild(meta);
@@ -1926,8 +1965,8 @@
         copyBtn.addEventListener("click", () => {
           const textToCopy = components.map((c) => c.content || c.question || c.title || "").filter(Boolean).join("\n\n");
           navigator.clipboard.writeText(textToCopy).then(() => {
-            copyBtn.textContent = "✓ Copied!";
-            setTimeout(() => (copyBtn.textContent = "📋 Copy"), 2000);
+            copyBtn.innerHTML = `${svg('check', 12)} <span>Copied!</span>`;
+            setTimeout(() => (copyBtn.innerHTML = `${svg('copy', 12)} <span>Copy</span>`), 2000);
             showToast("Assistant response copied!", "success");
           });
         });
@@ -1967,14 +2006,14 @@
         const copyBtn = document.createElement("button");
         copyBtn.className = "quick-chip";
         copyBtn.style.cssText = "position:absolute; right:8px; top:8px; font-size:10.5px; padding:2px 8px; opacity:0.8;";
-        copyBtn.textContent = "📋 Copy";
+        copyBtn.innerHTML = `${svg('copy', 11)} <span>Copy</span>`;
         pre.style.position = "relative";
 
         copyBtn.addEventListener("click", () => {
           const code = pre.querySelector("code")?.textContent || pre.textContent;
           navigator.clipboard.writeText(code).then(() => {
-            copyBtn.textContent = "✓ Copied!";
-            setTimeout(() => (copyBtn.textContent = "📋 Copy"), 2000);
+            copyBtn.innerHTML = `${svg('check', 11)} <span>Copied!</span>`;
+            setTimeout(() => (copyBtn.innerHTML = `${svg('copy', 11)} <span>Copy</span>`), 2000);
             showToast("Code copied to clipboard!", "info");
           });
         });
@@ -2083,7 +2122,7 @@
           progressBanner.innerHTML = `
             <div class="a2ui-qpb-header">
               <span class="a2ui-qpb-tag ${isCorrect ? 'correct' : 'wrong'}">
-                ${isCorrect ? '✓ +10 Points Earned' : '✕ Review Recommended'}
+                ${isCorrect ? `<span style="display:inline-flex; align-items:center; gap:3px;">${svg('check', 12)} +10 Points Earned</span>` : `<span style="display:inline-flex; align-items:center; gap:3px;">${svg('x', 12)} Review Recommended</span>`}
               </span>
               <span style="font-size:11px; font-weight:700; color:var(--accent-primary);">
                 ${topicPct}% Topic Mastery
@@ -2189,13 +2228,13 @@
 
       const prevBtn = document.createElement("button");
       prevBtn.className = "quick-chip";
-      prevBtn.textContent = "← Prev";
+      prevBtn.innerHTML = `${svg('arrow-left', 12)} <span>Prev</span>`;
 
       const counterBadge = title.querySelector("#fc-counter-badge");
 
       const nextBtn = document.createElement("button");
       nextBtn.className = "quick-chip";
-      nextBtn.textContent = cards.length <= 1 ? "⚡ Next Flashcards" : "Next →";
+      nextBtn.innerHTML = cards.length <= 1 ? `${svg('zap', 12)} <span>Next Flashcards</span>` : `<span>Next</span> ${svg('arrow-right', 12)}`;
       if (cards.length <= 1) nextBtn.classList.add("a2ui-fc-btn-next-set");
 
       const finishBanner = document.createElement("div");
@@ -2234,13 +2273,13 @@
 
         const isLastCard = currentIndex >= cards.length - 1;
         if (isLastCard) {
-          nextBtn.textContent = "⚡ Next Set";
+          nextBtn.innerHTML = `${svg('zap', 12)} <span>Next Set</span>`;
           nextBtn.classList.add("a2ui-fc-btn-next-set");
           if (!wrapper.contains(finishBanner)) {
             wrapper.appendChild(finishBanner);
           }
         } else {
-          nextBtn.textContent = "Next →";
+          nextBtn.innerHTML = `<span>Next</span> ${svg('arrow-right', 12)}`;
           nextBtn.classList.remove("a2ui-fc-btn-next-set");
           if (wrapper.contains(finishBanner)) {
             finishBanner.remove();
