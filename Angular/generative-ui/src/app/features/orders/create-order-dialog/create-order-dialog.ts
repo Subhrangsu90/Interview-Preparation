@@ -160,6 +160,7 @@ import { CreateOrderDto, OrderStatus } from '../../../core/models/ecommerce.mode
       <button mat-button mat-dialog-close type="button">Cancel</button>
       <button
         mat-flat-button
+        color="primary"
         type="submit"
         form="createOrderForm"
         [disabled]="orderForm().invalid()"

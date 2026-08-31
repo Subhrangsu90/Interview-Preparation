@@ -10,7 +10,7 @@
       </p>
     </div>
     <div class="header-actions">
-      <button mat-flat-button color="primary" class="primary-action-btn" (click)="openCreateTicketDialog()">
+      <button mat-flat-button color="primary" (click)="openCreateTicketDialog()">
         <mat-icon>add_circle</mat-icon>
         New Support Ticket
       </button>
@@ -63,30 +63,40 @@
   <!-- Main Card with Filter Bar & Ticket List -->
   <mat-card appearance="outlined" class="tickets-container-card">
     <div class="filter-toolbar">
-      <div class="search-input-wrap">
-        <mat-icon class="search-icon">search</mat-icon>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-form-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-label>Filter tickets</mat-label>
         <input
-          type="text"
+          matInput
           placeholder="Filter by Order # or Ticket #..."
           [value]="searchQuery()"
           (input)="onSearchInput($event)"
         />
         @if (searchQuery()) {
-          <button mat-icon-button (click)="searchQuery.set('')">
+          <button mat-icon-button matSuffix (click)="searchQuery.set('')" aria-label="Clear filter">
             <mat-icon>close</mat-icon>
           </button>
         }
-      </div>
+      </mat-form-field>
 
       <div class="status-tab-group">
         @for (status of statusTabs; track status) {
-          <button
-            mat-stroked-button
-            [class.active-tab]="selectedStatus() === status"
-            (click)="selectedStatus.set(status)"
-          >
-            {{ status | titlecase }}
-          </button>
+          @if (selectedStatus() === status) {
+            <button
+              mat-flat-button
+              color="primary"
+              (click)="selectedStatus.set(status)"
+            >
+              {{ status | titlecase }}
+            </button>
+          } @else {
+            <button
+              mat-stroked-button
+              (click)="selectedStatus.set(status)"
+            >
+              {{ status | titlecase }}
+            </button>
+          }
         }
       </div>
     </div>

@@ -10,6 +10,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { OrderService } from '../../core/services/order.service';
 import { Order, OrderStatus } from '../../core/models/ecommerce.models';
 import { CreateOrderDialog } from './create-order-dialog/create-order-dialog';
@@ -36,6 +38,8 @@ interface StatusFilterTab {
     MatDividerModule,
     MatProgressBarModule,
     MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './orders.html',
   styleUrl: './orders.scss',

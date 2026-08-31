@@ -11,7 +11,7 @@
       </p>
     </div>
     <div class="header-actions">
-      <button mat-flat-button color="primary" class="primary-action-btn" (click)="openCreateDialog()">
+      <button mat-flat-button color="primary" (click)="openCreateDialog()">
         <mat-icon>add</mat-icon>
         New Order
       </button>
@@ -64,31 +64,40 @@
   <!-- Filters & Search Toolbar -->
   <mat-card appearance="outlined" class="table-container-card">
     <div class="toolbar-wrapper">
-      <div class="search-box">
-        <mat-icon class="search-icon">search</mat-icon>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-form-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <mat-label>Search orders</mat-label>
         <input
-          type="text"
-          class="search-input"
-          placeholder="Search by order #, customer name, email, or tracking..."
+          matInput
+          placeholder="Order #, customer, email, or tracking"
           [value]="searchQuery()"
           (input)="onSearchChange($event)"
         />
         @if (searchQuery()) {
-          <button mat-icon-button (click)="clearSearch()" aria-label="Clear search">
+          <button mat-icon-button matSuffix (click)="clearSearch()" aria-label="Clear search">
             <mat-icon>close</mat-icon>
           </button>
         }
-      </div>
+      </mat-form-field>
 
       <div class="status-filters">
         @for (tab of filterTabs; track tab.value) {
-          <button
-            mat-stroked-button
-            [class.active-filter]="selectedStatus() === tab.value"
-            (click)="setStatusFilter(tab.value)"
-          >
-            {{ tab.label }}
-          </button>
+          @if (selectedStatus() === tab.value) {
+            <button
+              mat-flat-button
+              color="primary"
+              (click)="setStatusFilter(tab.value)"
+            >
+              {{ tab.label }}
+            </button>
+          } @else {
+            <button
+              mat-stroked-button
+              (click)="setStatusFilter(tab.value)"
+            >
+              {{ tab.label }}
+            </button>
+          }
         }
       </div>
     </div>
