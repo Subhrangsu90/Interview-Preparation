@@ -10,17 +10,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import {
-  UiPageHeader,
-  UiMetricCard,
-  UiStatusBadge,
-  UiSearchInput,
-  UiEmptyState,
-  UiCopyToClipboardDirective,
-  UiConfirmService,
-} from '@shared/ui';
-import { OrderService } from '../../core/services/order.service';
-import { Order, OrderStatus } from '../../core/models/ecommerce.models';
+import { UiPageHeader } from '@shared/ui/components/page-header';
+import { UiMetricCard } from '@shared/ui/components/metric-card';
+import { UiStatusBadge } from '@shared/ui/components/status-badge';
+import { UiSearchInput } from '@shared/ui/components/search-input';
+import { UiEmptyState } from '@shared/ui/components/empty-state';
+import { UiConfirmService } from '@shared/ui/components/confirm-dialog';
+import { UiCopyToClipboardDirective } from '@shared/ui/directives';
+import { OrderService } from '@core/services/order.service';
+import { Order, OrderStatus } from '@core/models/ecommerce.models';
 import { CreateOrderDialog } from './create-order-dialog/create-order-dialog';
 import { StatusUpdateDialog } from './status-update-dialog/status-update-dialog';
 

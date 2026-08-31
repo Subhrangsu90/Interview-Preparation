@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { Header } from './shared/components/header/header';
-import { Sidenav } from './shared/components/sidenav/sidenav';
-import { UiLoadingSpinner } from '@shared/ui';
+import { Header } from '@shared/components/header/header';
+import { Sidenav } from '@shared/components/sidenav/sidenav';
+import { UiLoadingSpinner } from '@shared/ui/components/loading-spinner';
 
 @Component({
   selector: 'app-root',

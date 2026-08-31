@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CreateTicketDto, TicketType } from '../../../core/models/ecommerce.models';
+import { CreateTicketDto, TicketType } from '@core/models/ecommerce.models';
 
 @Component({
   selector: 'app-create-ticket-dialog',

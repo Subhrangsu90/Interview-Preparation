@@ -8,18 +8,16 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import {
-  UiPageHeader,
-  UiMetricCard,
-  UiStatusBadge,
-  UiSearchInput,
-  UiEmptyState,
-  UiCopyToClipboardDirective,
-  UiRelativeTimePipe,
-  UiConfirmService,
-} from '@shared/ui';
-import { SupportTicketService } from '../../core/services/support-ticket.service';
-import { SupportTicket, TicketStatus, TicketType } from '../../core/models/ecommerce.models';
+import { UiPageHeader } from '@shared/ui/components/page-header';
+import { UiMetricCard } from '@shared/ui/components/metric-card';
+import { UiStatusBadge } from '@shared/ui/components/status-badge';
+import { UiSearchInput } from '@shared/ui/components/search-input';
+import { UiEmptyState } from '@shared/ui/components/empty-state';
+import { UiConfirmService } from '@shared/ui/components/confirm-dialog';
+import { UiCopyToClipboardDirective } from '@shared/ui/directives';
+import { UiRelativeTimePipe } from '@shared/ui/pipes';
+import { SupportTicketService } from '@core/services/support-ticket.service';
+import { SupportTicket, TicketStatus, TicketType } from '@core/models/ecommerce.models';
 import { CreateTicketDialog } from './create-ticket-dialog/create-ticket-dialog';
 
 @Component({

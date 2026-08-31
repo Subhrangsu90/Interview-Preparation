@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Order, OrderStatus } from '../../../core/models/ecommerce.models';
+import { Order, OrderStatus } from '@core/models/ecommerce.models';
 
 @Component({
   selector: 'app-status-update-dialog',

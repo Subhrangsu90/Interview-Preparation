@@ -18,7 +18,9 @@
       "@core/*": ["./src/app/core/*"],
       "@features/*": ["./src/app/features/*"],
       "@shared/*": ["./src/app/shared/*"],
-      "@shared/ui": ["./projects/shared-ui/src/public-api.ts"],
+      "@env": ["./src/environments/environment.ts"],
+      "@env/*": ["./src/environments/*"],
+      "@shared/ui/*": ["./projects/shared-ui/src/lib/*"],
       "@core/api": ["./projects/core/src/public-api.ts"],
       "core": ["./projects/core/src/public-api.ts"],
       "shared-ui": ["./projects/shared-ui/src/public-api.ts"]

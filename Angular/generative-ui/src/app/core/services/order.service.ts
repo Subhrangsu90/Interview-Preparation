@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { catchError, map, Observable, throwError, tap } from 'rxjs';
 import { ApiService, ApiError } from '@core/api';
-import { environment } from '../../../environments/environment';
+import { environment } from '@env';
 import {
   Order,
   CreateOrderDto,

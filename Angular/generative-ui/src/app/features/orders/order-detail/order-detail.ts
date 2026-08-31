@@ -6,9 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { UiStatusBadge, UiCopyToClipboardDirective } from '@shared/ui';
-import { OrderService } from '../../../core/services/order.service';
-import { Order, OrderItem, OrderStatus } from '../../../core/models/ecommerce.models';
+import { UiStatusBadge } from '@shared/ui/components/status-badge';
+import { UiCopyToClipboardDirective } from '@shared/ui/directives';
+import { OrderService } from '@core/services/order.service';
+import { Order, OrderItem, OrderStatus } from '@core/models/ecommerce.models';
 import { StatusUpdateDialog } from '../status-update-dialog/status-update-dialog';
 
 @Component({

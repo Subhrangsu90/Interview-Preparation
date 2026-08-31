@@ -4,7 +4,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideClientHydration } from '@angular/platform-browser';
 import { routes } from './app.routes';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
-import { environment } from '../environments/environment';
+import { environment } from '@env';
 import { provideApiBaseUrl } from '@core/api';
 
 export const appConfig: ApplicationConfig = {

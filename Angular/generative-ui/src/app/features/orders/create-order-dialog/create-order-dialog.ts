@@ -7,7 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { CreateOrderDto, OrderStatus } from '../../../core/models/ecommerce.models';
+import { CreateOrderDto, OrderStatus } from '@core/models/ecommerce.models';
 
 @Component({
   selector: 'app-create-order-dialog',
