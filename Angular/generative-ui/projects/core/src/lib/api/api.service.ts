@@ -30,7 +30,10 @@ export class ApiService {
     const url = this.resolveUrl(endpoint, options?.baseUrl);
     const httpOptions = this.buildHttpOptions(options);
 
-    return this.pipeRequest(this.http.post<T>(url, body ?? null, httpOptions), options?.unwrapEnvelope);
+    return this.pipeRequest(
+      this.http.post<T>(url, body ?? null, httpOptions),
+      options?.unwrapEnvelope
+    );
   }
 
   /**
@@ -40,7 +43,10 @@ export class ApiService {
     const url = this.resolveUrl(endpoint, options?.baseUrl);
     const httpOptions = this.buildHttpOptions(options);
 
-    return this.pipeRequest(this.http.put<T>(url, body ?? null, httpOptions), options?.unwrapEnvelope);
+    return this.pipeRequest(
+      this.http.put<T>(url, body ?? null, httpOptions),
+      options?.unwrapEnvelope
+    );
   }
 
   /**
@@ -50,7 +56,10 @@ export class ApiService {
     const url = this.resolveUrl(endpoint, options?.baseUrl);
     const httpOptions = this.buildHttpOptions(options);
 
-    return this.pipeRequest(this.http.patch<T>(url, body ?? null, httpOptions), options?.unwrapEnvelope);
+    return this.pipeRequest(
+      this.http.patch<T>(url, body ?? null, httpOptions),
+      options?.unwrapEnvelope
+    );
   }
 
   /**
@@ -132,9 +141,7 @@ export class ApiService {
 
     if (options?.headers) {
       httpOptions.headers =
-        options.headers instanceof HttpHeaders
-          ? options.headers
-          : new HttpHeaders(options.headers);
+        options.headers instanceof HttpHeaders ? options.headers : new HttpHeaders(options.headers);
     }
 
     if (options?.withCredentials !== undefined) {
@@ -151,7 +158,12 @@ export class ApiService {
   private pipeRequest<T>(source: Observable<T>, unwrapEnvelope = false): Observable<T> {
     return source.pipe(
       map((res: T) => {
-        if (unwrapEnvelope && res && typeof res === 'object' && 'data' in (res as Record<string, unknown>)) {
+        if (
+          unwrapEnvelope &&
+          res &&
+          typeof res === 'object' &&
+          'data' in (res as Record<string, unknown>)
+        ) {
           return (res as Record<string, unknown>)['data'] as T;
         }
         return res;

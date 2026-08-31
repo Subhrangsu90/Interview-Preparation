@@ -32,7 +32,9 @@ npm run db:migrate
 ## Run Commands
 
 ### 1. Development (Both Frontend + Backend)
+
 Runs Angular (`http://localhost:4200`) and the API server (`http://localhost:3000`) concurrently:
+
 ```bash
 npm run dev
 ```

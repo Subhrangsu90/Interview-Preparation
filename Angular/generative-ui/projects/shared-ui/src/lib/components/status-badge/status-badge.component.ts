@@ -1,12 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 
-export type StatusBadgeVariant =
-  | 'auto'
-  | 'success'
-  | 'warning'
-  | 'info'
-  | 'danger'
-  | 'neutral';
+export type StatusBadgeVariant = 'auto' | 'success' | 'warning' | 'info' | 'danger' | 'neutral';
 
 export type StatusBadgeSize = 'sm' | 'md';
 
@@ -35,7 +29,9 @@ export type StatusBadgeSize = 'sm' | 'md';
       border-radius: 9999px;
       line-height: 1;
       width: fit-content;
-      transition: background-color 0.2s ease, color 0.2s ease;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
 
       &.size-md {
         padding: 6px 12px;

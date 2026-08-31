@@ -12,11 +12,7 @@ describe('ApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideApiBaseUrl('/api'),
-      ],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideApiBaseUrl('/api')],
     });
 
     service = TestBed.inject(ApiService);
@@ -106,9 +102,11 @@ describe('ApiService', () => {
       const payload = { customer: 'Alice', total: 100 };
       const response = { id: 'new-id', ...payload };
 
-      service.post<{ id: string; customer: string; total: number }>('orders', payload).subscribe((res: { id: string; customer: string; total: number }) => {
-        expect(res).toEqual(response);
-      });
+      service
+        .post<{ id: string; customer: string; total: number }>('orders', payload)
+        .subscribe((res: { id: string; customer: string; total: number }) => {
+          expect(res).toEqual(response);
+        });
 
       const req = httpMock.expectOne('/api/orders');
       expect(req.request.method).toBe('POST');

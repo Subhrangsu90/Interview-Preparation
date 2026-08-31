@@ -42,7 +42,11 @@
       </h2>
 
       <div class="progress-timeline">
-        <div class="step" [class.completed]="isStepCompleted('placed', ord.status)" [class.active]="ord.status === 'pending'">
+        <div
+          class="step"
+          [class.completed]="isStepCompleted('placed', ord.status)"
+          [class.active]="ord.status === 'pending'"
+        >
           <div class="step-circle">
             <mat-icon>shopping_cart</mat-icon>
           </div>
@@ -52,7 +56,11 @@
 
         <div class="timeline-bar" [class.filled]="isStepCompleted('processing', ord.status)"></div>
 
-        <div class="step" [class.completed]="isStepCompleted('processing', ord.status)" [class.active]="ord.status === 'processing'">
+        <div
+          class="step"
+          [class.completed]="isStepCompleted('processing', ord.status)"
+          [class.active]="ord.status === 'processing'"
+        >
           <div class="step-circle">
             <mat-icon>inventory</mat-icon>
           </div>
@@ -62,7 +70,11 @@
 
         <div class="timeline-bar" [class.filled]="isStepCompleted('shipped', ord.status)"></div>
 
-        <div class="step" [class.completed]="isStepCompleted('shipped', ord.status)" [class.active]="ord.status === 'shipped'">
+        <div
+          class="step"
+          [class.completed]="isStepCompleted('shipped', ord.status)"
+          [class.active]="ord.status === 'shipped'"
+        >
           <div class="step-circle">
             <mat-icon>local_shipping</mat-icon>
           </div>
@@ -72,7 +84,11 @@
 
         <div class="timeline-bar" [class.filled]="isStepCompleted('delivered', ord.status)"></div>
 
-        <div class="step" [class.completed]="isStepCompleted('delivered', ord.status)" [class.active]="ord.status === 'delivered'">
+        <div
+          class="step"
+          [class.completed]="isStepCompleted('delivered', ord.status)"
+          [class.active]="ord.status === 'delivered'"
+        >
           <div class="step-circle">
             <mat-icon>home</mat-icon>
           </div>
@@ -115,12 +131,12 @@
                     </div>
                     <span class="product-name-text">{{ item.productName }}</span>
                   </td>
-                  <td class="sku-cell"><code>{{ item.sku }}</code></td>
+                  <td class="sku-cell">
+                    <code>{{ item.sku }}</code>
+                  </td>
                   <td>{{ item.quantity }}</td>
                   <td>${{ item.unitPrice }}</td>
-                  <td class="text-right font-bold">
-                    ${{ getItemTotal(item) }}
-                  </td>
+                  <td class="text-right font-bold">${{ getItemTotal(item) }}</td>
                 </tr>
               }
             </tbody>
@@ -166,7 +182,7 @@
                 class="info-val tracking-mono copyable"
                 [uiCopyToClipboard]="ord.trackingNumber"
                 matTooltip="Click to copy tracking code"
-                style="cursor: pointer;"
+                style="cursor: pointer"
               >
                 {{ ord.trackingNumber }}
               </span>

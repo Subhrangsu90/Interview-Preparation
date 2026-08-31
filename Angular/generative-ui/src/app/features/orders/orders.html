@@ -55,18 +55,11 @@
       <div class="status-filters">
         @for (tab of filterTabs; track tab.value) {
           @if (selectedStatus() === tab.value) {
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="setStatusFilter(tab.value)"
-            >
+            <button mat-flat-button color="primary" (click)="setStatusFilter(tab.value)">
               {{ tab.label }}
             </button>
           } @else {
-            <button
-              mat-stroked-button
-              (click)="setStatusFilter(tab.value)"
-            >
+            <button mat-stroked-button (click)="setStatusFilter(tab.value)">
               {{ tab.label }}
             </button>
           }
@@ -148,7 +141,7 @@
                 class="tracking-code"
                 [uiCopyToClipboard]="order.trackingNumber"
                 matTooltip="Click to copy tracking code"
-                style="cursor: pointer;"
+                style="cursor: pointer"
               >
                 <mat-icon class="inline-icon">local_shipping</mat-icon>
                 {{ order.trackingNumber }}

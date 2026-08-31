@@ -27,4 +27,3 @@ apiRouter.use('/orders', orderRouter);
 apiRouter.use('/support-tickets', supportTicketRouter);
 
 export default apiRouter;
-

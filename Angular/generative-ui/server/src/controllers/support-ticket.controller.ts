@@ -6,7 +6,8 @@ export class SupportTicketController {
   async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const status = typeof req.query['status'] === 'string' ? req.query['status'] : undefined;
-      const orderNumber = typeof req.query['orderNumber'] === 'string' ? req.query['orderNumber'] : undefined;
+      const orderNumber =
+        typeof req.query['orderNumber'] === 'string' ? req.query['orderNumber'] : undefined;
       const tickets = await supportTicketService.getAllTickets({ status, orderNumber });
       res.json({
         status: 'success',

@@ -3,25 +3,20 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: 'orders',
-    loadComponent: () =>
-      import('./features/orders/orders').then((m) => m.OrdersComponent),
+    loadComponent: () => import('./features/orders/orders').then((m) => m.OrdersComponent),
   },
   {
     path: 'orders/:orderNumber',
     loadComponent: () =>
-      import('./features/orders/order-detail/order-detail').then(
-        (m) => m.OrderDetailComponent
-      ),
+      import('./features/orders/order-detail/order-detail').then((m) => m.OrderDetailComponent),
   },
   {
     path: 'support',
-    loadComponent: () =>
-      import('./features/support/support').then((m) => m.SupportComponent),
+    loadComponent: () => import('./features/support/support').then((m) => m.SupportComponent),
   },
   {
     path: 'home',
-    loadComponent: () =>
-      import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+    loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
   {
     path: '',
@@ -33,4 +28,3 @@ export const routes: Routes = [
     redirectTo: 'orders',
   },
 ];
-

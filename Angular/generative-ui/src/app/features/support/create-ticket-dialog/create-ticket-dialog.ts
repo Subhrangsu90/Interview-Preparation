@@ -41,7 +41,12 @@ import { CreateTicketDto, TicketType } from '../../../core/models/ecommerce.mode
 
           <mat-form-field appearance="outline" class="flex-1">
             <mat-label>Customer Email</mat-label>
-            <input matInput formControlName="customerEmail" type="email" placeholder="customer@example.com" />
+            <input
+              matInput
+              formControlName="customerEmail"
+              type="email"
+              placeholder="customer@example.com"
+            />
             @if (form.get('customerEmail')?.invalid && form.get('customerEmail')?.touched) {
               <mat-error>Valid email is required</mat-error>
             }
@@ -73,7 +78,11 @@ import { CreateTicketDto, TicketType } from '../../../core/models/ecommerce.mode
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Subject / Reason</mat-label>
-          <input matInput formControlName="subject" placeholder="e.g. Damaged item during transit" />
+          <input
+            matInput
+            formControlName="subject"
+            placeholder="e.g. Damaged item during transit"
+          />
           @if (form.get('subject')?.invalid && form.get('subject')?.touched) {
             <mat-error>Subject must be at least 3 characters</mat-error>
           }
@@ -96,12 +105,7 @@ import { CreateTicketDto, TicketType } from '../../../core/models/ecommerce.mode
 
     <mat-dialog-actions align="end">
       <button mat-button mat-dialog-close>Cancel</button>
-      <button
-        mat-flat-button
-        color="primary"
-        [disabled]="form.invalid"
-        (click)="submit()"
-      >
+      <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="submit()">
         Submit Request
       </button>
     </mat-dialog-actions>
@@ -114,7 +118,9 @@ import { CreateTicketDto, TicketType } from '../../../core/models/ecommerce.mode
       font-size: 1.3rem;
       font-weight: 700;
       color: #0f172a;
-      .dialog-icon { color: #2563eb; }
+      .dialog-icon {
+        color: #2563eb;
+      }
     }
     .dialog-content {
       padding-top: 10px !important;
@@ -132,16 +138,22 @@ import { CreateTicketDto, TicketType } from '../../../core/models/ecommerce.mode
         gap: 0;
       }
     }
-    .flex-1 { flex: 1; }
-    .full-width { width: 100%; }
+    .flex-1 {
+      flex: 1;
+    }
+    .full-width {
+      width: 100%;
+    }
   `,
 })
 export class CreateTicketDialog implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly dialogRef = inject(MatDialogRef<CreateTicketDialog>);
-  readonly data = inject<{ orderNumber?: string; customerEmail?: string; type?: TicketType } | null>(
-    MAT_DIALOG_DATA
-  );
+  readonly data = inject<{
+    orderNumber?: string;
+    customerEmail?: string;
+    type?: TicketType;
+  } | null>(MAT_DIALOG_DATA);
 
   readonly form: FormGroup = this.fb.group({
     orderNumber: ['', [Validators.required]],

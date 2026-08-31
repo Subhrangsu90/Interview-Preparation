@@ -25,7 +25,13 @@ export interface MetricTrend {
           @if (trend(); as tr) {
             <span class="ui-metric-trend" [class]="tr.direction">
               <mat-icon class="trend-icon">
-                {{ tr.direction === 'up' ? 'trending_up' : tr.direction === 'down' ? 'trending_down' : 'trending_flat' }}
+                {{
+                  tr.direction === 'up'
+                    ? 'trending_up'
+                    : tr.direction === 'down'
+                      ? 'trending_down'
+                      : 'trending_flat'
+                }}
               </mat-icon>
               <span>{{ tr.value }}</span>
             </span>
@@ -45,7 +51,9 @@ export interface MetricTrend {
       border-radius: 12px;
       border-color: var(--mat-sys-outline-variant, #e2e8f0);
       background-color: var(--mat-sys-surface, #ffffff);
-      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition:
+        transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
       &:hover {
         box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.08);

@@ -19,11 +19,7 @@ import {
   UiConfirmService,
 } from '@shared/ui';
 import { SupportTicketService } from '../../core/services/support-ticket.service';
-import {
-  SupportTicket,
-  TicketStatus,
-  TicketType,
-} from '../../core/models/ecommerce.models';
+import { SupportTicket, TicketStatus, TicketType } from '../../core/models/ecommerce.models';
 import { CreateTicketDialog } from './create-ticket-dialog/create-ticket-dialog';
 
 @Component({
@@ -145,7 +141,11 @@ export class SupportComponent implements OnInit {
     });
   }
 
-  openCreateTicketDialog(prefill?: { orderNumber?: string; customerEmail?: string; type?: TicketType }): void {
+  openCreateTicketDialog(prefill?: {
+    orderNumber?: string;
+    customerEmail?: string;
+    type?: TicketType;
+  }): void {
     const dialogRef = this.dialog.open(CreateTicketDialog, {
       width: '560px',
       data: prefill,

@@ -26,12 +26,7 @@
       [value]="inProgressCount()"
       variant="blue"
     />
-    <ui-metric-card
-      icon="task_alt"
-      label="Resolved"
-      [value]="resolvedCount()"
-      variant="emerald"
-    />
+    <ui-metric-card icon="task_alt" label="Resolved" [value]="resolvedCount()" variant="emerald" />
     <ui-metric-card
       icon="assignment_return"
       label="Returns / Refunds"
@@ -54,18 +49,11 @@
       <div class="status-tab-group">
         @for (status of statusTabs; track status) {
           @if (selectedStatus() === status) {
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="selectedStatus.set(status)"
-            >
+            <button mat-flat-button color="primary" (click)="selectedStatus.set(status)">
               {{ status | titlecase }}
             </button>
           } @else {
-            <button
-              mat-stroked-button
-              (click)="selectedStatus.set(status)"
-            >
+            <button mat-stroked-button (click)="selectedStatus.set(status)">
               {{ status | titlecase }}
             </button>
           }
@@ -95,7 +83,7 @@
                 class="ticket-number"
                 [uiCopyToClipboard]="ticket.ticketNumber"
                 matTooltip="Click to copy ticket number"
-                style="cursor: pointer;"
+                style="cursor: pointer"
               >
                 {{ ticket.ticketNumber }}
               </span>
@@ -141,9 +129,7 @@
             @if (ticket.resolution) {
               <div class="resolution-box">
                 <mat-icon class="res-icon">check</mat-icon>
-                <div>
-                  <strong>Resolution:</strong> {{ ticket.resolution }}
-                </div>
+                <div><strong>Resolution:</strong> {{ ticket.resolution }}</div>
               </div>
             }
           </div>
@@ -152,7 +138,10 @@
             <div class="footer-meta">
               <span class="meta-item">
                 <mat-icon>receipt</mat-icon>
-                Order: <a [routerLink]="['/orders', ticket.orderNumber]" class="order-ref-link">{{ ticket.orderNumber }}</a>
+                Order:
+                <a [routerLink]="['/orders', ticket.orderNumber]" class="order-ref-link">{{
+                  ticket.orderNumber
+                }}</a>
               </span>
               <span class="meta-item">
                 <mat-icon>email</mat-icon>
@@ -166,7 +155,11 @@
 
             <div class="footer-quick-action">
               @if (ticket.status !== 'resolved' && ticket.status !== 'closed') {
-                <button mat-stroked-button color="primary" (click)="updateTicketStatus(ticket, 'resolved')">
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  (click)="updateTicketStatus(ticket, 'resolved')"
+                >
                   <mat-icon>check</mat-icon>
                   Resolve Request
                 </button>

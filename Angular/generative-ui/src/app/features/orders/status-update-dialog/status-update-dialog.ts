@@ -53,7 +53,9 @@ import { Order, OrderStatus } from '../../../core/models/ecommerce.models';
       display: flex;
       align-items: center;
       gap: 8px;
-      .dialog-icon { color: var(--mat-sys-primary); }
+      .dialog-icon {
+        color: var(--mat-sys-primary);
+      }
     }
     .dialog-content {
       padding-top: 8px;

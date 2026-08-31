@@ -6,6 +6,8 @@ export default defineConfig({
   schema: './server/src/db/schema.ts',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env['DATABASE_URL'] || 'postgresql://postgres:postgres@localhost:5432/generative_ui_db',
+    url:
+      process.env['DATABASE_URL'] ||
+      'postgresql://postgres:postgres@localhost:5432/generative_ui_db',
   },
 });
