@@ -2,9 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { API_BASE_URL } from './api.tokens';
-import { ApiError } from './api-error.model';
-import { HttpParamsRecord, RequestOptions } from './api.types';
+import { API_BASE_URL } from '@core/api';
+import { ApiError } from '@core/api';
+import { HttpParamsRecord, RequestOptions } from '@core/api';
 
 @Injectable({
   providedIn: 'root',

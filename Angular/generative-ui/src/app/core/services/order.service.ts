@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { catchError, map, Observable, throwError, tap } from 'rxjs';
 import { ApiService, ApiError } from '@core/api';
+import { environment } from '../../../environments/environment';
 import {
   Order,
   CreateOrderDto,
@@ -17,6 +18,7 @@ import {
 })
 export class OrderService {
   private readonly api = inject(ApiService);
+  private readonly endpoints = environment.endpoints.orders;
 
   // Dynamic state signals
   readonly orders = signal<Order[]>([]);
@@ -35,7 +37,7 @@ export class OrderService {
     };
 
     this.api
-      .get<Order[]>('orders', { params, unwrapEnvelope: true })
+      .get<Order[]>(this.endpoints.base, { params, unwrapEnvelope: true })
       .pipe(
         map((rawOrders) => {
           const parsed = orderSchema.array().safeParse(rawOrders ?? []);
@@ -62,7 +64,7 @@ export class OrderService {
     this.isLoading.set(true);
     this.error.set(null);
 
-    return this.api.get<Order>(`orders/${id}`, { unwrapEnvelope: true }).pipe(
+    return this.api.get<Order>(this.endpoints.byId(id), { unwrapEnvelope: true }).pipe(
       map((res) => {
         if (!res) return null;
         const parsed = orderSchema.safeParse(res);
@@ -85,7 +87,7 @@ export class OrderService {
     this.isLoading.set(true);
     this.error.set(null);
 
-    return this.api.get<Order>(`orders/number/${num}`, { unwrapEnvelope: true }).pipe(
+    return this.api.get<Order>(this.endpoints.byNumber(num), { unwrapEnvelope: true }).pipe(
       map((res) => {
         if (!res) return null;
         const parsed = orderSchema.safeParse(res);
@@ -107,7 +109,7 @@ export class OrderService {
     const num = orderNumber.trim().toUpperCase();
     this.error.set(null);
 
-    return this.api.get<TrackingInfo>(`orders/tracking/${num}`, { unwrapEnvelope: true }).pipe(
+    return this.api.get<TrackingInfo>(this.endpoints.tracking(num), { unwrapEnvelope: true }).pipe(
       map((res) => {
         if (!res) return null;
         const parsed = trackingInfoSchema.safeParse(res);
@@ -126,7 +128,7 @@ export class OrderService {
     this.isLoading.set(true);
     this.error.set(null);
 
-    return this.api.post<Order>('orders', validatedDto, { unwrapEnvelope: true }).pipe(
+    return this.api.post<Order>(this.endpoints.base, validatedDto, { unwrapEnvelope: true }).pipe(
       map((raw) => {
         const parsed = orderSchema.safeParse(raw);
         return parsed.success ? parsed.data : raw;
@@ -147,7 +149,7 @@ export class OrderService {
     const validatedDto = updateOrderDtoSchema.parse(dto);
     this.error.set(null);
 
-    return this.api.patch<Order>(`orders/${id}`, validatedDto, { unwrapEnvelope: true }).pipe(
+    return this.api.patch<Order>(this.endpoints.byId(id), validatedDto, { unwrapEnvelope: true }).pipe(
       map((res) => {
         if (!res) return null;
         const parsed = orderSchema.safeParse(res);
@@ -171,7 +173,7 @@ export class OrderService {
   deleteOrder(id: number): Observable<boolean> {
     this.error.set(null);
 
-    return this.api.delete<unknown>(`orders/${id}`).pipe(
+    return this.api.delete<unknown>(this.endpoints.byId(id)).pipe(
       map(() => true),
       catchError((err: ApiError) => {
         this.error.set(err.message || 'Failed to delete order');

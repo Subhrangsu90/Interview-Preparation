@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { catchError, map, Observable, throwError, tap } from 'rxjs';
 import { ApiService, ApiError } from '@core/api';
+import { environment } from '../../../environments/environment';
 import {
   SupportTicket,
   CreateTicketDto,
@@ -15,6 +16,7 @@ import {
 })
 export class SupportTicketService {
   private readonly api = inject(ApiService);
+  private readonly endpoints = environment.endpoints.supportTickets;
 
   // Dynamic state signals
   readonly tickets = signal<SupportTicket[]>([]);
@@ -31,7 +33,7 @@ export class SupportTicketService {
     };
 
     this.api
-      .get<SupportTicket[]>('support-tickets', { params, unwrapEnvelope: true })
+      .get<SupportTicket[]>(this.endpoints.base, { params, unwrapEnvelope: true })
       .pipe(
         map((rawTickets) => {
           const parsed = supportTicketSchema.array().safeParse(rawTickets ?? []);
@@ -60,7 +62,7 @@ export class SupportTicketService {
     this.error.set(null);
 
     return this.api
-      .post<SupportTicket>('support-tickets', validatedDto, { unwrapEnvelope: true })
+      .post<SupportTicket>(this.endpoints.base, validatedDto, { unwrapEnvelope: true })
       .pipe(
         map((raw) => {
           const parsed = supportTicketSchema.safeParse(raw);
@@ -83,7 +85,7 @@ export class SupportTicketService {
     this.error.set(null);
 
     return this.api
-      .patch<SupportTicket>(`support-tickets/${id}`, validatedDto, { unwrapEnvelope: true })
+      .patch<SupportTicket>(this.endpoints.byId(id), validatedDto, { unwrapEnvelope: true })
       .pipe(
         map((res) => {
           if (!res) return null;
@@ -105,7 +107,7 @@ export class SupportTicketService {
   deleteTicket(id: number): Observable<boolean> {
     this.error.set(null);
 
-    return this.api.delete<unknown>(`support-tickets/${id}`).pipe(
+    return this.api.delete<unknown>(this.endpoints.byId(id)).pipe(
       map(() => true),
       catchError((err: ApiError) => {
         this.error.set(err.message || 'Failed to delete ticket');
