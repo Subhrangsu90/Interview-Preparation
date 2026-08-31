@@ -117,7 +117,7 @@ import { CreateTicketDto, TicketType } from '../../../core/models/ecommerce.mode
       .dialog-icon { color: #2563eb; }
     }
     .dialog-content {
-      padding-top: 10px;
+      padding-top: 10px !important;
     }
     .ticket-form {
       display: flex;

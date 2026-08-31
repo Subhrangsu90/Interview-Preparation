@@ -8,8 +8,16 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import {
+  UiPageHeader,
+  UiMetricCard,
+  UiStatusBadge,
+  UiSearchInput,
+  UiEmptyState,
+  UiCopyToClipboardDirective,
+  UiRelativeTimePipe,
+  UiConfirmService,
+} from '@shared/ui';
 import { SupportTicketService } from '../../core/services/support-ticket.service';
 import {
   SupportTicket,
@@ -33,8 +41,13 @@ import { CreateTicketDialog } from './create-ticket-dialog/create-ticket-dialog'
     MatDividerModule,
     MatProgressBarModule,
     MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
+    UiPageHeader,
+    UiMetricCard,
+    UiStatusBadge,
+    UiSearchInput,
+    UiEmptyState,
+    UiCopyToClipboardDirective,
+    UiRelativeTimePipe,
   ],
   templateUrl: './support.html',
   styleUrl: './support.scss',
@@ -43,6 +56,7 @@ export class SupportComponent implements OnInit {
   private readonly ticketService = inject(SupportTicketService);
   private readonly dialog = inject(MatDialog);
   private readonly route = inject(ActivatedRoute);
+  private readonly confirmService = inject(UiConfirmService);
 
   readonly statusTabs: string[] = ['all', 'open', 'in_progress', 'resolved', 'closed'];
 
@@ -159,8 +173,17 @@ export class SupportComponent implements OnInit {
   }
 
   deleteTicket(ticket: SupportTicket): void {
-    if (confirm(`Delete ticket ${ticket.ticketNumber}?`)) {
-      this.ticketService.deleteTicket(ticket.id).subscribe();
-    }
+    this.confirmService
+      .confirm({
+        title: 'Delete Support Ticket',
+        message: `Are you sure you want to delete ticket ${ticket.ticketNumber}? This action cannot be undone.`,
+        confirmText: 'Delete Ticket',
+        isDestructive: true,
+      })
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.ticketService.deleteTicket(ticket.id).subscribe();
+        }
+      });
   }
 }

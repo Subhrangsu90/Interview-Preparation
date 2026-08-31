@@ -15,9 +15,7 @@
       <div class="header-main-info">
         <div class="order-title-group">
           <h1 class="order-id-title">{{ ord.orderNumber }}</h1>
-          <span class="status-pill" [class]="ord.status">
-            {{ ord.status | titlecase }}
-          </span>
+          <ui-status-badge [status]="ord.status" />
         </div>
         <p class="order-meta">
           Placed on {{ formatDate(ord.createdAt) }} • Currency: {{ ord.currency }}
@@ -163,9 +161,18 @@
 
           <div class="info-item">
             <span class="info-label">Tracking Number:</span>
-            <span class="info-val tracking-mono">
-              {{ ord.trackingNumber || 'Pending assignment' }}
-            </span>
+            @if (ord.trackingNumber) {
+              <span
+                class="info-val tracking-mono copyable"
+                [uiCopyToClipboard]="ord.trackingNumber"
+                matTooltip="Click to copy tracking code"
+                style="cursor: pointer;"
+              >
+                {{ ord.trackingNumber }}
+              </span>
+            } @else {
+              <span class="info-val tracking-mono">Pending assignment</span>
+            }
           </div>
 
           <div class="info-item">

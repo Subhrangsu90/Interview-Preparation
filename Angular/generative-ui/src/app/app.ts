@@ -3,11 +3,11 @@ import { RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Header } from './shared/components/header/header';
 import { Sidenav } from './shared/components/sidenav/sidenav';
-import { LoadingSpinner } from './shared/components/loading-spinner/loading-spinner';
+import { UiLoadingSpinner } from '@shared/ui';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatSidenavModule, Header, Sidenav, LoadingSpinner],
+  imports: [RouterOutlet, MatSidenavModule, Header, Sidenav, UiLoadingSpinner],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

@@ -1,12 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, throwError, tap } from 'rxjs';
+import { ApiService, ApiError } from '@core/api';
 import {
   Order,
   CreateOrderDto,
   UpdateOrderDto,
   TrackingInfo,
-  ApiResponse,
   orderSchema,
   createOrderDtoSchema,
   updateOrderDtoSchema,
@@ -17,8 +16,7 @@ import {
   providedIn: 'root',
 })
 export class OrderService {
-  private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/orders';
+  private readonly api = inject(ApiService);
 
   // Dynamic state signals
   readonly orders = signal<Order[]>([]);
@@ -30,21 +28,21 @@ export class OrderService {
   loadOrders(filters?: { status?: string; search?: string }): void {
     this.isLoading.set(true);
     this.error.set(null);
-    const params: Record<string, string> = {};
-    if (filters?.status && filters.status !== 'all') params['status'] = filters.status;
-    if (filters?.search) params['search'] = filters.search;
 
-    this.http
-      .get<ApiResponse<Order[]>>(this.baseUrl, { params })
+    const params = {
+      status: filters?.status !== 'all' ? filters?.status : undefined,
+      search: filters?.search || undefined,
+    };
+
+    this.api
+      .get<Order[]>('orders', { params, unwrapEnvelope: true })
       .pipe(
-        map((res) => {
-          const rawOrders = res.data ?? [];
-          const parsed = orderSchema.array().safeParse(rawOrders);
-          return parsed.success ? parsed.data : rawOrders;
+        map((rawOrders) => {
+          const parsed = orderSchema.array().safeParse(rawOrders ?? []);
+          return parsed.success ? parsed.data : (rawOrders ?? []);
         }),
-        catchError((err) => {
-          const errMsg = err?.error?.message || err?.message || 'Failed to load orders from API';
-          this.error.set(errMsg);
+        catchError((err: ApiError) => {
+          this.error.set(err.message || 'Failed to load orders from API');
           this.isLoading.set(false);
           return throwError(() => err);
         })
@@ -63,14 +61,15 @@ export class OrderService {
   getOrderById(id: number): Observable<Order | null> {
     this.isLoading.set(true);
     this.error.set(null);
-    return this.http.get<ApiResponse<Order>>(`${this.baseUrl}/${id}`).pipe(
+
+    return this.api.get<Order>(`orders/${id}`, { unwrapEnvelope: true }).pipe(
       map((res) => {
-        if (!res.data) return null;
-        const parsed = orderSchema.safeParse(res.data);
-        return parsed.success ? parsed.data : res.data;
+        if (!res) return null;
+        const parsed = orderSchema.safeParse(res);
+        return parsed.success ? parsed.data : res;
       }),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || `Order with ID ${id} not found`);
+      catchError((err: ApiError) => {
+        this.error.set(err.message || `Order with ID ${id} not found`);
         this.isLoading.set(false);
         return throwError(() => err);
       }),
@@ -85,14 +84,15 @@ export class OrderService {
     const num = orderNumber.trim().toUpperCase();
     this.isLoading.set(true);
     this.error.set(null);
-    return this.http.get<ApiResponse<Order>>(`${this.baseUrl}/number/${num}`).pipe(
+
+    return this.api.get<Order>(`orders/number/${num}`, { unwrapEnvelope: true }).pipe(
       map((res) => {
-        if (!res.data) return null;
-        const parsed = orderSchema.safeParse(res.data);
-        return parsed.success ? parsed.data : res.data;
+        if (!res) return null;
+        const parsed = orderSchema.safeParse(res);
+        return parsed.success ? parsed.data : res;
       }),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || `Order ${num} not found`);
+      catchError((err: ApiError) => {
+        this.error.set(err.message || `Order ${num} not found`);
         this.isLoading.set(false);
         return throwError(() => err);
       }),
@@ -106,14 +106,15 @@ export class OrderService {
   getTracking(orderNumber: string): Observable<TrackingInfo | null> {
     const num = orderNumber.trim().toUpperCase();
     this.error.set(null);
-    return this.http.get<ApiResponse<TrackingInfo>>(`${this.baseUrl}/tracking/${num}`).pipe(
+
+    return this.api.get<TrackingInfo>(`orders/tracking/${num}`, { unwrapEnvelope: true }).pipe(
       map((res) => {
-        if (!res.data) return null;
-        const parsed = trackingInfoSchema.safeParse(res.data);
-        return parsed.success ? parsed.data : res.data;
+        if (!res) return null;
+        const parsed = trackingInfoSchema.safeParse(res);
+        return parsed.success ? parsed.data : res;
       }),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || `Tracking info for ${num} not found`);
+      catchError((err: ApiError) => {
+        this.error.set(err.message || `Tracking info for ${num} not found`);
         return throwError(() => err);
       }),
       tap((info) => this.trackingInfo.set(info))
@@ -124,14 +125,14 @@ export class OrderService {
     const validatedDto = createOrderDtoSchema.parse(dto);
     this.isLoading.set(true);
     this.error.set(null);
-    return this.http.post<ApiResponse<Order>>(this.baseUrl, validatedDto).pipe(
-      map((res) => {
-        const raw = res.data!;
+
+    return this.api.post<Order>('orders', validatedDto, { unwrapEnvelope: true }).pipe(
+      map((raw) => {
         const parsed = orderSchema.safeParse(raw);
         return parsed.success ? parsed.data : raw;
       }),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || 'Failed to create order');
+      catchError((err: ApiError) => {
+        this.error.set(err.message || 'Failed to create order');
         this.isLoading.set(false);
         return throwError(() => err);
       }),
@@ -145,14 +146,15 @@ export class OrderService {
   updateOrder(id: number, dto: UpdateOrderDto): Observable<Order | null> {
     const validatedDto = updateOrderDtoSchema.parse(dto);
     this.error.set(null);
-    return this.http.patch<ApiResponse<Order>>(`${this.baseUrl}/${id}`, validatedDto).pipe(
+
+    return this.api.patch<Order>(`orders/${id}`, validatedDto, { unwrapEnvelope: true }).pipe(
       map((res) => {
-        if (!res.data) return null;
-        const parsed = orderSchema.safeParse(res.data);
-        return parsed.success ? parsed.data : res.data;
+        if (!res) return null;
+        const parsed = orderSchema.safeParse(res);
+        return parsed.success ? parsed.data : res;
       }),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || 'Failed to update order');
+      catchError((err: ApiError) => {
+        this.error.set(err.message || 'Failed to update order');
         return throwError(() => err);
       }),
       tap((updated) => {
@@ -168,10 +170,11 @@ export class OrderService {
 
   deleteOrder(id: number): Observable<boolean> {
     this.error.set(null);
-    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`).pipe(
+
+    return this.api.delete<unknown>(`orders/${id}`).pipe(
       map(() => true),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || 'Failed to delete order');
+      catchError((err: ApiError) => {
+        this.error.set(err.message || 'Failed to delete order');
         return throwError(() => err);
       }),
       tap(() => {

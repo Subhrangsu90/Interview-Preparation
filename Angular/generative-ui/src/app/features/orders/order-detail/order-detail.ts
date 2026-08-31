@@ -1,11 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CommonModule, TitleCasePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import {
+  UiStatusBadge,
+  UiCopyToClipboardDirective,
+} from '@shared/ui';
 import { OrderService } from '../../../core/services/order.service';
 import { Order, OrderItem, OrderStatus } from '../../../core/models/ecommerce.models';
 import { StatusUpdateDialog } from '../status-update-dialog/status-update-dialog';
@@ -15,13 +19,14 @@ import { StatusUpdateDialog } from '../status-update-dialog/status-update-dialog
   standalone: true,
   imports: [
     CommonModule,
-    TitleCasePipe,
     RouterLink,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatDividerModule,
     MatDialogModule,
+    UiStatusBadge,
+    UiCopyToClipboardDirective,
   ],
   templateUrl: './order-detail.html',
   styleUrl: './order-detail.scss',

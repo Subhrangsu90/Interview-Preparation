@@ -1,83 +1,55 @@
 <div class="support-page">
-  <header class="page-header">
-    <div class="header-titles">
-      <h1 class="page-title">
-        <mat-icon class="title-icon">support_agent</mat-icon>
-        Order Support & Returns Desk
-      </h1>
-      <p class="page-subtitle">
-        Manage customer return requests, refund approvals, and logistics inquiries
-      </p>
-    </div>
-    <div class="header-actions">
+  <ui-page-header
+    title="Order Support & Returns Desk"
+    subtitle="Manage customer return requests, refund approvals, and logistics inquiries"
+    icon="support_agent"
+  >
+    <div actions class="header-actions">
       <button mat-flat-button color="primary" (click)="openCreateTicketDialog()">
         <mat-icon>add_circle</mat-icon>
         New Support Ticket
       </button>
     </div>
-  </header>
+  </ui-page-header>
 
   <!-- Support Metrics -->
   <section class="support-metrics-grid">
-    <mat-card appearance="outlined" class="metric-card">
-      <div class="icon-wrap open">
-        <mat-icon>pending_actions</mat-icon>
-      </div>
-      <div class="metric-texts">
-        <span class="value">{{ openTicketsCount() }}</span>
-        <span class="label">Open Tickets</span>
-      </div>
-    </mat-card>
-
-    <mat-card appearance="outlined" class="metric-card">
-      <div class="icon-wrap progress">
-        <mat-icon>hourglass_bottom</mat-icon>
-      </div>
-      <div class="metric-texts">
-        <span class="value">{{ inProgressCount() }}</span>
-        <span class="label">In Progress</span>
-      </div>
-    </mat-card>
-
-    <mat-card appearance="outlined" class="metric-card">
-      <div class="icon-wrap resolved">
-        <mat-icon>task_alt</mat-icon>
-      </div>
-      <div class="metric-texts">
-        <span class="value">{{ resolvedCount() }}</span>
-        <span class="label">Resolved</span>
-      </div>
-    </mat-card>
-
-    <mat-card appearance="outlined" class="metric-card">
-      <div class="icon-wrap return">
-        <mat-icon>assignment_return</mat-icon>
-      </div>
-      <div class="metric-texts">
-        <span class="value">{{ returnRequestsCount() }}</span>
-        <span class="label">Returns / Refunds</span>
-      </div>
-    </mat-card>
+    <ui-metric-card
+      icon="pending_actions"
+      label="Open Tickets"
+      [value]="openTicketsCount()"
+      variant="amber"
+    />
+    <ui-metric-card
+      icon="hourglass_bottom"
+      label="In Progress"
+      [value]="inProgressCount()"
+      variant="blue"
+    />
+    <ui-metric-card
+      icon="task_alt"
+      label="Resolved"
+      [value]="resolvedCount()"
+      variant="emerald"
+    />
+    <ui-metric-card
+      icon="assignment_return"
+      label="Returns / Refunds"
+      [value]="returnRequestsCount()"
+      variant="purple"
+    />
   </section>
 
   <!-- Main Card with Filter Bar & Ticket List -->
   <mat-card appearance="outlined" class="tickets-container-card">
     <div class="filter-toolbar">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-form-field">
-        <mat-icon matPrefix>search</mat-icon>
-        <mat-label>Filter tickets</mat-label>
-        <input
-          matInput
-          placeholder="Filter by Order # or Ticket #..."
-          [value]="searchQuery()"
-          (input)="onSearchInput($event)"
-        />
-        @if (searchQuery()) {
-          <button mat-icon-button matSuffix (click)="searchQuery.set('')" aria-label="Clear filter">
-            <mat-icon>close</mat-icon>
-          </button>
-        }
-      </mat-form-field>
+      <ui-search-input
+        placeholder="Filter by Order # or Ticket #..."
+        ariaLabel="tickets"
+        [value]="searchQuery()"
+        (searchChange)="searchQuery.set($event)"
+        (cleared)="searchQuery.set('')"
+      />
 
       <div class="status-tab-group">
         @for (status of statusTabs; track status) {
@@ -119,7 +91,14 @@
         <div class="ticket-card" [class.urgent]="ticket.priority === 'urgent'">
           <div class="ticket-card-header">
             <div class="ticket-id-section">
-              <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+              <span
+                class="ticket-number"
+                [uiCopyToClipboard]="ticket.ticketNumber"
+                matTooltip="Click to copy ticket number"
+                style="cursor: pointer;"
+              >
+                {{ ticket.ticketNumber }}
+              </span>
               <span class="type-pill" [class]="ticket.type">
                 {{ formatType(ticket.type) }}
               </span>
@@ -129,9 +108,7 @@
             </div>
 
             <div class="ticket-status-section">
-              <span class="status-pill" [class]="ticket.status">
-                {{ ticket.status | titlecase }}
-              </span>
+              <ui-status-badge [status]="ticket.status" />
               <button mat-icon-button [matMenuTriggerFor]="ticketMenu" aria-label="Ticket actions">
                 <mat-icon>more_vert</mat-icon>
               </button>
@@ -183,7 +160,7 @@
               </span>
               <span class="meta-item">
                 <mat-icon>schedule</mat-icon>
-                {{ formatDate(ticket.createdAt) }}
+                {{ ticket.createdAt | uiRelativeTime }}
               </span>
             </div>
 
@@ -198,11 +175,11 @@
           </div>
         </div>
       } @empty {
-        <div class="empty-tickets">
-          <mat-icon class="empty-icon">verified_user</mat-icon>
-          <h3>All Caught Up!</h3>
-          <p>No support tickets match the current filter.</p>
-        </div>
+        <ui-empty-state
+          icon="verified_user"
+          title="All Caught Up!"
+          description="No support tickets match the current filter."
+        />
       }
     </div>
   </mat-card>

@@ -1,11 +1,10 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, throwError, tap } from 'rxjs';
+import { ApiService, ApiError } from '@core/api';
 import {
   SupportTicket,
   CreateTicketDto,
   UpdateTicketDto,
-  ApiResponse,
   supportTicketSchema,
   createTicketDtoSchema,
   updateTicketDtoSchema,
@@ -15,8 +14,7 @@ import {
   providedIn: 'root',
 })
 export class SupportTicketService {
-  private readonly http = inject(HttpClient);
-  private readonly baseUrl = '/api/support-tickets';
+  private readonly api = inject(ApiService);
 
   // Dynamic state signals
   readonly tickets = signal<SupportTicket[]>([]);
@@ -26,21 +24,21 @@ export class SupportTicketService {
   loadTickets(filters?: { status?: string; orderNumber?: string }): void {
     this.isLoading.set(true);
     this.error.set(null);
-    const params: Record<string, string> = {};
-    if (filters?.status && filters.status !== 'all') params['status'] = filters.status;
-    if (filters?.orderNumber) params['orderNumber'] = filters.orderNumber;
 
-    this.http
-      .get<ApiResponse<SupportTicket[]>>(this.baseUrl, { params })
+    const params = {
+      status: filters?.status !== 'all' ? filters?.status : undefined,
+      orderNumber: filters?.orderNumber || undefined,
+    };
+
+    this.api
+      .get<SupportTicket[]>('support-tickets', { params, unwrapEnvelope: true })
       .pipe(
-        map((res) => {
-          const rawTickets = res.data ?? [];
-          const parsed = supportTicketSchema.array().safeParse(rawTickets);
-          return parsed.success ? parsed.data : rawTickets;
+        map((rawTickets) => {
+          const parsed = supportTicketSchema.array().safeParse(rawTickets ?? []);
+          return parsed.success ? parsed.data : (rawTickets ?? []);
         }),
-        catchError((err) => {
-          const errMsg = err?.error?.message || err?.message || 'Failed to load support tickets';
-          this.error.set(errMsg);
+        catchError((err: ApiError) => {
+          this.error.set(err.message || 'Failed to load support tickets');
           this.isLoading.set(false);
           return throwError(() => err);
         })
@@ -60,51 +58,57 @@ export class SupportTicketService {
     const validatedDto = createTicketDtoSchema.parse(dto);
     this.isLoading.set(true);
     this.error.set(null);
-    return this.http.post<ApiResponse<SupportTicket>>(this.baseUrl, validatedDto).pipe(
-      map((res) => {
-        const raw = res.data!;
-        const parsed = supportTicketSchema.safeParse(raw);
-        return parsed.success ? parsed.data : raw;
-      }),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || 'Failed to create support ticket');
-        this.isLoading.set(false);
-        return throwError(() => err);
-      }),
-      tap((ticket) => {
-        this.tickets.update((list) => [ticket, ...list]);
-        this.isLoading.set(false);
-      })
-    );
+
+    return this.api
+      .post<SupportTicket>('support-tickets', validatedDto, { unwrapEnvelope: true })
+      .pipe(
+        map((raw) => {
+          const parsed = supportTicketSchema.safeParse(raw);
+          return parsed.success ? parsed.data : raw;
+        }),
+        catchError((err: ApiError) => {
+          this.error.set(err.message || 'Failed to create support ticket');
+          this.isLoading.set(false);
+          return throwError(() => err);
+        }),
+        tap((ticket) => {
+          this.tickets.update((list) => [ticket, ...list]);
+          this.isLoading.set(false);
+        })
+      );
   }
 
   updateTicket(id: number, dto: UpdateTicketDto): Observable<SupportTicket | null> {
     const validatedDto = updateTicketDtoSchema.parse(dto);
     this.error.set(null);
-    return this.http.patch<ApiResponse<SupportTicket>>(`${this.baseUrl}/${id}`, validatedDto).pipe(
-      map((res) => {
-        if (!res.data) return null;
-        const parsed = supportTicketSchema.safeParse(res.data);
-        return parsed.success ? parsed.data : res.data;
-      }),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || 'Failed to update ticket');
-        return throwError(() => err);
-      }),
-      tap((updated) => {
-        if (updated) {
-          this.tickets.update((list) => list.map((t) => (t.id === id ? updated : t)));
-        }
-      })
-    );
+
+    return this.api
+      .patch<SupportTicket>(`support-tickets/${id}`, validatedDto, { unwrapEnvelope: true })
+      .pipe(
+        map((res) => {
+          if (!res) return null;
+          const parsed = supportTicketSchema.safeParse(res);
+          return parsed.success ? parsed.data : res;
+        }),
+        catchError((err: ApiError) => {
+          this.error.set(err.message || 'Failed to update ticket');
+          return throwError(() => err);
+        }),
+        tap((updated) => {
+          if (updated) {
+            this.tickets.update((list) => list.map((t) => (t.id === id ? updated : t)));
+          }
+        })
+      );
   }
 
   deleteTicket(id: number): Observable<boolean> {
     this.error.set(null);
-    return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`).pipe(
+
+    return this.api.delete<unknown>(`support-tickets/${id}`).pipe(
       map(() => true),
-      catchError((err) => {
-        this.error.set(err?.error?.message || err?.message || 'Failed to delete ticket');
+      catchError((err: ApiError) => {
+        this.error.set(err.message || 'Failed to delete ticket');
         return throwError(() => err);
       }),
       tap(() => {

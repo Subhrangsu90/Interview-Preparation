@@ -17,7 +17,11 @@
       "@app/*": ["./src/app/*"],
       "@core/*": ["./src/app/core/*"],
       "@features/*": ["./src/app/features/*"],
-      "@shared/*": ["./src/app/shared/*"]
+      "@shared/*": ["./src/app/shared/*"],
+      "@shared/ui": ["./projects/shared-ui/src/public-api.ts"],
+      "@core/api": ["./projects/core/src/public-api.ts"],
+      "core": ["./projects/core/src/public-api.ts"],
+      "shared-ui": ["./projects/shared-ui/src/public-api.ts"]
     }
   },
   "angularCompilerOptions": {
@@ -32,6 +36,18 @@
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/shared-ui/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/shared-ui/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/core/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/core/tsconfig.spec.json"
     }
   ]
 }

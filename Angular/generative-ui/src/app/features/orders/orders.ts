@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, computed, signal } from '@angular/core';
-import { CommonModule, TitleCasePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,8 +10,15 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import {
+  UiPageHeader,
+  UiMetricCard,
+  UiStatusBadge,
+  UiSearchInput,
+  UiEmptyState,
+  UiCopyToClipboardDirective,
+  UiConfirmService,
+} from '@shared/ui';
 import { OrderService } from '../../core/services/order.service';
 import { Order, OrderStatus } from '../../core/models/ecommerce.models';
 import { CreateOrderDialog } from './create-order-dialog/create-order-dialog';
@@ -27,7 +34,6 @@ interface StatusFilterTab {
   standalone: true,
   imports: [
     CommonModule,
-    TitleCasePipe,
     RouterLink,
     MatCardModule,
     MatButtonModule,
@@ -38,8 +44,12 @@ interface StatusFilterTab {
     MatDividerModule,
     MatProgressBarModule,
     MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
+    UiPageHeader,
+    UiMetricCard,
+    UiStatusBadge,
+    UiSearchInput,
+    UiEmptyState,
+    UiCopyToClipboardDirective,
   ],
   templateUrl: './orders.html',
   styleUrl: './orders.scss',
@@ -48,6 +58,7 @@ export class OrdersComponent implements OnInit {
   private readonly orderService = inject(OrderService);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly confirmService = inject(UiConfirmService);
 
   readonly displayedColumns: string[] = [
     'orderNumber',
@@ -174,8 +185,17 @@ export class OrdersComponent implements OnInit {
   }
 
   deleteOrder(order: Order): void {
-    if (confirm(`Are you sure you want to delete order ${order.orderNumber}?`)) {
-      this.orderService.deleteOrder(order.id).subscribe();
-    }
+    this.confirmService
+      .confirm({
+        title: 'Delete Order',
+        message: `Are you sure you want to delete order ${order.orderNumber}? This action cannot be undone.`,
+        confirmText: 'Delete Order',
+        isDestructive: true,
+      })
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.orderService.deleteOrder(order.id).subscribe();
+        }
+      });
   }
 }
