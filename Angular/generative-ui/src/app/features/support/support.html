@@ -1,0 +1,187 @@
+<div class="support-page">
+  <header class="page-header">
+    <div class="header-titles">
+      <h1 class="page-title">
+        <mat-icon class="title-icon">support_agent</mat-icon>
+        Order Support & Returns Desk
+      </h1>
+      <p class="page-subtitle">
+        Manage customer return requests, refund approvals, and logistics inquiries
+      </p>
+    </div>
+    <div class="header-actions">
+      <button mat-flat-button color="primary" class="primary-action-btn" (click)="openCreateTicketDialog()">
+        <mat-icon>add_circle</mat-icon>
+        New Support Ticket
+      </button>
+    </div>
+  </header>
+
+  <!-- Support Metrics -->
+  <section class="support-metrics-grid">
+    <mat-card appearance="outlined" class="metric-card">
+      <div class="icon-wrap open">
+        <mat-icon>pending_actions</mat-icon>
+      </div>
+      <div class="metric-texts">
+        <span class="value">{{ openTicketsCount() }}</span>
+        <span class="label">Open Tickets</span>
+      </div>
+    </mat-card>
+
+    <mat-card appearance="outlined" class="metric-card">
+      <div class="icon-wrap progress">
+        <mat-icon>hourglass_bottom</mat-icon>
+      </div>
+      <div class="metric-texts">
+        <span class="value">{{ inProgressCount() }}</span>
+        <span class="label">In Progress</span>
+      </div>
+    </mat-card>
+
+    <mat-card appearance="outlined" class="metric-card">
+      <div class="icon-wrap resolved">
+        <mat-icon>task_alt</mat-icon>
+      </div>
+      <div class="metric-texts">
+        <span class="value">{{ resolvedCount() }}</span>
+        <span class="label">Resolved</span>
+      </div>
+    </mat-card>
+
+    <mat-card appearance="outlined" class="metric-card">
+      <div class="icon-wrap return">
+        <mat-icon>assignment_return</mat-icon>
+      </div>
+      <div class="metric-texts">
+        <span class="value">{{ returnRequestsCount() }}</span>
+        <span class="label">Returns / Refunds</span>
+      </div>
+    </mat-card>
+  </section>
+
+  <!-- Main Card with Filter Bar & Ticket List -->
+  <mat-card appearance="outlined" class="tickets-container-card">
+    <div class="filter-toolbar">
+      <div class="search-input-wrap">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          placeholder="Filter by Order # or Ticket #..."
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+        />
+        @if (searchQuery()) {
+          <button mat-icon-button (click)="searchQuery.set('')">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <div class="status-tab-group">
+        @for (status of statusTabs; track status) {
+          <button
+            mat-stroked-button
+            [class.active-tab]="selectedStatus() === status"
+            (click)="selectedStatus.set(status)"
+          >
+            {{ status | titlecase }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Ticket Cards List -->
+    <div class="tickets-list">
+      @for (ticket of filteredTickets(); track ticket.id) {
+        <div class="ticket-card" [class.urgent]="ticket.priority === 'urgent'">
+          <div class="ticket-card-header">
+            <div class="ticket-id-section">
+              <span class="ticket-number">{{ ticket.ticketNumber }}</span>
+              <span class="type-pill" [class]="ticket.type">
+                {{ formatType(ticket.type) }}
+              </span>
+              <span class="priority-pill" [class]="ticket.priority">
+                {{ ticket.priority | uppercase }}
+              </span>
+            </div>
+
+            <div class="ticket-status-section">
+              <span class="status-pill" [class]="ticket.status">
+                {{ ticket.status | titlecase }}
+              </span>
+              <button mat-icon-button [matMenuTriggerFor]="ticketMenu" aria-label="Ticket actions">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #ticketMenu="matMenu">
+                <button mat-menu-item (click)="updateTicketStatus(ticket, 'in_progress')">
+                  <mat-icon>hourglass_bottom</mat-icon>
+                  <span>Mark In Progress</span>
+                </button>
+                <button mat-menu-item (click)="updateTicketStatus(ticket, 'resolved')">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Mark Resolved</span>
+                </button>
+                <button mat-menu-item (click)="updateTicketStatus(ticket, 'closed')">
+                  <mat-icon>lock</mat-icon>
+                  <span>Close Ticket</span>
+                </button>
+                <mat-divider />
+                <button mat-menu-item (click)="deleteTicket(ticket)" class="danger-item">
+                  <mat-icon color="warn">delete</mat-icon>
+                  <span>Delete Ticket</span>
+                </button>
+              </mat-menu>
+            </div>
+          </div>
+
+          <div class="ticket-body">
+            <h3 class="ticket-subject">{{ ticket.subject }}</h3>
+            <p class="ticket-desc">{{ ticket.description }}</p>
+
+            @if (ticket.resolution) {
+              <div class="resolution-box">
+                <mat-icon class="res-icon">check</mat-icon>
+                <div>
+                  <strong>Resolution:</strong> {{ ticket.resolution }}
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="ticket-footer">
+            <div class="footer-meta">
+              <span class="meta-item">
+                <mat-icon>receipt</mat-icon>
+                Order: <a [routerLink]="['/orders', ticket.orderNumber]" class="order-ref-link">{{ ticket.orderNumber }}</a>
+              </span>
+              <span class="meta-item">
+                <mat-icon>email</mat-icon>
+                {{ ticket.customerEmail }}
+              </span>
+              <span class="meta-item">
+                <mat-icon>schedule</mat-icon>
+                {{ formatDate(ticket.createdAt) }}
+              </span>
+            </div>
+
+            <div class="footer-quick-action">
+              @if (ticket.status !== 'resolved' && ticket.status !== 'closed') {
+                <button mat-stroked-button color="primary" (click)="updateTicketStatus(ticket, 'resolved')">
+                  <mat-icon>check</mat-icon>
+                  Resolve Request
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-tickets">
+          <mat-icon class="empty-icon">verified_user</mat-icon>
+          <h3>All Caught Up!</h3>
+          <p>No support tickets match the current filter.</p>
+        </div>
+      }
+    </div>
+  </mat-card>
+</div>

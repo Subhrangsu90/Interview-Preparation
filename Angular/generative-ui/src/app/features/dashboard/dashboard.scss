@@ -62,6 +62,11 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+.header-text-group {
+  display: flex;
+  flex-direction: column;
+}
+
 .welcome-divider {
   border-top-color: var(--mat-sys-outline-variant) !important;
 }
@@ -71,8 +76,70 @@
 }
 
 .welcome-description {
-  margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.65;
+  margin: 0 0 24px 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: var(--mat-sys-on-surface-variant);
 }
+
+.quick-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.nav-card {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border-color: #cbd5e1;
+  }
+
+  .nav-card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #2563eb;
+    min-width: 44px;
+  }
+
+  .nav-card-details {
+    display: flex;
+    flex-direction: column;
+
+    h3 {
+      margin: 0 0 4px 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+      font-size: 0.85rem;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .action-link {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #2563eb;
+    }
+  }
+}
+

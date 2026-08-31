@@ -1,0 +1,212 @@
+<div class="order-detail-page">
+  @if (order(); as ord) {
+    <!-- Breadcrumb & Top Bar -->
+    <nav class="breadcrumb-nav">
+      <a routerLink="/orders" class="back-link">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Orders
+      </a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="current-order">{{ ord.orderNumber }}</span>
+    </nav>
+
+    <!-- Header Card -->
+    <header class="detail-header-card">
+      <div class="header-main-info">
+        <div class="order-title-group">
+          <h1 class="order-id-title">{{ ord.orderNumber }}</h1>
+          <span class="status-pill" [class]="ord.status">
+            {{ ord.status | titlecase }}
+          </span>
+        </div>
+        <p class="order-meta">
+          Placed on {{ formatDate(ord.createdAt) }} • Currency: {{ ord.currency }}
+        </p>
+      </div>
+
+      <div class="header-action-group">
+        <button mat-stroked-button (click)="openStatusDialog(ord)">
+          <mat-icon>sync_alt</mat-icon>
+          Update Status
+        </button>
+        <button mat-flat-button color="primary" (click)="requestReturn(ord)">
+          <mat-icon>support_agent</mat-icon>
+          Request Return / Support
+        </button>
+      </div>
+    </header>
+
+    <!-- Order Lifecycle Stepper -->
+    <mat-card appearance="outlined" class="stepper-card">
+      <h2 class="section-title">
+        <mat-icon>local_shipping</mat-icon>
+        Fulfillment & Delivery Progress
+      </h2>
+
+      <div class="progress-timeline">
+        <div class="step" [class.completed]="isStepCompleted('placed', ord.status)" [class.active]="ord.status === 'pending'">
+          <div class="step-circle">
+            <mat-icon>shopping_cart</mat-icon>
+          </div>
+          <div class="step-label">Order Placed</div>
+          <div class="step-date">{{ formatDate(ord.createdAt) }}</div>
+        </div>
+
+        <div class="timeline-bar" [class.filled]="isStepCompleted('processing', ord.status)"></div>
+
+        <div class="step" [class.completed]="isStepCompleted('processing', ord.status)" [class.active]="ord.status === 'processing'">
+          <div class="step-circle">
+            <mat-icon>inventory</mat-icon>
+          </div>
+          <div class="step-label">Processing & Packing</div>
+          <div class="step-date">Fulfillment Center</div>
+        </div>
+
+        <div class="timeline-bar" [class.filled]="isStepCompleted('shipped', ord.status)"></div>
+
+        <div class="step" [class.completed]="isStepCompleted('shipped', ord.status)" [class.active]="ord.status === 'shipped'">
+          <div class="step-circle">
+            <mat-icon>local_shipping</mat-icon>
+          </div>
+          <div class="step-label">In Transit</div>
+          <div class="step-date">{{ ord.carrier }}</div>
+        </div>
+
+        <div class="timeline-bar" [class.filled]="isStepCompleted('delivered', ord.status)"></div>
+
+        <div class="step" [class.completed]="isStepCompleted('delivered', ord.status)" [class.active]="ord.status === 'delivered'">
+          <div class="step-circle">
+            <mat-icon>home</mat-icon>
+          </div>
+          <div class="step-label">Delivered</div>
+          <div class="step-date">Front Door / Mailbox</div>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Two-Column Layout: Items vs Logistics & Customer -->
+    <div class="details-grid">
+      <!-- Left Column: Line Items -->
+      <mat-card appearance="outlined" class="items-card">
+        <h2 class="section-title">
+          <mat-icon>receipt</mat-icon>
+          Items in this Order ({{ ord.items.length }})
+        </h2>
+
+        <div class="items-table-wrapper">
+          <table class="custom-items-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of ord.items; track item.id || item.sku) {
+                <tr>
+                  <td class="product-cell">
+                    <div class="product-avatar">
+                      @if (item.imageUrl) {
+                        <img [src]="item.imageUrl" [alt]="item.productName" />
+                      } @else {
+                        <mat-icon>image</mat-icon>
+                      }
+                    </div>
+                    <span class="product-name-text">{{ item.productName }}</span>
+                  </td>
+                  <td class="sku-cell"><code>{{ item.sku }}</code></td>
+                  <td>{{ item.quantity }}</td>
+                  <td>${{ item.unitPrice }}</td>
+                  <td class="text-right font-bold">
+                    ${{ getItemTotal(item) }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <mat-divider class="items-divider" />
+
+        <div class="order-summary-totals">
+          <div class="total-row subtotal">
+            <span>Subtotal:</span>
+            <span>${{ ord.totalAmount }}</span>
+          </div>
+          <div class="total-row shipping">
+            <span>Shipping & Handling:</span>
+            <span class="free-shipping">FREE (Standard)</span>
+          </div>
+          <div class="total-row grand-total">
+            <span>Grand Total:</span>
+            <span class="amount">${{ ord.totalAmount }} {{ ord.currency }}</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Right Column: Shipping & Customer Info -->
+      <div class="side-info-column">
+        <!-- Shipping Logistics Card -->
+        <mat-card appearance="outlined" class="info-card">
+          <h2 class="section-title">
+            <mat-icon>flight_takeoff</mat-icon>
+            Shipping & Carrier
+          </h2>
+
+          <div class="info-item">
+            <span class="info-label">Carrier:</span>
+            <span class="info-val font-bold">{{ ord.carrier }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Tracking Number:</span>
+            <span class="info-val tracking-mono">
+              {{ ord.trackingNumber || 'Pending assignment' }}
+            </span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Estimated Delivery:</span>
+            <span class="info-val delivery-highlight">
+              {{ formatEstDelivery(ord.estimatedDelivery) }}
+            </span>
+          </div>
+
+          <mat-divider class="inner-divider" />
+
+          <h3 class="subsection-title">
+            <mat-icon class="sub-icon">location_on</mat-icon>
+            Delivery Address
+          </h3>
+          <p class="address-box">{{ ord.shippingAddress }}</p>
+        </mat-card>
+
+        <!-- Customer Card -->
+        <mat-card appearance="outlined" class="info-card">
+          <h2 class="section-title">
+            <mat-icon>person</mat-icon>
+            Customer Information
+          </h2>
+
+          <div class="info-item">
+            <span class="info-label">Full Name:</span>
+            <span class="info-val">{{ ord.customerName }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Email:</span>
+            <span class="info-val">{{ ord.customerEmail }}</span>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  } @else {
+    <div class="loading-container">
+      <mat-icon class="loading-spin">sync</mat-icon>
+      <p>Loading order details...</p>
+    </div>
+  }
+</div>

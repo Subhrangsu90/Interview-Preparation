@@ -18,10 +18,9 @@ interface NavItem {
 })
 export class Sidenav {
   protected readonly mainNavItems: readonly NavItem[] = [
+    { label: 'Orders', route: '/orders', icon: 'receipt_long' },
+    { label: 'Support & Returns', route: '/support', icon: 'support_agent' },
     { label: 'Dashboard', route: '/home', icon: 'dashboard' },
-    { label: 'Generative Studio', route: '/studio', icon: 'auto_awesome' },
-    { label: 'Components', route: '/components', icon: 'widgets' },
-    { label: 'Analytics', route: '/analytics', icon: 'bar_chart' },
   ];
 
   protected readonly secondaryNavItems: readonly NavItem[] = [

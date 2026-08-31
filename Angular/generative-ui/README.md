@@ -1,59 +1,87 @@
-# GenerativeUi
+# Generative UI
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.6.
+Full-stack application with **Angular** frontend, **Express** API server, **Drizzle ORM**, and **PostgreSQL** (Docker).
 
-## Development server
+---
 
-To start a local development server, run:
+## Prerequisites
 
-```bash
-ng serve
-```
+- [Node.js](https://nodejs.org/) (v20+)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (running)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Initial Setup
 
 ```bash
-ng generate component component-name
+# 1. Install dependencies
+npm install
+
+# 2. Setup environment file
+cp .env.example .env
+
+# 3. Start PostgreSQL container
+npm run docker:up
+
+# 4. Apply database migrations
+npm run db:migrate
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
+
+## Run Commands
+
+### 1. Development (Both Frontend + Backend)
+Runs Angular (`http://localhost:4200`) and the API server (`http://localhost:3000`) concurrently:
+```bash
+npm run dev
+```
+
+### 2. Run Independently
 
 ```bash
-ng generate --help
+# Frontend only (port 4200)
+npm start
+
+# Backend API only (port 3000, with hot reload)
+npm run server:dev
 ```
 
-## Building
+---
 
-To build the project run:
+## Database & Docker Commands
 
 ```bash
-ng build
+# Start PostgreSQL container
+npm run docker:up
+
+# Stop PostgreSQL container
+npm run docker:down
+
+# Generate new migration from schema changes
+npm run db:generate
+
+# Apply migrations to database
+npm run db:migrate
+
+# Open Drizzle Studio (web UI database viewer)
+npm run db:studio
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Build & Quality Checks
 
 ```bash
-ng test
+# Build frontend
+npm run build
+
+# Build backend
+npm run server:build
+
+# Run linter
+npm run lint
+
+# Run tests
+npm run test
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
