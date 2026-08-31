@@ -176,6 +176,27 @@
     }
   }
 
+  .api-error-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border-bottom: 1px solid #fecaca;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+
+    mat-icon {
+      font-size: 1.25rem;
+    }
+
+    button {
+      margin-left: auto;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+  }
+
   .tickets-list {
     display: flex;
     flex-direction: column;

@@ -1,14 +1,15 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withViewTransitions } from '@angular/router';
-import { provideHttpClient, withXhr } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideClientHydration } from '@angular/platform-browser';
 import { routes } from './app.routes';
+import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withViewTransitions()),
     provideClientHydration(),
-    provideHttpClient()
+    provideHttpClient(withInterceptors([loadingInterceptor])),
   ],
 };

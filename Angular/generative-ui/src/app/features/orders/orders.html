@@ -93,6 +93,18 @@
       </div>
     </div>
 
+    @if (isLoading()) {
+      <mat-progress-bar mode="indeterminate" class="table-progress" />
+    }
+
+    @if (error()) {
+      <div class="api-error-banner">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error() }}</span>
+        <button mat-stroked-button (click)="ngOnInit()">Retry</button>
+      </div>
+    }
+
     <!-- Orders Table -->
     <div class="table-scroll-container">
       <table mat-table [dataSource]="filteredOrders()" class="orders-table">

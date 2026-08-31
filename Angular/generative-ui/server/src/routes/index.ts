@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { itemRouter } from './item.route.js';
 import { orderRouter } from './order.route.js';
 import { supportTicketRouter } from './support-ticket.route.js';
 import { pool } from '../db/index.js';
@@ -24,7 +23,6 @@ apiRouter.get('/health', async (_req, res) => {
   });
 });
 
-apiRouter.use('/items', itemRouter);
 apiRouter.use('/orders', orderRouter);
 apiRouter.use('/support-tickets', supportTicketRouter);
 

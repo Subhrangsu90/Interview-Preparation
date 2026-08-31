@@ -1,43 +1,12 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { catchError, map, Observable, throwError, tap } from 'rxjs';
 import {
   SupportTicket,
   CreateTicketDto,
   UpdateTicketDto,
   ApiResponse,
 } from '../models/ecommerce.models';
-
-const INITIAL_MOCK_TICKETS: SupportTicket[] = [
-  {
-    id: 1,
-    ticketNumber: 'TKT-1042',
-    orderNumber: 'ORD-9104',
-    customerEmail: 'marcus.v@example.com',
-    type: 'return',
-    status: 'open',
-    priority: 'medium',
-    subject: 'Return Request: Headphones ear cushion defect',
-    description: 'The right cushion seems loose out of the box. Requesting return and exchange for replacement.',
-    resolution: null,
-    createdAt: new Date(Date.now() - 12 * 3600 * 1000).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    ticketNumber: 'TKT-1038',
-    orderNumber: 'ORD-3312',
-    customerEmail: 'elena.r@example.com',
-    type: 'shipping_delay',
-    status: 'in_progress',
-    priority: 'high',
-    subject: 'Delivery address update request before dispatch',
-    description: 'Please update delivery suite number from Suite 100 to Suite 400 at 450 Bayview Ave.',
-    resolution: 'Support agent contacted DHL logistics to append suite notes.',
-    createdAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
 
 @Injectable({
   providedIn: 'root',
@@ -46,12 +15,14 @@ export class SupportTicketService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api/support-tickets';
 
-  readonly tickets = signal<SupportTicket[]>(INITIAL_MOCK_TICKETS);
+  // Dynamic state signals
+  readonly tickets = signal<SupportTicket[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
 
   loadTickets(filters?: { status?: string; orderNumber?: string }): void {
     this.isLoading.set(true);
+    this.error.set(null);
     const params: Record<string, string> = {};
     if (filters?.status && filters.status !== 'all') params['status'] = filters.status;
     if (filters?.orderNumber) params['orderNumber'] = filters.orderNumber;
@@ -60,16 +31,11 @@ export class SupportTicketService {
       .get<ApiResponse<SupportTicket[]>>(this.baseUrl, { params })
       .pipe(
         map((res) => res.data ?? []),
-        catchError(() => {
-          let local = [...this.tickets()];
-          if (filters?.status && filters.status !== 'all') {
-            local = local.filter((t) => t.status === filters.status);
-          }
-          if (filters?.orderNumber) {
-            const num = filters.orderNumber.toUpperCase();
-            local = local.filter((t) => t.orderNumber.toUpperCase().includes(num));
-          }
-          return of(local);
+        catchError((err) => {
+          const errMsg = err?.error?.message || err?.message || 'Failed to load support tickets';
+          this.error.set(errMsg);
+          this.isLoading.set(false);
+          return throwError(() => err);
         })
       )
       .subscribe({
@@ -77,47 +43,36 @@ export class SupportTicketService {
           this.tickets.set(data);
           this.isLoading.set(false);
         },
-        error: (err) => {
-          this.error.set(err?.message || 'Failed to load tickets');
+        error: () => {
           this.isLoading.set(false);
         },
       });
   }
 
   createTicket(dto: CreateTicketDto): Observable<SupportTicket> {
+    this.isLoading.set(true);
+    this.error.set(null);
     return this.http.post<ApiResponse<SupportTicket>>(this.baseUrl, dto).pipe(
       map((res) => res.data!),
-      catchError(() => {
-        const newTicket: SupportTicket = {
-          id: Date.now(),
-          ticketNumber: `TKT-${Math.floor(1000 + Math.random() * 9000)}`,
-          orderNumber: dto.orderNumber.toUpperCase(),
-          customerEmail: dto.customerEmail,
-          type: dto.type,
-          status: dto.status || 'open',
-          priority: dto.priority || 'medium',
-          subject: dto.subject,
-          description: dto.description,
-          resolution: null,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        return of(newTicket);
+      catchError((err) => {
+        this.error.set(err?.error?.message || err?.message || 'Failed to create support ticket');
+        this.isLoading.set(false);
+        return throwError(() => err);
       }),
       tap((ticket) => {
         this.tickets.update((list) => [ticket, ...list]);
+        this.isLoading.set(false);
       })
     );
   }
 
   updateTicket(id: number, dto: UpdateTicketDto): Observable<SupportTicket | null> {
+    this.error.set(null);
     return this.http.patch<ApiResponse<SupportTicket>>(`${this.baseUrl}/${id}`, dto).pipe(
       map((res) => res.data ?? null),
-      catchError(() => {
-        const current = this.tickets().find((t) => t.id === id);
-        if (!current) return of(null);
-        const updated: SupportTicket = { ...current, ...dto, updatedAt: new Date().toISOString() };
-        return of(updated);
+      catchError((err) => {
+        this.error.set(err?.error?.message || err?.message || 'Failed to update ticket');
+        return throwError(() => err);
       }),
       tap((updated) => {
         if (updated) {
@@ -128,9 +83,13 @@ export class SupportTicketService {
   }
 
   deleteTicket(id: number): Observable<boolean> {
+    this.error.set(null);
     return this.http.delete<ApiResponse<void>>(`${this.baseUrl}/${id}`).pipe(
       map(() => true),
-      catchError(() => of(true)),
+      catchError((err) => {
+        this.error.set(err?.error?.message || err?.message || 'Failed to delete ticket');
+        return throwError(() => err);
+      }),
       tap(() => {
         this.tickets.update((list) => list.filter((t) => t.id !== id));
       })

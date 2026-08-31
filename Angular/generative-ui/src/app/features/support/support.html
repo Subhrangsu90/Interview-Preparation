@@ -91,6 +91,18 @@
       </div>
     </div>
 
+    @if (isLoading()) {
+      <mat-progress-bar mode="indeterminate" class="tickets-progress" />
+    }
+
+    @if (error()) {
+      <div class="api-error-banner">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ error() }}</span>
+        <button mat-stroked-button (click)="ngOnInit()">Retry</button>
+      </div>
+    }
+
     <!-- Ticket Cards List -->
     <div class="tickets-list">
       @for (ticket of filteredTickets(); track ticket.id) {

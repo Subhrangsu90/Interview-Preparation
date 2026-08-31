@@ -8,6 +8,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { OrderService } from '../../core/services/order.service';
 import { Order, OrderStatus } from '../../core/models/ecommerce.models';
@@ -33,6 +34,7 @@ interface StatusFilterTab {
     MatMenuModule,
     MatTooltipModule,
     MatDividerModule,
+    MatProgressBarModule,
     MatDialogModule,
   ],
   templateUrl: './orders.html',
@@ -65,8 +67,10 @@ export class OrdersComponent implements OnInit {
   readonly searchQuery = signal<string>('');
   readonly selectedStatus = signal<string>('all');
 
-  // Computed signals
+  // Dynamic signals from OrderService
   readonly allOrders = this.orderService.orders;
+  readonly isLoading = this.orderService.isLoading;
+  readonly error = this.orderService.error;
 
   readonly filteredOrders = computed(() => {
     const list = this.allOrders();

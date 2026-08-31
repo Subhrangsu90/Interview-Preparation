@@ -1,17 +1,5 @@
 import { pgTable, serial, text, varchar, timestamp, integer, numeric } from 'drizzle-orm/pg-core';
 
-export const items = pgTable('items', {
-  id: serial('id').primaryKey(),
-  title: varchar('title', { length: 255 }).notNull(),
-  description: text('description'),
-  status: varchar('status', { length: 50 }).notNull().default('active'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
-});
-
-export type Item = typeof items.$inferSelect;
-export type NewItem = typeof items.$inferInsert;
-
 export const orders = pgTable('orders', {
   id: serial('id').primaryKey(),
   orderNumber: varchar('order_number', { length: 50 }).notNull().unique(),
