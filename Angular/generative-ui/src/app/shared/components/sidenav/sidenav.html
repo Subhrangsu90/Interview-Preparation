@@ -1,12 +1,12 @@
 <nav class="sidenav-navigation" aria-label="Main navigation">
-  <div class="nav-section-title">MAIN</div>
+  <div class="nav-section-title">Main</div>
   <mat-nav-list class="nav-list">
     @for (item of mainNavItems; track item.label) {
       <a
         mat-list-item
         [routerLink]="item.route"
         routerLinkActive="active-item"
-        [routerLinkActiveOptions]="{ exact: item.label === 'Dashboard' }"
+        [routerLinkActiveOptions]="{ exact: true }"
         class="nav-item"
       >
         <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
@@ -17,10 +17,16 @@
 
   <mat-divider class="nav-divider" />
 
-  <div class="nav-section-title">SYSTEM</div>
+  <div class="nav-section-title">System</div>
   <mat-nav-list class="nav-list">
     @for (item of secondaryNavItems; track item.label) {
-      <a mat-list-item [routerLink]="item.route" class="nav-item">
+      <a
+        mat-list-item
+        [routerLink]="item.route"
+        routerLinkActive="active-item"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+      >
         <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
         <span matListItemTitle class="nav-label">{{ item.label }}</span>
       </a>

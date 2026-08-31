@@ -13,7 +13,7 @@ html {
         primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
       ),
-      typography: Roboto,
+      typography: Mulish,
       density: 0,
     )
   );
@@ -30,7 +30,7 @@ body {
   // variables at https://material.angular.dev/guide/system-variables
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
+  font-family: 'Mulish', sans-serif;
 
   // Reset the user agent margin.
   margin: 0;
@@ -38,11 +38,14 @@ body {
   overflow: hidden;
 }
 
-// Global enforcement: strictly no gradients or transitions
+// Global enforcement: Mulish typography and standard box sizing
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  transition: none !important;
-  animation: none !important;
+  font-family: 'Mulish', sans-serif;
+}
+
+.mat-icon {
+  font-family: 'Material Icons' !important;
 }

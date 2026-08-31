@@ -19,8 +19,11 @@
 }
 
 .app-sidenav {
-  border-right: 1px solid var(--mat-sys-outline-variant);
-  background-color: var(--mat-sys-surface-container-low);
+  width: 260px;
+  border-right: 1px solid var(--mat-sys-outline-variant) !important;
+  border-radius: 0 !important;
+  background-color: var(--mat-sys-surface-container-low) !important;
+  box-shadow: none !important;
   overflow-x: hidden;
 }
 
@@ -30,8 +33,8 @@
 }
 
 .app-main {
-  padding: 24px;
-  max-width: 1200px;
+  padding: 36px 24px;
+  max-width: 960px;
   margin: 0 auto;
   width: 100%;
 }

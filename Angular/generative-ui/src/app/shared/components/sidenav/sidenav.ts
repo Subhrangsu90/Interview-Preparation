@@ -19,13 +19,13 @@ interface NavItem {
 export class Sidenav {
   protected readonly mainNavItems: readonly NavItem[] = [
     { label: 'Dashboard', route: '/home', icon: 'dashboard' },
-    { label: 'Generative Studio', route: '/home', icon: 'auto_awesome' },
-    { label: 'Components', route: '/home', icon: 'widgets' },
-    { label: 'Analytics', route: '/home', icon: 'bar_chart' },
+    { label: 'Generative Studio', route: '/studio', icon: 'auto_awesome' },
+    { label: 'Components', route: '/components', icon: 'widgets' },
+    { label: 'Analytics', route: '/analytics', icon: 'bar_chart' },
   ];
 
   protected readonly secondaryNavItems: readonly NavItem[] = [
-    { label: 'Settings', route: '/home', icon: 'settings' },
-    { label: 'Help & Docs', route: '/home', icon: 'help_outline' },
+    { label: 'Settings', route: '/settings', icon: 'settings' },
+    { label: 'Help & Docs', route: '/help', icon: 'help_outline' },
   ];
 }
