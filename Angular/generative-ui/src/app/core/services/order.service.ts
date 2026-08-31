@@ -7,6 +7,10 @@ import {
   UpdateOrderDto,
   TrackingInfo,
   ApiResponse,
+  orderSchema,
+  createOrderDtoSchema,
+  updateOrderDtoSchema,
+  trackingInfoSchema,
 } from '../models/ecommerce.models';
 
 @Injectable({
@@ -33,7 +37,11 @@ export class OrderService {
     this.http
       .get<ApiResponse<Order[]>>(this.baseUrl, { params })
       .pipe(
-        map((res) => res.data ?? []),
+        map((res) => {
+          const rawOrders = res.data ?? [];
+          const parsed = orderSchema.array().safeParse(rawOrders);
+          return parsed.success ? parsed.data : rawOrders;
+        }),
         catchError((err) => {
           const errMsg = err?.error?.message || err?.message || 'Failed to load orders from API';
           this.error.set(errMsg);
@@ -56,7 +64,11 @@ export class OrderService {
     this.isLoading.set(true);
     this.error.set(null);
     return this.http.get<ApiResponse<Order>>(`${this.baseUrl}/${id}`).pipe(
-      map((res) => res.data ?? null),
+      map((res) => {
+        if (!res.data) return null;
+        const parsed = orderSchema.safeParse(res.data);
+        return parsed.success ? parsed.data : res.data;
+      }),
       catchError((err) => {
         this.error.set(err?.error?.message || err?.message || `Order with ID ${id} not found`);
         this.isLoading.set(false);
@@ -74,7 +86,11 @@ export class OrderService {
     this.isLoading.set(true);
     this.error.set(null);
     return this.http.get<ApiResponse<Order>>(`${this.baseUrl}/number/${num}`).pipe(
-      map((res) => res.data ?? null),
+      map((res) => {
+        if (!res.data) return null;
+        const parsed = orderSchema.safeParse(res.data);
+        return parsed.success ? parsed.data : res.data;
+      }),
       catchError((err) => {
         this.error.set(err?.error?.message || err?.message || `Order ${num} not found`);
         this.isLoading.set(false);
@@ -91,7 +107,11 @@ export class OrderService {
     const num = orderNumber.trim().toUpperCase();
     this.error.set(null);
     return this.http.get<ApiResponse<TrackingInfo>>(`${this.baseUrl}/tracking/${num}`).pipe(
-      map((res) => res.data ?? null),
+      map((res) => {
+        if (!res.data) return null;
+        const parsed = trackingInfoSchema.safeParse(res.data);
+        return parsed.success ? parsed.data : res.data;
+      }),
       catchError((err) => {
         this.error.set(err?.error?.message || err?.message || `Tracking info for ${num} not found`);
         return throwError(() => err);
@@ -101,10 +121,15 @@ export class OrderService {
   }
 
   createOrder(dto: CreateOrderDto): Observable<Order> {
+    const validatedDto = createOrderDtoSchema.parse(dto);
     this.isLoading.set(true);
     this.error.set(null);
-    return this.http.post<ApiResponse<Order>>(this.baseUrl, dto).pipe(
-      map((res) => res.data!),
+    return this.http.post<ApiResponse<Order>>(this.baseUrl, validatedDto).pipe(
+      map((res) => {
+        const raw = res.data!;
+        const parsed = orderSchema.safeParse(raw);
+        return parsed.success ? parsed.data : raw;
+      }),
       catchError((err) => {
         this.error.set(err?.error?.message || err?.message || 'Failed to create order');
         this.isLoading.set(false);
@@ -118,9 +143,14 @@ export class OrderService {
   }
 
   updateOrder(id: number, dto: UpdateOrderDto): Observable<Order | null> {
+    const validatedDto = updateOrderDtoSchema.parse(dto);
     this.error.set(null);
-    return this.http.patch<ApiResponse<Order>>(`${this.baseUrl}/${id}`, dto).pipe(
-      map((res) => res.data ?? null),
+    return this.http.patch<ApiResponse<Order>>(`${this.baseUrl}/${id}`, validatedDto).pipe(
+      map((res) => {
+        if (!res.data) return null;
+        const parsed = orderSchema.safeParse(res.data);
+        return parsed.success ? parsed.data : res.data;
+      }),
       catchError((err) => {
         this.error.set(err?.error?.message || err?.message || 'Failed to update order');
         return throwError(() => err);

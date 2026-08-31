@@ -1,10 +1,13 @@
 import { eq, desc, and } from 'drizzle-orm';
 import { db } from '../db/index.js';
-import { supportTickets, type SupportTicket } from '../db/schema.js';
+import { supportTickets, dbSupportTicketInsertSchema, type SupportTicket } from '../db/schema.js';
 import type { CreateTicketDto, UpdateTicketDto } from '../schemas/support-ticket.schema.js';
 
 export class SupportTicketService {
-  async getAllTickets(filters?: { status?: string; orderNumber?: string }): Promise<SupportTicket[]> {
+  async getAllTickets(filters?: {
+    status?: string;
+    orderNumber?: string;
+  }): Promise<SupportTicket[]> {
     const conditions = [];
 
     if (filters?.status && filters.status !== 'all') {
@@ -28,11 +31,7 @@ export class SupportTicketService {
   }
 
   async getTicketById(id: number): Promise<SupportTicket | null> {
-    const result = await db
-      .select()
-      .from(supportTickets)
-      .where(eq(supportTickets.id, id))
-      .limit(1);
+    const result = await db.select().from(supportTickets).where(eq(supportTickets.id, id)).limit(1);
 
     return result[0] ?? null;
   }
@@ -40,19 +39,18 @@ export class SupportTicketService {
   async createTicket(dto: CreateTicketDto): Promise<SupportTicket> {
     const generatedTicketNumber = `TKT-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    const createdRows = await db
-      .insert(supportTickets)
-      .values({
-        ticketNumber: generatedTicketNumber,
-        orderNumber: dto.orderNumber.toUpperCase(),
-        customerEmail: dto.customerEmail,
-        type: dto.type,
-        status: dto.status ?? 'open',
-        priority: dto.priority ?? 'medium',
-        subject: dto.subject,
-        description: dto.description,
-      })
-      .returning();
+    const validatedTicketInsert = dbSupportTicketInsertSchema.parse({
+      ticketNumber: generatedTicketNumber,
+      orderNumber: dto.orderNumber.toUpperCase(),
+      customerEmail: dto.customerEmail,
+      type: dto.type,
+      status: dto.status ?? 'open',
+      priority: dto.priority ?? 'medium',
+      subject: dto.subject,
+      description: dto.description,
+    });
+
+    const createdRows = await db.insert(supportTickets).values(validatedTicketInsert).returning();
 
     return createdRows[0];
   }

@@ -1,6 +1,13 @@
 import { eq, desc, ilike, or, and, inArray } from 'drizzle-orm';
 import { db } from '../db/index.js';
-import { orders, orderItems, type Order, type OrderItem } from '../db/schema.js';
+import {
+  orders,
+  orderItems,
+  dbOrderInsertSchema,
+  dbOrderItemInsertSchema,
+  type Order,
+  type OrderItem,
+} from '../db/schema.js';
 import type { CreateOrderDto, UpdateOrderDto } from '../schemas/order.schema.js';
 
 export interface OrderWithItems extends Order {
@@ -101,40 +108,38 @@ export class OrderService {
       .reduce((acc, itm) => acc + Number(itm.unitPrice) * itm.quantity, 0)
       .toFixed(2);
 
-    const newOrderRows = await db
-      .insert(orders)
-      .values({
-        orderNumber: generatedOrderNumber,
-        customerName: dto.customerName,
-        customerEmail: dto.customerEmail,
-        status: dto.status ?? 'processing',
-        totalAmount: total,
-        currency: 'USD',
-        shippingAddress: dto.shippingAddress,
-        carrier: dto.carrier || 'FedEx Express',
-        trackingNumber:
-          dto.trackingNumber || `TRK-${Math.floor(100000000 + Math.random() * 900000000)}`,
-        estimatedDelivery: dto.estimatedDelivery
-          ? new Date(dto.estimatedDelivery)
-          : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-      })
-      .returning();
+    const validatedOrderInsert = dbOrderInsertSchema.parse({
+      orderNumber: generatedOrderNumber,
+      customerName: dto.customerName,
+      customerEmail: dto.customerEmail,
+      status: dto.status ?? 'processing',
+      totalAmount: total,
+      currency: 'USD',
+      shippingAddress: dto.shippingAddress,
+      carrier: dto.carrier || 'FedEx Express',
+      trackingNumber:
+        dto.trackingNumber || `TRK-${Math.floor(100000000 + Math.random() * 900000000)}`,
+      estimatedDelivery: dto.estimatedDelivery
+        ? new Date(dto.estimatedDelivery)
+        : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+    });
+
+    const newOrderRows = await db.insert(orders).values(validatedOrderInsert).returning();
 
     const createdOrder = newOrderRows[0];
 
     const insertedItems: OrderItem[] = [];
     for (const item of dto.items) {
-      const itemRows = await db
-        .insert(orderItems)
-        .values({
-          orderId: createdOrder.id,
-          productName: item.productName,
-          sku: item.sku,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          imageUrl: item.imageUrl || null,
-        })
-        .returning();
+      const validatedItemInsert = dbOrderItemInsertSchema.parse({
+        orderId: createdOrder.id,
+        productName: item.productName,
+        sku: item.sku,
+        quantity: item.quantity,
+        unitPrice: String(item.unitPrice),
+        imageUrl: item.imageUrl || null,
+      });
+
+      const itemRows = await db.insert(orderItems).values(validatedItemInsert).returning();
       insertedItems.push(itemRows[0]);
     }
 
@@ -204,7 +209,9 @@ export class OrderService {
       checkpoints.push({
         status: 'In Transit',
         location: 'Regional Logistics Hub',
-        timestamp: new Date(new Date(order.createdAt).getTime() + 18 * 3600 * 1000).toLocaleString(),
+        timestamp: new Date(
+          new Date(order.createdAt).getTime() + 18 * 3600 * 1000
+        ).toLocaleString(),
         description: `Departed facility via ${carrier}. On schedule.`,
       });
     }

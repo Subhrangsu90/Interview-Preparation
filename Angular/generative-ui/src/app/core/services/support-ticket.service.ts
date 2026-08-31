@@ -6,6 +6,9 @@ import {
   CreateTicketDto,
   UpdateTicketDto,
   ApiResponse,
+  supportTicketSchema,
+  createTicketDtoSchema,
+  updateTicketDtoSchema,
 } from '../models/ecommerce.models';
 
 @Injectable({
@@ -30,7 +33,11 @@ export class SupportTicketService {
     this.http
       .get<ApiResponse<SupportTicket[]>>(this.baseUrl, { params })
       .pipe(
-        map((res) => res.data ?? []),
+        map((res) => {
+          const rawTickets = res.data ?? [];
+          const parsed = supportTicketSchema.array().safeParse(rawTickets);
+          return parsed.success ? parsed.data : rawTickets;
+        }),
         catchError((err) => {
           const errMsg = err?.error?.message || err?.message || 'Failed to load support tickets';
           this.error.set(errMsg);
@@ -50,10 +57,15 @@ export class SupportTicketService {
   }
 
   createTicket(dto: CreateTicketDto): Observable<SupportTicket> {
+    const validatedDto = createTicketDtoSchema.parse(dto);
     this.isLoading.set(true);
     this.error.set(null);
-    return this.http.post<ApiResponse<SupportTicket>>(this.baseUrl, dto).pipe(
-      map((res) => res.data!),
+    return this.http.post<ApiResponse<SupportTicket>>(this.baseUrl, validatedDto).pipe(
+      map((res) => {
+        const raw = res.data!;
+        const parsed = supportTicketSchema.safeParse(raw);
+        return parsed.success ? parsed.data : raw;
+      }),
       catchError((err) => {
         this.error.set(err?.error?.message || err?.message || 'Failed to create support ticket');
         this.isLoading.set(false);
@@ -67,9 +79,14 @@ export class SupportTicketService {
   }
 
   updateTicket(id: number, dto: UpdateTicketDto): Observable<SupportTicket | null> {
+    const validatedDto = updateTicketDtoSchema.parse(dto);
     this.error.set(null);
-    return this.http.patch<ApiResponse<SupportTicket>>(`${this.baseUrl}/${id}`, dto).pipe(
-      map((res) => res.data ?? null),
+    return this.http.patch<ApiResponse<SupportTicket>>(`${this.baseUrl}/${id}`, validatedDto).pipe(
+      map((res) => {
+        if (!res.data) return null;
+        const parsed = supportTicketSchema.safeParse(res.data);
+        return parsed.success ? parsed.data : res.data;
+      }),
       catchError((err) => {
         this.error.set(err?.error?.message || err?.message || 'Failed to update ticket');
         return throwError(() => err);

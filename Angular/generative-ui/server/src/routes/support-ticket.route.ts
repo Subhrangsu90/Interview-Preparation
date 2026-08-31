@@ -5,25 +5,24 @@ import {
   createTicketSchema,
   updateTicketSchema,
   ticketIdParamSchema,
+  ticketQuerySchema,
 } from '../schemas/support-ticket.schema.js';
 
 const router = Router();
 
 // GET all tickets
-router.get('/', (req, res, next) => supportTicketController.getAll(req, res, next));
+router.get('/', validate({ query: ticketQuerySchema }), (req, res, next) =>
+  supportTicketController.getAll(req, res, next)
+);
 
 // GET ticket by ID
-router.get(
-  '/:id',
-  validate({ params: ticketIdParamSchema }),
-  (req, res, next) => supportTicketController.getById(req, res, next)
+router.get('/:id', validate({ params: ticketIdParamSchema }), (req, res, next) =>
+  supportTicketController.getById(req, res, next)
 );
 
 // POST create ticket
-router.post(
-  '/',
-  validate({ body: createTicketSchema }),
-  (req, res, next) => supportTicketController.create(req, res, next)
+router.post('/', validate({ body: createTicketSchema }), (req, res, next) =>
+  supportTicketController.create(req, res, next)
 );
 
 // PATCH update ticket
@@ -34,10 +33,8 @@ router.patch(
 );
 
 // DELETE ticket
-router.delete(
-  '/:id',
-  validate({ params: ticketIdParamSchema }),
-  (req, res, next) => supportTicketController.delete(req, res, next)
+router.delete('/:id', validate({ params: ticketIdParamSchema }), (req, res, next) =>
+  supportTicketController.delete(req, res, next)
 );
 
 export const supportTicketRouter = router;
