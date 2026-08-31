@@ -1,0 +1,27 @@
+<mat-toolbar color="primary" class="header-toolbar">
+  <button
+    mat-icon-button
+    type="button"
+    (click)="menuToggle.emit()"
+    aria-label="Toggle navigation menu"
+    class="menu-button"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <div class="brand-container">
+    <mat-icon class="brand-icon">auto_awesome</mat-icon>
+    <span class="brand-title">Generative UI</span>
+  </div>
+
+  <span class="toolbar-spacer"></span>
+
+  <div class="header-actions">
+    <button mat-icon-button type="button" aria-label="Notifications" class="action-button">
+      <mat-icon>notifications_none</mat-icon>
+    </button>
+    <button mat-icon-button type="button" aria-label="User profile" class="action-button">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+  </div>
+</mat-toolbar>

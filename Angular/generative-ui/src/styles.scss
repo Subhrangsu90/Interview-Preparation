@@ -35,5 +35,14 @@ body {
   // Reset the user agent margin.
   margin: 0;
   height: 100%;
+  overflow: hidden;
 }
-/* You can add global styles to this file, and also import other style files */
+
+// Global enforcement: strictly no gradients or transitions
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  transition: none !important;
+  animation: none !important;
+}
