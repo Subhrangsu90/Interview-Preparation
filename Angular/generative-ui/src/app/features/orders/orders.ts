@@ -8,7 +8,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UiPageHeader } from '@shared/ui/components/page-header';
 import { UiMetricCard } from '@shared/ui/components/metric-card';
@@ -42,7 +41,6 @@ interface StatusFilterTab {
     MatMenuModule,
     MatTooltipModule,
     MatDividerModule,
-    MatProgressBarModule,
     MatDialogModule,
     UiPageHeader,
     UiMetricCard,
@@ -86,7 +84,6 @@ export class OrdersComponent implements OnInit {
 
   // Dynamic signals from OrderService
   readonly allOrders = this.orderService.orders;
-  readonly isLoading = this.orderService.isLoading;
   readonly error = this.orderService.error;
 
   readonly filteredOrders = computed(() => {

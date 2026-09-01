@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -38,7 +37,6 @@ import { CreateTicketDialog } from './create-ticket-dialog/create-ticket-dialog'
     MatTooltipModule,
     MatTableModule,
     MatDividerModule,
-    MatProgressBarModule,
     MatDialogModule,
     UiPageHeader,
     UiMetricCard,
@@ -74,7 +72,6 @@ export class SupportComponent implements OnInit {
   readonly selectedStatus = signal<string>('all');
 
   readonly allTickets = this.ticketService.tickets;
-  readonly isLoading = this.ticketService.isLoading;
   readonly error = this.ticketService.error;
 
   readonly filteredTickets = computed(() => {

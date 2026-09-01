@@ -61,10 +61,6 @@
       </div>
     </div>
 
-    @if (isLoading()) {
-      <mat-progress-bar mode="indeterminate" class="tickets-progress" />
-    }
-
     @if (error()) {
       <div class="api-error-banner">
         <mat-icon>error_outline</mat-icon>
