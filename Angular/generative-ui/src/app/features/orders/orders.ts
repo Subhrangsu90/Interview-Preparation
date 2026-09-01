@@ -17,6 +17,7 @@ import { UiSearchInput } from '@shared/ui/components/search-input';
 import { UiEmptyState } from '@shared/ui/components/empty-state';
 import { UiConfirmService } from '@shared/ui/components/confirm-dialog';
 import { UiCopyToClipboardDirective } from '@shared/ui/directives';
+import { TrackEventDirective } from '@event-bus/directives';
 import { OrderService } from '@core/services/order.service';
 import { Order, OrderStatus } from '@core/models/ecommerce.models';
 import { CreateOrderDialog } from './create-order-dialog/create-order-dialog';
@@ -48,6 +49,7 @@ interface StatusFilterTab {
     UiSearchInput,
     UiEmptyState,
     UiCopyToClipboardDirective,
+    TrackEventDirective,
   ],
   templateUrl: './orders.html',
   styleUrl: './orders.scss',

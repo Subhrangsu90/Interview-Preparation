@@ -59,5 +59,26 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['projects/event-bus/**/*.ts'],
+    rules: {
+      '@angular-eslint/directive-selector': [
+        'error',
+        {
+          type: 'attribute',
+          prefix: ['ui', 'track', 'event'],
+          style: 'camelCase',
+        },
+      ],
+      '@angular-eslint/component-selector': [
+        'error',
+        {
+          type: 'element',
+          prefix: ['ui', 'event'],
+          style: 'kebab-case',
+        },
+      ],
+    },
+  },
   eslintConfigPrettier
 );

@@ -21,8 +21,10 @@
       "@env": ["./src/environments/environment.ts"],
       "@env/*": ["./src/environments/*"],
       "@shared/ui/*": ["./projects/shared-ui/src/lib/*"],
+      "@event-bus/*": ["./projects/event-bus/src/lib/*"],
       "@core/api": ["./projects/core/src/public-api.ts"],
       "core": ["./projects/core/src/public-api.ts"],
+      "event-bus": ["./projects/event-bus/src/public-api.ts"],
       "shared-ui": ["./projects/shared-ui/src/public-api.ts"]
     }
   },
@@ -50,6 +52,12 @@
     },
     {
       "path": "./projects/core/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/event-bus/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/event-bus/tsconfig.spec.json"
     }
   ]
 }

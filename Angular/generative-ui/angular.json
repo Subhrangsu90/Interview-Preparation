@@ -159,6 +159,38 @@
           }
         }
       }
+    },
+    "event-bus": {
+      "projectType": "library",
+      "root": "projects/event-bus",
+      "sourceRoot": "projects/event-bus/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/event-bus/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/event-bus/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/event-bus/tsconfig.spec.json"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/event-bus/**/*.ts", "projects/event-bus/**/*.html"]
+          }
+        }
+      }
     }
   }
 }

@@ -19,6 +19,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
   {
+    path: 'events',
+    loadComponent: () => import('./features/events/events').then((m) => m.EventsComponent),
+  },
+  {
     path: '',
     redirectTo: 'orders',
     pathMatch: 'full',

@@ -1,0 +1,230 @@
+<!-- Floating Trigger Pill (When Minimized) -->
+@if (!isExpanded()) {
+  <button
+    type="button"
+    class="event-monitor-fab"
+    (click)="toggleExpand()"
+    aria-label="Open Event Monitor"
+  >
+    <div class="pulse-dot" [class.paused]="isPaused()"></div>
+    <mat-icon class="fab-icon">stream</mat-icon>
+    <span class="fab-title">Live Events</span>
+    <span class="fab-badge">{{ totalCount() }}</span>
+  </button>
+}
+
+<!-- Expanded Event Monitor Dock -->
+@if (isExpanded()) {
+  <section
+    class="event-monitor-dock"
+    role="region"
+    aria-label="UI Event Monitor"
+  >
+    <!-- Dock Header -->
+    <header class="dock-header">
+      <div class="header-left">
+        <div class="pulse-dot" [class.paused]="isPaused()"></div>
+        <mat-icon class="header-icon">analytics</mat-icon>
+        <span class="dock-title">Live Event Stream</span>
+        <span class="total-badge">{{ totalCount() }} captured</span>
+        @if (isPaused()) {
+          <span class="paused-pill">PAUSED</span>
+        }
+      </div>
+
+      <div class="header-actions">
+        <button
+          type="button"
+          mat-icon-button
+          (click)="togglePause()"
+          [matTooltip]="isPaused() ? 'Resume capturing events' : 'Pause event stream'"
+          class="action-btn"
+          aria-label="Pause or Resume event capturing"
+        >
+          <mat-icon>{{ isPaused() ? 'play_arrow' : 'pause' }}</mat-icon>
+        </button>
+
+        <button
+          type="button"
+          mat-icon-button
+          (click)="clearEvents()"
+          matTooltip="Clear all events"
+          class="action-btn"
+          aria-label="Clear event stream"
+        >
+          <mat-icon>delete_sweep</mat-icon>
+        </button>
+
+        <button
+          type="button"
+          mat-icon-button
+          (click)="toggleExpand()"
+          matTooltip="Minimize monitor"
+          class="action-btn close-btn"
+          aria-label="Minimize event monitor"
+        >
+          <mat-icon>expand_more</mat-icon>
+        </button>
+      </div>
+    </header>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="dock-toolbar">
+      <!-- Search Input -->
+      <div class="search-box">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Filter by name, source, or payload..."
+          class="search-input"
+        />
+        @if (searchQuery()) {
+          <button
+            type="button"
+            class="clear-search"
+            (click)="onSearchChange('')"
+            aria-label="Clear search"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      <!-- Source Filter Chips -->
+      <nav class="filter-chips" aria-label="Event source filters">
+        @for (tab of sourceTabs; track tab.value) {
+          <button
+            type="button"
+            class="chip-btn"
+            [class.active]="selectedSource() === tab.value"
+            (click)="selectSource(tab.value)"
+          >
+            <mat-icon class="chip-icon">{{ tab.icon }}</mat-icon>
+            <span>{{ tab.label }}</span>
+            @if (tab.value !== 'all') {
+              <span class="chip-count">{{ countsBySource()[tab.value] }}</span>
+            }
+          </button>
+        }
+      </nav>
+    </div>
+
+    <!-- Main Content: Event Stream & Details Panel -->
+    <div class="dock-body">
+      <!-- Events List -->
+      <div class="event-stream-container">
+        @if (events().length === 0) {
+          <div class="empty-events">
+            <mat-icon class="empty-icon">sensors_off</mat-icon>
+            <p class="empty-title">No events captured yet</p>
+            <p class="empty-sub">Interact with the UI, click buttons, or filter data to see live events pop up here.</p>
+          </div>
+        } @else {
+          <ul class="event-list">
+            @for (ev of events(); track ev.id) {
+              <li class="event-list-item">
+                <button
+                  type="button"
+                  class="event-row"
+                  [class.selected]="selectedEvent()?.id === ev.id"
+                  [class.has-error]="ev.category === 'error'"
+                  (click)="selectEvent(ev)"
+                >
+                  <!-- Source Badge -->
+                  <span class="source-badge" [ngClass]="getSourceClass(ev.source)">
+                    <mat-icon class="badge-icon">{{ getSourceIcon(ev.source) }}</mat-icon>
+                    {{ ev.source }}
+                  </span>
+
+                  <!-- Event Name & Info -->
+                  <div class="event-info">
+                    <span class="event-name">{{ ev.name }}</span>
+                    @if (ev.durationMs !== undefined) {
+                      <span class="duration-badge">{{ ev.durationMs }}ms</span>
+                    }
+                  </div>
+
+                  <!-- Timestamp -->
+                  <div class="event-time">
+                    {{ ev.timestamp | date:'HH:mm:ss.SSS' }}
+                  </div>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Selected Event Inspector (Side Panel) -->
+      @if (selectedEvent(); as current) {
+        <aside class="event-inspector" aria-label="Event Details Inspector">
+          <div class="inspector-header">
+            <div class="inspector-title">
+              <mat-icon class="inspector-icon">data_object</mat-icon>
+              <span>{{ current.name }}</span>
+            </div>
+            <div class="inspector-actions">
+              @if (current.payload) {
+                <button
+                  type="button"
+                  class="copy-btn"
+                  (click)="copyPayload(current)"
+                >
+                  <mat-icon class="copy-icon">content_copy</mat-icon>
+                  {{ copyFeedback() || 'Copy' }}
+                </button>
+              }
+              <button
+                type="button"
+                class="close-inspector"
+                (click)="selectedEvent.set(null)"
+                aria-label="Close inspector"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="inspector-body">
+            <div class="meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">Source</span>
+                <span class="meta-value source-pill" [ngClass]="getSourceClass(current.source)">{{ current.source }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Category</span>
+                <span class="meta-value">{{ current.category }}</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Time</span>
+                <span class="meta-value">{{ current.timestamp | date:'mediumTime' }}</span>
+              </div>
+              @if (current.durationMs !== undefined) {
+                <div class="meta-item">
+                  <span class="meta-label">Duration</span>
+                  <span class="meta-value text-accent">{{ current.durationMs }}ms</span>
+                </div>
+              }
+            </div>
+
+            <!-- Payload JSON Viewer -->
+            <div class="payload-section">
+              <span class="payload-title">Payload:</span>
+              <pre class="json-code"><code>{{ formatJson(current.payload) }}</code></pre>
+            </div>
+
+            <!-- Metadata if any -->
+            @if (current.metadata) {
+              <div class="payload-section">
+                <span class="payload-title">Metadata:</span>
+                <pre class="json-code"><code>{{ formatJson(current.metadata) }}</code></pre>
+              </div>
+            }
+          </div>
+        </aside>
+      }
+    </div>
+  </section>
+}

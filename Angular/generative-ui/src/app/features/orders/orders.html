@@ -6,7 +6,12 @@
     icon="receipt_long"
   >
     <div actions class="header-actions">
-      <button mat-flat-button color="primary" (click)="openCreateDialog()">
+      <button
+        mat-flat-button
+        color="primary"
+        [trackEvent]="'NEW_ORDER_BUTTON_CLICKED'"
+        (click)="openCreateDialog()"
+      >
         <mat-icon>add</mat-icon>
         New Order
       </button>
@@ -190,7 +195,7 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns" class="clickable-row"></tr>
 
         <!-- No data row -->

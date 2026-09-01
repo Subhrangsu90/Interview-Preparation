@@ -7,6 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTableModule } from '@angular/material/table';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UiPageHeader } from '@shared/ui/components/page-header';
 import { UiMetricCard } from '@shared/ui/components/metric-card';
@@ -32,6 +34,8 @@ import { CreateTicketDialog } from './create-ticket-dialog/create-ticket-dialog'
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
+    MatTooltipModule,
+    MatTableModule,
     MatDividerModule,
     MatProgressBarModule,
     MatDialogModule,
@@ -51,6 +55,16 @@ export class SupportComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly route = inject(ActivatedRoute);
   private readonly confirmService = inject(UiConfirmService);
+
+  readonly displayedColumns: string[] = [
+    'ticketNumber',
+    'subject',
+    'type',
+    'priority',
+    'status',
+    'orderNumber',
+    'actions',
+  ];
 
   readonly statusTabs: string[] = ['all', 'open', 'in_progress', 'resolved', 'closed'];
 

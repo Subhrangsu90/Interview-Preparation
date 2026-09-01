@@ -60,18 +60,23 @@
 
   .orders-table {
     width: 100%;
+    border-collapse: collapse;
+    background: transparent;
 
     th.mat-header-cell {
-      font-weight: 600;
-      color: var(--mat-sys-on-surface-variant);
-      font-size: 0.8rem;
+      padding: 14px 18px;
+      font-size: 0.76rem;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
+      color: var(--mat-sys-on-surface-variant, #64748b);
+      background: var(--mat-sys-surface-container-lowest, #ffffff);
+      border-bottom: 1px solid var(--mat-sys-outline-variant, #e2e8f0);
+      white-space: nowrap;
 
       &.actions-header {
         text-align: right;
+        padding-right: 24px;
       }
     }
 
@@ -80,19 +85,20 @@
       cursor: pointer;
 
       &:hover {
-        background-color: var(--mat-sys-surface-container-low);
+        background-color: var(--mat-sys-surface-container-low, #f8fafc);
       }
     }
 
     td.mat-cell {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant);
-      color: var(--mat-sys-on-surface);
-      font-size: 0.9rem;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--mat-sys-outline-variant, #f1f5f9);
+      color: var(--mat-sys-on-surface, #0f172a);
+      font-size: 0.88rem;
+      vertical-align: middle;
 
       .order-link {
         text-decoration: none;
-        color: var(--mat-sys-primary);
+        color: var(--mat-sys-primary, #4338ca);
         font-weight: 600;
 
         &:hover {
@@ -101,23 +107,26 @@
       }
 
       .order-num-text {
-        font-family: monospace;
-        font-size: 0.95rem;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 0.9rem;
+        font-weight: 600;
       }
 
       .order-date {
-        font-size: 0.8rem;
-        color: var(--mat-sys-on-surface-variant);
-        margin-top: 2px;
+        font-size: 0.76rem;
+        color: var(--mat-sys-on-surface-variant, #64748b);
+        margin-top: 3px;
       }
 
       .customer-name {
         font-weight: 600;
+        color: #0f172a;
       }
 
       .customer-email {
-        font-size: 0.8rem;
-        color: var(--mat-sys-on-surface-variant);
+        font-size: 0.78rem;
+        color: var(--mat-sys-on-surface-variant, #64748b);
+        margin-top: 1px;
       }
 
       .items-cell {
@@ -126,9 +135,9 @@
         gap: 2px;
 
         .items-count-badge {
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: var(--mat-sys-primary);
+          font-size: 0.74rem;
+          font-weight: 700;
+          color: var(--mat-sys-primary, #4338ca);
         }
 
         .primary-item-name {
@@ -136,48 +145,53 @@
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          font-size: 0.85rem;
+          font-size: 0.84rem;
+          color: var(--mat-sys-on-surface, #334155);
         }
       }
 
       .order-total {
         font-weight: 700;
-        font-size: 0.95rem;
+        font-size: 0.92rem;
+        color: #0f172a;
       }
 
       .carrier-label {
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: var(--mat-sys-on-surface-variant);
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--mat-sys-on-surface-variant, #64748b);
       }
 
       .tracking-code {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 4px;
-        font-family: monospace;
-        font-size: 0.8rem;
-        color: var(--mat-sys-primary);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.76rem;
+        color: var(--mat-sys-primary, #4338ca);
+        margin-top: 2px;
         transition: opacity 0.15s ease;
 
         &:hover {
           opacity: 0.8;
+          text-decoration: underline;
         }
 
         .inline-icon {
-          font-size: 1rem;
-          width: 1rem;
-          height: 1rem;
+          font-size: 0.95rem;
+          width: 0.95rem;
+          height: 0.95rem;
         }
       }
 
       .text-muted {
-        color: var(--mat-sys-on-surface-variant);
-        font-size: 0.8rem;
+        color: var(--mat-sys-on-surface-variant, #94a3b8);
+        font-size: 0.78rem;
       }
 
       .actions-cell {
         text-align: right;
+        padding-right: 16px;
         white-space: nowrap;
       }
     }

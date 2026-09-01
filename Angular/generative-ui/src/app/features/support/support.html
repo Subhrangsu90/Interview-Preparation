@@ -73,107 +73,130 @@
       </div>
     }
 
-    <!-- Ticket Cards List -->
-    <div class="tickets-list">
-      @for (ticket of filteredTickets(); track ticket.id) {
-        <div class="ticket-card" [class.urgent]="ticket.priority === 'urgent'">
-          <div class="ticket-card-header">
-            <div class="ticket-id-section">
+    <!-- Tickets Table -->
+    <div class="table-scroll-container">
+      <table mat-table [dataSource]="filteredTickets()" class="support-table">
+        <!-- Ticket # Column -->
+        <ng-container matColumnDef="ticketNumber">
+          <th mat-header-cell *matHeaderCellDef class="ticket-header">Ticket #</th>
+          <td mat-cell *matCellDef="let ticket">
+            <div class="ticket-num-cell">
               <span
-                class="ticket-number"
+                class="ticket-number-text"
                 [uiCopyToClipboard]="ticket.ticketNumber"
                 matTooltip="Click to copy ticket number"
-                style="cursor: pointer"
               >
                 {{ ticket.ticketNumber }}
               </span>
-              <span class="type-pill" [class]="ticket.type">
-                {{ formatType(ticket.type) }}
-              </span>
-              <span class="priority-pill" [class]="ticket.priority">
-                {{ ticket.priority | uppercase }}
-              </span>
+              <span class="ticket-time">{{ ticket.createdAt | uiRelativeTime }}</span>
             </div>
+          </td>
+        </ng-container>
 
-            <div class="ticket-status-section">
-              <ui-status-badge [status]="ticket.status" />
-              <button mat-icon-button [matMenuTriggerFor]="ticketMenu" aria-label="Ticket actions">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-              <mat-menu #ticketMenu="matMenu">
-                <button mat-menu-item (click)="updateTicketStatus(ticket, 'in_progress')">
-                  <mat-icon>hourglass_bottom</mat-icon>
-                  <span>Mark In Progress</span>
-                </button>
-                <button mat-menu-item (click)="updateTicketStatus(ticket, 'resolved')">
-                  <mat-icon>check_circle</mat-icon>
-                  <span>Mark Resolved</span>
-                </button>
-                <button mat-menu-item (click)="updateTicketStatus(ticket, 'closed')">
-                  <mat-icon>lock</mat-icon>
-                  <span>Close Ticket</span>
-                </button>
-                <mat-divider />
-                <button mat-menu-item (click)="deleteTicket(ticket)" class="danger-item">
-                  <mat-icon color="warn">delete</mat-icon>
-                  <span>Delete Ticket</span>
-                </button>
-              </mat-menu>
-            </div>
-          </div>
-
-          <div class="ticket-body">
-            <h3 class="ticket-subject">{{ ticket.subject }}</h3>
-            <p class="ticket-desc">{{ ticket.description }}</p>
-
-            @if (ticket.resolution) {
-              <div class="resolution-box">
-                <mat-icon class="res-icon">check</mat-icon>
-                <div><strong>Resolution:</strong> {{ ticket.resolution }}</div>
+        <!-- Subject & Customer Column -->
+        <ng-container matColumnDef="subject">
+          <th mat-header-cell *matHeaderCellDef class="subject-header">Subject & Customer</th>
+          <td mat-cell *matCellDef="let ticket">
+            <div class="subject-cell">
+              <div class="subject-title">{{ ticket.subject }}</div>
+              <div class="customer-info">
+                <span>{{ ticket.customerEmail }}</span>
               </div>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef class="type-header">Type</th>
+          <td mat-cell *matCellDef="let ticket">
+            <span class="type-pill" [ngClass]="ticket.type">
+              {{ formatType(ticket.type) }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Priority Column -->
+        <ng-container matColumnDef="priority">
+          <th mat-header-cell *matHeaderCellDef class="priority-header">Priority</th>
+          <td mat-cell *matCellDef="let ticket">
+            <span class="priority-pill" [ngClass]="ticket.priority">
+              {{ ticket.priority | uppercase }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef class="status-header">Status</th>
+          <td mat-cell *matCellDef="let ticket">
+            <ui-status-badge [status]="ticket.status" />
+          </td>
+        </ng-container>
+
+        <!-- Order Number Column -->
+        <ng-container matColumnDef="orderNumber">
+          <th mat-header-cell *matHeaderCellDef class="order-header">Order Reference</th>
+          <td mat-cell *matCellDef="let ticket">
+            @if (ticket.orderNumber) {
+              <a [routerLink]="['/orders', ticket.orderNumber]" class="order-ref-link">
+                <mat-icon class="inline-icon">receipt</mat-icon>
+                <span>{{ ticket.orderNumber }}</span>
+              </a>
+            } @else {
+              <span class="text-muted">—</span>
             }
-          </div>
+          </td>
+        </ng-container>
 
-          <div class="ticket-footer">
-            <div class="footer-meta">
-              <span class="meta-item">
-                <mat-icon>receipt</mat-icon>
-                Order:
-                <a [routerLink]="['/orders', ticket.orderNumber]" class="order-ref-link">{{
-                  ticket.orderNumber
-                }}</a>
-              </span>
-              <span class="meta-item">
-                <mat-icon>email</mat-icon>
-                {{ ticket.customerEmail }}
-              </span>
-              <span class="meta-item">
-                <mat-icon>schedule</mat-icon>
-                {{ ticket.createdAt | uiRelativeTime }}
-              </span>
-            </div>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef class="actions-header">Actions</th>
+          <td mat-cell *matCellDef="let ticket" class="actions-cell">
+            <button
+              mat-icon-button
+              [matMenuTriggerFor]="ticketMenu"
+              aria-label="Ticket actions"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
 
-            <div class="footer-quick-action">
-              @if (ticket.status !== 'resolved' && ticket.status !== 'closed') {
-                <button
-                  mat-stroked-button
-                  color="primary"
-                  (click)="updateTicketStatus(ticket, 'resolved')"
-                >
-                  <mat-icon>check</mat-icon>
-                  Resolve Request
-                </button>
-              }
-            </div>
-          </div>
-        </div>
-      } @empty {
-        <ui-empty-state
-          icon="verified_user"
-          title="All Caught Up!"
-          description="No support tickets match the current filter."
-        />
-      }
+            <mat-menu #ticketMenu="matMenu">
+              <button mat-menu-item (click)="updateTicketStatus(ticket, 'in_progress')">
+                <mat-icon>hourglass_bottom</mat-icon>
+                <span>Mark In Progress</span>
+              </button>
+              <button mat-menu-item (click)="updateTicketStatus(ticket, 'resolved')">
+                <mat-icon>check_circle</mat-icon>
+                <span>Mark Resolved</span>
+              </button>
+              <button mat-menu-item (click)="updateTicketStatus(ticket, 'closed')">
+                <mat-icon>lock</mat-icon>
+                <span>Close Ticket</span>
+              </button>
+              <mat-divider />
+              <button mat-menu-item (click)="deleteTicket(ticket)" class="danger-item">
+                <mat-icon color="warn">delete</mat-icon>
+                <span>Delete Ticket</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="clickable-row"></tr>
+
+        <!-- No data row -->
+        <tr class="mat-row no-data-row" *matNoDataRow>
+          <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+            <ui-empty-state
+              icon="verified_user"
+              title="All Caught Up!"
+              message="No support tickets match the current filter."
+            />
+          </td>
+        </tr>
+      </table>
     </div>
   </mat-card>
 </div>

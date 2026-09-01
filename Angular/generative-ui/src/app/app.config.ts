@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideClientHydration } from '@angular/platform-browser';
 import { routes } from './app.routes';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
+import { eventTrackingInterceptor } from '@event-bus/interceptors';
 import { environment } from '@env';
 import { provideApiBaseUrl } from '@core/api';
 
@@ -12,7 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes, withViewTransitions()),
     provideClientHydration(),
-    provideHttpClient(withInterceptors([loadingInterceptor])),
+    provideHttpClient(withInterceptors([loadingInterceptor, eventTrackingInterceptor])),
     provideApiBaseUrl(environment.apiBaseUrl)
   ],
 };

@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { catchError, map, Observable, throwError, tap } from 'rxjs';
 import { ApiService, ApiError } from '@core/api';
+import { EventBusService } from '@event-bus/services';
 import { environment } from '@env';
 import {
   Order,
@@ -19,6 +20,7 @@ import {
 export class OrderService {
   private readonly api = inject(ApiService);
   private readonly endpoints = environment.endpoints.orders;
+  private readonly eventBus = inject(EventBusService, { optional: true });
 
   // Dynamic state signals
   readonly orders = signal<Order[]>([]);
@@ -53,6 +55,12 @@ export class OrderService {
         next: (data) => {
           this.orders.set(data);
           this.isLoading.set(false);
+          this.eventBus?.emit({
+            source: 'service',
+            category: 'data',
+            name: 'ORDERS_STATE_UPDATED',
+            payload: { count: data.length, filters },
+          });
         },
         error: () => {
           this.isLoading.set(false);

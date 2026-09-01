@@ -24,6 +24,7 @@ export class Sidenav {
   ];
 
   protected readonly secondaryNavItems: readonly NavItem[] = [
+    { label: 'Live Events', route: '/events', icon: 'stream' },
     { label: 'Settings', route: '/settings', icon: 'settings' },
     { label: 'Help & Docs', route: '/help', icon: 'help_outline' },
   ];
