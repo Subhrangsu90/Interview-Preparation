@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UiStatusBadge } from '@shared/ui/components/status-badge';
 import { UiCopyToClipboardDirective } from '@shared/ui/directives';
+import { UiPagination } from '@shared/ui/components/pagination';
 import { OrderService } from '@core/services/order.service';
 import { Order, OrderItem, OrderStatus } from '@core/models/ecommerce.models';
 import { StatusUpdateDialog } from '../status-update-dialog/status-update-dialog';
@@ -25,6 +26,7 @@ import { StatusUpdateDialog } from '../status-update-dialog/status-update-dialog
     MatDialogModule,
     UiStatusBadge,
     UiCopyToClipboardDirective,
+    UiPagination,
   ],
   templateUrl: './order-detail.html',
   styleUrl: './order-detail.scss',
@@ -36,6 +38,17 @@ export class OrderDetailComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
 
   readonly order = signal<Order | null>(null);
+  readonly pageSize = signal<number>(5);
+  readonly pageIndex = signal<number>(0);
+
+  readonly pagedItems = computed(() => {
+    const items = this.order()?.items || [];
+    const size = this.pageSize();
+    const maxIndex = Math.max(0, Math.ceil(items.length / size) - 1);
+    const index = Math.min(this.pageIndex(), maxIndex);
+    const start = index * size;
+    return items.slice(start, start + size);
+  });
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {

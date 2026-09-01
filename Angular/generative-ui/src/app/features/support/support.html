@@ -42,18 +42,18 @@
         placeholder="Filter by Order # or Ticket #..."
         ariaLabel="tickets"
         [value]="searchQuery()"
-        (searchChange)="searchQuery.set($event)"
-        (cleared)="searchQuery.set('')"
+        (searchChange)="onSearchChange($event)"
+        (cleared)="onSearchChange('')"
       />
 
       <div class="status-tab-group">
         @for (status of statusTabs; track status) {
           @if (selectedStatus() === status) {
-            <button mat-flat-button color="primary" (click)="selectedStatus.set(status)">
+            <button mat-flat-button color="primary" (click)="setStatus(status)">
               {{ status | titlecase }}
             </button>
           } @else {
-            <button mat-stroked-button (click)="selectedStatus.set(status)">
+            <button mat-stroked-button (click)="setStatus(status)">
               {{ status | titlecase }}
             </button>
           }
@@ -75,7 +75,7 @@
 
     <!-- Tickets Table -->
     <div class="table-scroll-container">
-      <table mat-table [dataSource]="filteredTickets()" class="support-table">
+      <table mat-table [dataSource]="pagedTickets()" class="support-table">
         <!-- Ticket # Column -->
         <ng-container matColumnDef="ticketNumber">
           <th mat-header-cell *matHeaderCellDef class="ticket-header">Ticket #</th>
@@ -198,5 +198,12 @@
         </tr>
       </table>
     </div>
+    <ui-pagination
+      [length]="filteredTickets().length"
+      [(pageIndex)]="pageIndex"
+      [(pageSize)]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      ariaLabel="Select page of tickets"
+    />
   </mat-card>
 </div>

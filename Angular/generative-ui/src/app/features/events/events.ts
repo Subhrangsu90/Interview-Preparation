@@ -6,10 +6,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { UiPageHeader } from '@shared/ui/components/page-header';
 import { UiMetricCard } from '@shared/ui/components/metric-card';
 import { UiSearchInput } from '@shared/ui/components/search-input';
 import { UiEmptyState } from '@shared/ui/components/empty-state';
+import { UiPagination } from '@shared/ui/components/pagination';
 import { EventBusService } from '@event-bus/services';
 import { UiEvent, UiEventSource } from '@event-bus/models';
 
@@ -24,10 +26,12 @@ import { UiEvent, UiEventSource } from '@event-bus/models';
     MatIconModule,
     MatTooltipModule,
     MatTableModule,
+    MatSidenavModule,
     UiPageHeader,
     UiMetricCard,
     UiSearchInput,
     UiEmptyState,
+    UiPagination,
   ],
   templateUrl: './events.html',
   styleUrl: './events.scss',
@@ -70,13 +74,27 @@ export class EventsComponent {
   readonly countsBySource = computed(() => this.eventBus.countsBySource());
   readonly isPaused = computed(() => this.eventBus.isPaused());
 
+  readonly pageSize = signal<number>(10);
+  readonly pageIndex = signal<number>(0);
+
+  readonly pagedEvents = computed(() => {
+    const list = this.events();
+    const size = this.pageSize();
+    const maxIndex = Math.max(0, Math.ceil(list.length / size) - 1);
+    const index = Math.min(this.pageIndex(), maxIndex);
+    const start = index * size;
+    return list.slice(start, start + size);
+  });
+
   selectSource(source: UiEventSource | 'all'): void {
     this.selectedSource.set(source);
+    this.pageIndex.set(0);
     this.eventBus.setFilter({ source });
   }
 
   onSearchChange(query: string): void {
     this.searchQuery.set(query);
+    this.pageIndex.set(0);
     this.eventBus.setFilter({ search: query });
   }
 
@@ -94,6 +112,7 @@ export class EventsComponent {
 
   clearEvents(): void {
     this.eventBus.clear();
+    this.pageIndex.set(0);
     this.selectedEvent.set(null);
   }
 

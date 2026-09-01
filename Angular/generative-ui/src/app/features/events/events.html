@@ -1,205 +1,14 @@
-<div class="events-page">
-  <!-- Page Header -->
-  <ui-page-header
-    title="Live Telemetry & Events"
-    subtitle="Inspect real-time event triggers across UI components, HTTP network, services, and pipes"
-    icon="stream"
+<mat-drawer-container class="events-drawer-container" [hasBackdrop]="true">
+  <!-- Right Event Inspector Drawer -->
+  <mat-drawer
+    #drawer
+    position="end"
+    mode="over"
+    [opened]="selectedEvent() !== null"
+    (closed)="selectedEvent.set(null)"
+    class="event-details-drawer"
   >
-    <div actions class="header-actions">
-      <button
-        mat-stroked-button
-        [color]="isPaused() ? 'accent' : 'primary'"
-        (click)="togglePause()"
-        class="header-btn"
-      >
-        <mat-icon>{{ isPaused() ? 'play_arrow' : 'pause' }}</mat-icon>
-        {{ isPaused() ? 'Resume Stream' : 'Pause Stream' }}
-      </button>
-
-      <button
-        mat-flat-button
-        color="warn"
-        (click)="clearEvents()"
-        [disabled]="totalCount() === 0"
-        class="header-btn"
-      >
-        <mat-icon>delete_sweep</mat-icon>
-        Clear Events
-      </button>
-    </div>
-  </ui-page-header>
-
-  <!-- Metrics Grid -->
-  <section class="metrics-grid" aria-label="Event telemetry metrics">
-    <ui-metric-card
-      icon="stream"
-      label="Total Captured"
-      [value]="totalCount()"
-      variant="blue"
-    />
-    <ui-metric-card
-      icon="http"
-      label="HTTP API Calls"
-      [value]="countsBySource().http"
-      variant="emerald"
-    />
-    <ui-metric-card
-      icon="touch_app"
-      label="UI Interactions"
-      [value]="countsBySource().component"
-      variant="purple"
-    />
-    <ui-metric-card
-      icon="memory"
-      label="Service Updates"
-      [value]="countsBySource().service"
-      variant="amber"
-    />
-  </section>
-
-  <!-- Main Workspace Card -->
-  <mat-card class="events-card">
-    <mat-card-header class="card-header">
-      <!-- Toolbar: Source Filter Tabs -->
-      <nav class="source-nav" aria-label="Event source categories">
-        @for (tab of sourceTabs; track tab.value) {
-          <button
-            type="button"
-            class="source-tab"
-            [class.active]="selectedSource() === tab.value"
-            (click)="selectSource(tab.value)"
-          >
-            <mat-icon class="tab-icon">{{ tab.icon }}</mat-icon>
-            <span>{{ tab.label }}</span>
-            @if (tab.value !== 'all') {
-              <span class="tab-count">{{ countsBySource()[tab.value] }}</span>
-            }
-          </button>
-        }
-      </nav>
-
-      <!-- Search Input -->
-      <div class="search-wrapper">
-        <ui-search-input
-          [value]="searchQuery()"
-          (searchChange)="onSearchChange($event)"
-          placeholder="Filter by name, source, or payload..."
-        />
-      </div>
-    </mat-card-header>
-
-    <mat-card-content class="card-content">
-      <!-- Empty State -->
-      @if (events().length === 0) {
-        <ui-empty-state
-          icon="sensors_off"
-          title="No events in buffer"
-          message="Trigger interactions on other pages (e.g. Orders, Support) or clear filters to view live events."
-        />
-      } @else {
-        <div class="events-table-wrapper">
-          <table mat-table [dataSource]="events()" class="events-table">
-            <!-- Source Column -->
-            <ng-container matColumnDef="source">
-              <th mat-header-cell *matHeaderCellDef class="source-header">Source</th>
-              <td mat-cell *matCellDef="let ev">
-                <span class="badge-source" [ngClass]="getSourceClass(ev.source)">
-                  <mat-icon class="badge-icon">{{ getSourceIcon(ev.source) }}</mat-icon>
-                  {{ ev.source }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- Event Name Column -->
-            <ng-container matColumnDef="name">
-              <th mat-header-cell *matHeaderCellDef class="name-header">Event Name</th>
-              <td mat-cell *matCellDef="let ev">
-                <div class="event-name-cell">
-                  <span class="event-name-text">{{ ev.name }}</span>
-                  @if (ev.metadata?.['element']) {
-                    <span class="element-tag">&lt;{{ ev.metadata?.['element'] }}&gt;</span>
-                  }
-                </div>
-              </td>
-            </ng-container>
-
-            <!-- Category Column -->
-            <ng-container matColumnDef="category">
-              <th mat-header-cell *matHeaderCellDef class="category-header">Category</th>
-              <td mat-cell *matCellDef="let ev">
-                <span class="category-tag">{{ ev.category }}</span>
-              </td>
-            </ng-container>
-
-            <!-- Duration / Latency Column -->
-            <ng-container matColumnDef="duration">
-              <th mat-header-cell *matHeaderCellDef class="duration-header">Latency</th>
-              <td mat-cell *matCellDef="let ev">
-                @if (ev.durationMs !== undefined) {
-                  <span class="duration-chip">{{ ev.durationMs }}ms</span>
-                } @else {
-                  <span class="no-latency">—</span>
-                }
-              </td>
-            </ng-container>
-
-            <!-- Timestamp Column -->
-            <ng-container matColumnDef="timestamp">
-              <th mat-header-cell *matHeaderCellDef class="time-header">Timestamp</th>
-              <td mat-cell *matCellDef="let ev" class="time-cell">
-                {{ ev.timestamp | date:'HH:mm:ss.SSS' }}
-              </td>
-            </ng-container>
-
-            <!-- Actions Column -->
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef class="actions-header">Details</th>
-              <td mat-cell *matCellDef="let ev" class="actions-cell">
-                <button
-                  type="button"
-                  mat-icon-button
-                  (click)="selectEvent(ev); $event.stopPropagation()"
-                  matTooltip="Inspect event payload"
-                  class="inspect-btn"
-                  aria-label="Inspect event payload"
-                >
-                  <mat-icon>chevron_right</mat-icon>
-                </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-            <tr
-              mat-row
-              *matRowDef="let ev; columns: displayedColumns"
-              class="clickable-row"
-              [class.selected-row]="selectedEvent()?.id === ev.id"
-              [class.error-row]="ev.category === 'error'"
-              (click)="selectEvent(ev)"
-            ></tr>
-          </table>
-        </div>
-      }
-    </mat-card-content>
-  </mat-card>
-
-  <!-- Right Slide-Over Drawer & Backdrop -->
-  @if (selectedEvent(); as current) {
-    <!-- Backdrop -->
-    <div
-      class="drawer-backdrop"
-      (click)="selectedEvent.set(null)"
-      tabindex="-1"
-      aria-hidden="true"
-    ></div>
-
-    <!-- Drawer Panel -->
-    <aside
-      class="event-drawer"
-      role="dialog"
-      aria-label="Event details inspector"
-      aria-modal="true"
-    >
+    @if (selectedEvent(); as current) {
       <div class="drawer-header">
         <div class="drawer-title-group">
           <div class="title-badge-row">
@@ -220,7 +29,6 @@
             <button
               type="button"
               mat-stroked-button
-              class="copy-payload-btn"
               (click)="copyPayload(current)"
             >
               <mat-icon>content_copy</mat-icon>
@@ -230,7 +38,6 @@
           <button
             type="button"
             mat-icon-button
-            class="close-drawer-btn"
             (click)="selectedEvent.set(null)"
             aria-label="Close drawer"
           >
@@ -270,6 +77,207 @@
           </div>
         }
       </div>
-    </aside>
-  }
-</div>
+    }
+  </mat-drawer>
+
+  <!-- Main Page Content -->
+  <mat-drawer-content class="events-drawer-content">
+    <div class="events-page">
+      <!-- Page Header -->
+      <ui-page-header
+        title="Live Telemetry & Events"
+        subtitle="Inspect real-time event triggers across UI components, HTTP network, services, and pipes"
+        icon="stream"
+      >
+        <div actions class="header-actions">
+          <button
+            mat-stroked-button
+            [color]="isPaused() ? 'accent' : 'primary'"
+            (click)="togglePause()"
+          >
+            <mat-icon>{{ isPaused() ? 'play_arrow' : 'pause' }}</mat-icon>
+            {{ isPaused() ? 'Resume Stream' : 'Pause Stream' }}
+          </button>
+
+          <button
+            mat-flat-button
+            color="warn"
+            (click)="clearEvents()"
+            [disabled]="totalCount() === 0"
+          >
+            <mat-icon>delete_sweep</mat-icon>
+            Clear Events
+          </button>
+        </div>
+      </ui-page-header>
+
+      <!-- Metrics Grid -->
+      <section class="metrics-grid" aria-label="Event telemetry metrics">
+        <ui-metric-card
+          icon="stream"
+          label="Total Captured"
+          [value]="totalCount()"
+          variant="blue"
+        />
+        <ui-metric-card
+          icon="http"
+          label="HTTP API Calls"
+          [value]="countsBySource().http"
+          variant="emerald"
+        />
+        <ui-metric-card
+          icon="touch_app"
+          label="UI Interactions"
+          [value]="countsBySource().component"
+          variant="purple"
+        />
+        <ui-metric-card
+          icon="memory"
+          label="Service Updates"
+          [value]="countsBySource().service"
+          variant="amber"
+        />
+      </section>
+
+      <!-- Main Workspace Card -->
+      <mat-card appearance="outlined" class="table-container-card">
+        <div class="toolbar-wrapper">
+          <div class="search-wrapper">
+            <ui-search-input
+              [value]="searchQuery()"
+              (searchChange)="onSearchChange($event)"
+              placeholder="Filter by name, source, or payload..."
+            />
+          </div>
+
+          <div class="source-filters" role="group" aria-label="Event source categories">
+            @for (tab of sourceTabs; track tab.value) {
+              @if (selectedSource() === tab.value) {
+                <button
+                  mat-flat-button
+                  color="primary"
+                  (click)="selectSource(tab.value)"
+                >
+                  <mat-icon>{{ tab.icon }}</mat-icon>
+                  <span>{{ tab.label }}</span>
+                  @if (tab.value !== 'all') {
+                    <span class="filter-count">({{ countsBySource()[tab.value] }})</span>
+                  }
+                </button>
+              } @else {
+                <button
+                  mat-stroked-button
+                  (click)="selectSource(tab.value)"
+                >
+                  <mat-icon>{{ tab.icon }}</mat-icon>
+                  <span>{{ tab.label }}</span>
+                  @if (tab.value !== 'all') {
+                    <span class="filter-count">({{ countsBySource()[tab.value] }})</span>
+                  }
+                </button>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        @if (events().length === 0) {
+          <ui-empty-state
+            icon="sensors_off"
+            title="No events in buffer"
+            message="Trigger interactions on other pages (e.g. Orders, Support) or clear filters to view live events."
+          />
+        } @else {
+          <div class="table-scroll-container">
+            <table mat-table [dataSource]="pagedEvents()" class="events-table">
+              <!-- Source Column -->
+              <ng-container matColumnDef="source">
+                <th mat-header-cell *matHeaderCellDef>Source</th>
+                <td mat-cell *matCellDef="let ev">
+                  <span class="badge-source" [ngClass]="getSourceClass(ev.source)">
+                    <mat-icon class="badge-icon">{{ getSourceIcon(ev.source) }}</mat-icon>
+                    {{ ev.source }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Event Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Event Name</th>
+                <td mat-cell *matCellDef="let ev">
+                  <div class="event-name-cell">
+                    <span class="event-name-text">{{ ev.name }}</span>
+                    @if (ev.metadata?.['element']) {
+                      <span class="element-tag">&lt;{{ ev.metadata?.['element'] }}&gt;</span>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Category Column -->
+              <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef>Category</th>
+                <td mat-cell *matCellDef="let ev">
+                  <span class="category-tag">{{ ev.category }}</span>
+                </td>
+              </ng-container>
+
+              <!-- Duration / Latency Column -->
+              <ng-container matColumnDef="duration">
+                <th mat-header-cell *matHeaderCellDef>Latency</th>
+                <td mat-cell *matCellDef="let ev">
+                  @if (ev.durationMs !== undefined) {
+                    <span class="duration-chip">{{ ev.durationMs }}ms</span>
+                  } @else {
+                    <span class="no-latency">—</span>
+                  }
+                </td>
+              </ng-container>
+
+              <!-- Timestamp Column -->
+              <ng-container matColumnDef="timestamp">
+                <th mat-header-cell *matHeaderCellDef>Timestamp</th>
+                <td mat-cell *matCellDef="let ev" class="time-cell">
+                  {{ ev.timestamp | date:'HH:mm:ss.SSS' }}
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="actions-header">Details</th>
+                <td mat-cell *matCellDef="let ev" class="actions-cell">
+                  <button
+                    type="button"
+                    mat-icon-button
+                    (click)="selectEvent(ev); $event.stopPropagation()"
+                    matTooltip="Inspect event payload"
+                    aria-label="Inspect event payload"
+                  >
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr
+                mat-row
+                *matRowDef="let ev; columns: displayedColumns"
+                class="clickable-row"
+                [class.selected-row]="selectedEvent()?.id === ev.id"
+                [class.error-row]="ev.category === 'error'"
+                (click)="selectEvent(ev)"
+              ></tr>
+            </table>
+          </div>
+          <ui-pagination
+            [length]="events().length"
+            [(pageIndex)]="pageIndex"
+            [(pageSize)]="pageSize"
+            [pageSizeOptions]="[10, 25, 50, 100]"
+            ariaLabel="Select page of events"
+          />
+        }
+      </mat-card>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

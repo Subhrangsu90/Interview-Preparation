@@ -15,6 +15,7 @@ import { UiMetricCard } from '@shared/ui/components/metric-card';
 import { UiStatusBadge } from '@shared/ui/components/status-badge';
 import { UiSearchInput } from '@shared/ui/components/search-input';
 import { UiEmptyState } from '@shared/ui/components/empty-state';
+import { UiPagination } from '@shared/ui/components/pagination';
 import { UiConfirmService } from '@shared/ui/components/confirm-dialog';
 import { UiCopyToClipboardDirective } from '@shared/ui/directives';
 import { UiRelativeTimePipe } from '@shared/ui/pipes';
@@ -44,6 +45,7 @@ import { CreateTicketDialog } from './create-ticket-dialog/create-ticket-dialog'
     UiStatusBadge,
     UiSearchInput,
     UiEmptyState,
+    UiPagination,
     UiCopyToClipboardDirective,
     UiRelativeTimePipe,
   ],
@@ -93,6 +95,18 @@ export class SupportComponent implements OnInit {
     });
   });
 
+  readonly pageSize = signal<number>(10);
+  readonly pageIndex = signal<number>(0);
+
+  readonly pagedTickets = computed(() => {
+    const list = this.filteredTickets();
+    const size = this.pageSize();
+    const maxIndex = Math.max(0, Math.ceil(list.length / size) - 1);
+    const index = Math.min(this.pageIndex(), maxIndex);
+    const start = index * size;
+    return list.slice(start, start + size);
+  });
+
   readonly openTicketsCount = computed(
     () => this.allTickets().filter((t) => t.status === 'open').length
   );
@@ -121,9 +135,20 @@ export class SupportComponent implements OnInit {
     });
   }
 
+  setStatus(status: string): void {
+    this.selectedStatus.set(status);
+    this.pageIndex.set(0);
+  }
+
+  onSearchChange(query: string): void {
+    this.searchQuery.set(query);
+    this.pageIndex.set(0);
+  }
+
   onSearchInput(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchQuery.set(target.value);
+    this.pageIndex.set(0);
   }
 
   formatType(type: TicketType): string {

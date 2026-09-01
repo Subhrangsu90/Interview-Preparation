@@ -86,7 +86,7 @@
 
     <!-- Orders Table -->
     <div class="table-scroll-container">
-      <table mat-table [dataSource]="filteredOrders()" class="orders-table">
+      <table mat-table [dataSource]="pagedOrders()" class="orders-table">
         <!-- Order Number Column -->
         <ng-container matColumnDef="orderNumber">
           <th mat-header-cell *matHeaderCellDef>Order #</th>
@@ -212,5 +212,12 @@
         </tr>
       </table>
     </div>
+    <ui-pagination
+      [length]="filteredOrders().length"
+      [(pageIndex)]="pageIndex"
+      [(pageSize)]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 50]"
+      ariaLabel="Select page of orders"
+    />
   </mat-card>
 </div>

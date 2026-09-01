@@ -1,25 +1,23 @@
 import { Router } from 'express';
 import { orderRouter } from './order.route.js';
 import { supportTicketRouter } from './support-ticket.route.js';
-import { pool } from '../db/index.js';
+import { testDatabaseConnection } from '../db/index.js';
 
 const apiRouter = Router();
 
 apiRouter.get('/health', async (_req, res) => {
-  let dbStatus = 'disconnected';
-  try {
-    const client = await pool.connect();
-    client.release();
-    dbStatus = 'connected';
-  } catch {
-    dbStatus = 'disconnected';
-  }
+  const dbHealth = await testDatabaseConnection();
+  const isHealthy = dbHealth.ok;
 
-  res.json({
-    status: 'ok',
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    database: dbStatus,
+    database: {
+      status: isHealthy ? 'connected' : 'disconnected',
+      latencyMs: dbHealth.latencyMs,
+      ...(isHealthy ? {} : { error: dbHealth.error, code: dbHealth.code }),
+    },
   });
 });
 

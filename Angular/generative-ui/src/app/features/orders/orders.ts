@@ -15,6 +15,7 @@ import { UiMetricCard } from '@shared/ui/components/metric-card';
 import { UiStatusBadge } from '@shared/ui/components/status-badge';
 import { UiSearchInput } from '@shared/ui/components/search-input';
 import { UiEmptyState } from '@shared/ui/components/empty-state';
+import { UiPagination } from '@shared/ui/components/pagination';
 import { UiConfirmService } from '@shared/ui/components/confirm-dialog';
 import { UiCopyToClipboardDirective } from '@shared/ui/directives';
 import { TrackEventDirective } from '@event-bus/directives';
@@ -48,6 +49,7 @@ interface StatusFilterTab {
     UiStatusBadge,
     UiSearchInput,
     UiEmptyState,
+    UiPagination,
     UiCopyToClipboardDirective,
     TrackEventDirective,
   ],
@@ -105,6 +107,18 @@ export class OrdersComponent implements OnInit {
     });
   });
 
+  readonly pageSize = signal<number>(10);
+  readonly pageIndex = signal<number>(0);
+
+  readonly pagedOrders = computed(() => {
+    const list = this.filteredOrders();
+    const size = this.pageSize();
+    const maxIndex = Math.max(0, Math.ceil(list.length / size) - 1);
+    const index = Math.min(this.pageIndex(), maxIndex);
+    const start = index * size;
+    return list.slice(start, start + size);
+  });
+
   readonly totalOrdersCount = computed(() => this.allOrders().length);
   readonly processingCount = computed(
     () => this.allOrders().filter((o) => o.status === 'processing').length
@@ -123,19 +137,23 @@ export class OrdersComponent implements OnInit {
   onSearchChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchQuery.set(target.value);
+    this.pageIndex.set(0);
   }
 
   clearSearch(): void {
     this.searchQuery.set('');
+    this.pageIndex.set(0);
   }
 
   setStatusFilter(status: string): void {
     this.selectedStatus.set(status);
+    this.pageIndex.set(0);
   }
 
   clearAllFilters(): void {
     this.searchQuery.set('');
     this.selectedStatus.set('all');
+    this.pageIndex.set(0);
   }
 
   formatDate(dateVal: string | Date | undefined): string {

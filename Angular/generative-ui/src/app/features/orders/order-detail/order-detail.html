@@ -119,7 +119,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (item of ord.items; track item.id || item.sku) {
+              @for (item of pagedItems(); track item.id || item.sku) {
                 <tr>
                   <td class="product-cell">
                     <div class="product-avatar">
@@ -142,6 +142,16 @@
             </tbody>
           </table>
         </div>
+
+        @if ((ord.items?.length || 0) > 5) {
+          <ui-pagination
+            [length]="ord.items.length"
+            [(pageIndex)]="pageIndex"
+            [(pageSize)]="pageSize"
+            [pageSizeOptions]="[5, 10, 20]"
+            ariaLabel="Select page of order items"
+          />
+        }
 
         <mat-divider class="items-divider" />
 
