@@ -57,22 +57,17 @@
     }
   }
 
-  .tickets-list {
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-    gap: 16px;
+  .table-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+  }
 
-    .table-scroll-container {
-      width: 100%;
-      overflow-x: auto;
-    }
-
-    .support-table {
+  .support-table {
       width: 100%;
       border-collapse: collapse;
       background: transparent;
 
+      th.mat-mdc-header-cell,
       th.mat-header-cell {
         padding: 14px 18px;
         font-size: 0.76rem;
@@ -98,6 +93,7 @@
         }
       }
 
+      td.mat-mdc-cell,
       td.mat-cell {
         padding: 14px 18px;
         border-bottom: 1px solid var(--mat-sys-outline-variant, #f1f5f9);
@@ -203,24 +199,31 @@
           }
         }
 
+        a.order-ref-link,
         .order-ref-link {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
+          gap: 6px;
           color: var(--mat-sys-primary, #4338ca);
           text-decoration: none;
           font-weight: 600;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.82rem;
+          font-family: 'JetBrains Mono', 'Fira Code', monospace;
+          font-size: 0.84rem;
+          cursor: pointer;
 
           .inline-icon {
-            font-size: 0.95rem;
-            width: 0.95rem;
-            height: 0.95rem;
+            font-size: 1rem;
+            width: 1rem;
+            height: 1rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
           }
 
           &:hover {
             text-decoration: underline;
+            color: var(--mat-sys-primary, #4338ca);
           }
         }
 
@@ -236,7 +239,6 @@
       }
     }
   }
-}
 
 .danger-item {
   color: var(--mat-sys-error, #dc2626);
