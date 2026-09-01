@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, computed, signal } from '@angular/core';
+import { Component, inject, OnInit, computed, signal, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -31,6 +32,7 @@ interface StatusFilterTab {
 @Component({
   selector: 'app-orders',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterLink,
@@ -59,6 +61,7 @@ export class OrdersComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
   private readonly confirmService = inject(UiConfirmService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly displayedColumns: string[] = [
     'orderNumber',
@@ -173,11 +176,17 @@ export class OrdersComponent implements OnInit {
       disableClose: false,
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.orderService.createOrder(result).subscribe();
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((result) => {
+        if (result) {
+          this.orderService
+            .createOrder(result)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
+        }
+      });
   }
 
   openQuickStatusModal(order: Order): void {
@@ -186,11 +195,17 @@ export class OrdersComponent implements OnInit {
       data: { order },
     });
 
-    dialogRef.afterClosed().subscribe((newStatus: OrderStatus | undefined) => {
-      if (newStatus) {
-        this.orderService.updateOrder(order.id, { status: newStatus }).subscribe();
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((newStatus: OrderStatus | undefined) => {
+        if (newStatus) {
+          this.orderService
+            .updateOrder(order.id, { status: newStatus })
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
+        }
+      });
   }
 
   openSupportTicketForOrder(order: Order): void {
@@ -207,9 +222,13 @@ export class OrdersComponent implements OnInit {
         confirmText: 'Delete Order',
         isDestructive: true,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((confirmed) => {
         if (confirmed) {
-          this.orderService.deleteOrder(order.id).subscribe();
+          this.orderService
+            .deleteOrder(order.id)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
         }
       });
   }

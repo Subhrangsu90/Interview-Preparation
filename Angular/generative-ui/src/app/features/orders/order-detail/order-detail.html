@@ -236,10 +236,15 @@
         </mat-card>
       </div>
     </div>
-  } @else {
-    <div class="loading-container">
-      <mat-icon class="loading-spin">sync</mat-icon>
-      <p>Loading order details...</p>
+  } @else if (!orderService.isLoading()) {
+    <div class="not-found-container">
+      <ui-empty-state
+        icon="search_off"
+        title="Order Not Found"
+        description="The requested order could not be located or may have been removed."
+        actionLabel="Back to Orders"
+        (actionClick)="goBack()"
+      />
     </div>
   }
 </div>

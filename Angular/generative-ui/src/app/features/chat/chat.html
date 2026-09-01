@@ -182,10 +182,11 @@
                 description="Ask anything regarding customer orders, shipment tracking, return requests, or e-commerce operations."
               />
 
-              <!-- Suggestion Prompt Cards -->
+              <!-- Suggestion Prompt Cards with Angular Material mat-card -->
               <div class="quick-prompts-grid">
                 @for (item of quickPrompts; track item.title) {
-                  <div
+                  <mat-card
+                    appearance="outlined"
                     class="quick-prompt-card"
                     (click)="applyQuickPrompt(item)"
                     tabindex="0"
@@ -194,15 +195,17 @@
                     [trackEvent]="'AI_QUICK_PROMPT_CLICK'"
                     [eventPayload]="{ promptTitle: item.title }"
                   >
-                    <div class="card-top">
-                      <div class="card-icon-box">
+                    <mat-card-header>
+                      <div mat-card-avatar class="card-icon-box">
                         <mat-icon>{{ item.icon }}</mat-icon>
                       </div>
-                      <span class="card-category">{{ item.category }}</span>
-                    </div>
-                    <div class="card-title">{{ item.title }}</div>
-                    <div class="card-prompt">{{ item.prompt }}</div>
-                  </div>
+                      <mat-card-title>{{ item.title }}</mat-card-title>
+                      <mat-card-subtitle>{{ item.category }}</mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content>
+                      <p class="card-prompt">{{ item.prompt }}</p>
+                    </mat-card-content>
+                  </mat-card>
                 }
               </div>
             </div>

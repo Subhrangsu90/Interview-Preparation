@@ -6,6 +6,7 @@ import {
   signal,
   computed,
   AfterViewChecked,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -44,6 +45,7 @@ interface FormattedPart {
 @Component({
   selector: 'app-ai-chat',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     DatePipe,

@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -25,6 +26,7 @@ import { CreateTicketDialog } from './create-ticket-dialog/create-ticket-dialog'
 @Component({
   selector: 'app-support',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     TitleCasePipe,
@@ -55,6 +57,7 @@ export class SupportComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly route = inject(ActivatedRoute);
   private readonly confirmService = inject(UiConfirmService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly displayedColumns: string[] = [
     'ticketNumber',
@@ -121,15 +124,17 @@ export class SupportComponent implements OnInit {
     this.ticketService.loadTickets();
 
     // Check if routed with queryParams (e.g. from Order Detail "Request Return")
-    this.route.queryParams.subscribe((params) => {
-      if (params['orderNumber']) {
-        this.openCreateTicketDialog({
-          orderNumber: params['orderNumber'],
-          customerEmail: params['email'] || '',
-          type: (params['type'] as TicketType) || 'return',
-        });
-      }
-    });
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params['orderNumber']) {
+          this.openCreateTicketDialog({
+            orderNumber: params['orderNumber'],
+            customerEmail: params['email'] || '',
+            type: (params['type'] as TicketType) || 'return',
+          });
+        }
+      });
   }
 
   setStatus(status: string): void {
@@ -185,11 +190,17 @@ export class SupportComponent implements OnInit {
       data: prefill,
     });
 
-    dialogRef.afterClosed().subscribe((res) => {
-      if (res) {
-        this.ticketService.createTicket(res).subscribe();
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((res) => {
+        if (res) {
+          this.ticketService
+            .createTicket(res)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
+        }
+      });
   }
 
   updateTicketStatus(ticket: SupportTicket, newStatus: TicketStatus): void {
@@ -203,6 +214,7 @@ export class SupportComponent implements OnInit {
         status: newStatus,
         resolution: resolution !== undefined ? resolution : ticket.resolution || undefined,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
   }
 
@@ -214,9 +226,13 @@ export class SupportComponent implements OnInit {
         confirmText: 'Delete Ticket',
         isDestructive: true,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((confirmed) => {
         if (confirmed) {
-          this.ticketService.deleteTicket(ticket.id).subscribe();
+          this.ticketService
+            .deleteTicket(ticket.id)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
         }
       });
   }

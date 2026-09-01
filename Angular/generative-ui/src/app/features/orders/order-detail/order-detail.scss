@@ -397,25 +397,10 @@
   }
 }
 
-.loading-container {
+.not-found-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  padding: 64px 0;
-  color: var(--mat-sys-on-surface-variant);
-
-  .loading-spin {
-    animation: spin 1.5s linear infinite;
-    font-size: 2.5rem;
-    width: 2.5rem;
-    height: 2.5rem;
-    margin-bottom: 12px;
-  }
-}
-
-@keyframes spin {
-  100% {
-    transform: rotate(360deg);
-  }
+  align-items: center;
+  padding: 64px 16px;
+  width: 100%;
 }
