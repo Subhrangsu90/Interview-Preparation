@@ -1,0 +1,191 @@
+<div class="settings-page">
+  <!-- Page Header -->
+  <ui-page-header
+    title="Settings"
+    subtitle="Personalize your workspace appearance, theme modes, and system preferences"
+    icon="settings"
+  >
+    <div actions class="header-actions">
+      <button mat-stroked-button (click)="resetToDefaults()">
+        <mat-icon>restart_alt</mat-icon>
+        Reset Defaults
+      </button>
+    </div>
+  </ui-page-header>
+
+  <!-- Settings Tabs -->
+  <mat-card appearance="outlined" class="settings-card">
+    <mat-tab-group class="settings-tab-group" animationDuration="150ms">
+      <!-- Appearance Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">palette</mat-icon>
+          <span>Appearance</span>
+        </ng-template>
+
+        <div class="tab-content">
+          <!-- Color Theme Selection -->
+          <section class="settings-section" aria-labelledby="theme-heading">
+            <div class="section-header">
+              <div class="section-title-box">
+                <mat-icon class="section-icon">dark_mode</mat-icon>
+                <div>
+                  <h2 id="theme-heading" class="section-title">Color Scheme</h2>
+                  <p class="section-subtitle">
+                    Select your preferred interface theme with Angular Material 3 color palettes.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="theme-options-grid">
+              <!-- Light Theme Card -->
+              <div
+                class="theme-card"
+                [class.selected]="themeService.theme() === 'light'"
+                (click)="selectTheme('light')"
+                (keydown.enter)="selectTheme('light')"
+                tabindex="0"
+                role="radio"
+                [attr.aria-checked]="themeService.theme() === 'light'"
+              >
+                <!-- Mini UI Mockup -->
+                <div class="theme-preview light-preview">
+                  <div class="mock-header"></div>
+                  <div class="mock-body">
+                    <div class="mock-sidebar"></div>
+                    <div class="mock-content">
+                      <div class="mock-line short"></div>
+                      <div class="mock-line long"></div>
+                      <div class="mock-chip"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="theme-card-info">
+                  <div class="theme-card-header">
+                    <span class="theme-name">Light Mode</span>
+                    <mat-icon class="check-icon">
+                      {{ themeService.theme() === 'light' ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                    </mat-icon>
+                  </div>
+                  <p class="theme-desc">
+                    Vibrant, high-contrast daylight theme with Mulish typography.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Dark Theme Card -->
+              <div
+                class="theme-card"
+                [class.selected]="themeService.theme() === 'dark'"
+                (click)="selectTheme('dark')"
+                (keydown.enter)="selectTheme('dark')"
+                tabindex="0"
+                role="radio"
+                [attr.aria-checked]="themeService.theme() === 'dark'"
+              >
+                <!-- Mini UI Mockup -->
+                <div class="theme-preview dark-preview">
+                  <div class="mock-header"></div>
+                  <div class="mock-body">
+                    <div class="mock-sidebar"></div>
+                    <div class="mock-content">
+                      <div class="mock-line short"></div>
+                      <div class="mock-line long"></div>
+                      <div class="mock-chip"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="theme-card-info">
+                  <div class="theme-card-header">
+                    <span class="theme-name">Dark Mode</span>
+                    <mat-icon class="check-icon">
+                      {{ themeService.theme() === 'dark' ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                    </mat-icon>
+                  </div>
+                  <p class="theme-desc">
+                    Deep surface tones with glowing cyan accents, easy on the eyes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <mat-divider class="section-divider" />
+
+          <!-- Base Font Size Selection -->
+          <section class="settings-section" aria-labelledby="size-heading">
+            <div class="section-header">
+              <div class="section-title-box">
+                <mat-icon class="section-icon">format_size</mat-icon>
+                <div>
+                  <h2 id="size-heading" class="section-title">Base Font Size</h2>
+                  <p class="section-subtitle">
+                    Adjust base root scale to expand or compact typography across all pages.
+                  </p>
+                </div>
+              </div>
+              <span class="current-size-badge">{{ themeService.baseSize() }}px</span>
+            </div>
+
+            <div class="size-options-grid">
+              @for (opt of fontSizeOptions; track opt.size) {
+                <div
+                  class="size-card"
+                  [class.selected]="themeService.baseSize() === opt.size"
+                  (click)="selectBaseSize(opt.size)"
+                  (keydown.enter)="selectBaseSize(opt.size)"
+                  tabindex="0"
+                  role="button"
+                >
+                  <div class="size-header">
+                    <span class="size-label">{{ opt.label }}</span>
+                    <span class="size-px">{{ opt.size }}px</span>
+                  </div>
+                  <p class="size-hint">{{ opt.hint }}</p>
+                  <div class="sample-text" [style.font-size.px]="opt.size">
+                    The quick brown fox jumps over the lazy dog.
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        </div>
+      </mat-tab>
+
+      <!-- General Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">info</mat-icon>
+          <span>General</span>
+        </ng-template>
+
+        <div class="tab-content">
+          <section class="settings-section">
+            <h2 class="section-title">System & Architecture Details</h2>
+            <div class="system-info-grid">
+              <div class="info-tile">
+                <span class="info-tile-label">Framework</span>
+                <span class="info-tile-value">Angular 22+ (SSR & Hydration)</span>
+              </div>
+              <div class="info-tile">
+                <span class="info-tile-label">Design System</span>
+                <span class="info-tile-value">Angular Material 3 (Cyan & Orange)</span>
+              </div>
+              <div class="info-tile">
+                <span class="info-tile-label">State Management</span>
+                <span class="info-tile-value">Angular Signals & RxJS Interop</span>
+              </div>
+              <div class="info-tile">
+                <span class="info-tile-label">Storage Engine</span>
+                <span class="info-tile-value">PostgreSQL + Drizzle ORM + Local Storage</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</div>

@@ -1,6 +1,7 @@
 import { Directive, ElementRef, HostListener, inject, input } from '@angular/core';
 import { EventBusService } from '../services/event-bus.service';
 import { UiEventCategory } from '../models/event.models';
+import { TelemetryEventName } from '../models/event-names.constants';
 
 /**
  * Declarative directive to track UI events directly from HTML templates.
@@ -20,7 +21,7 @@ export class TrackEventDirective {
   private readonly eventBus = inject(EventBusService);
   private readonly el = inject(ElementRef<HTMLElement>);
 
-  readonly trackEvent = input.required<string>();
+  readonly trackEvent = input.required<TelemetryEventName>();
   readonly eventPayload = input<unknown>(undefined);
   readonly eventCategory = input<UiEventCategory>('action');
   readonly eventTrigger = input<'click' | 'focus' | 'blur' | 'change'>('click');

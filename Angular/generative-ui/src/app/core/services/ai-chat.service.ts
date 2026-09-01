@@ -1,6 +1,7 @@
 import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { EventBusService } from '@event-bus/services';
+import { TelemetryEvents } from '@event-bus/models';
 import {
   AiModelOption,
   ChatMessage,
@@ -186,7 +187,7 @@ export class AiChatService {
     this.eventBus?.emit({
       source: 'service',
       category: 'data',
-      name: 'AI_CHAT_SESSION_CREATED',
+      name: TelemetryEvents.AI_CHAT_SESSION_CREATED,
       payload: { sessionId: newSession.id, title },
     });
 
@@ -252,7 +253,7 @@ export class AiChatService {
     this.eventBus?.emit({
       source: 'service',
       category: 'action',
-      name: 'AI_MODEL_CHANGED',
+      name: TelemetryEvents.AI_MODEL_CHANGED,
       payload: { modelId },
     });
   }
@@ -279,7 +280,7 @@ export class AiChatService {
     this.eventBus?.emit({
       source: 'service',
       category: 'action',
-      name: 'AI_FEEDBACK_SUBMITTED',
+      name: TelemetryEvents.AI_FEEDBACK_SUBMITTED,
       payload: { messageId, feedback },
     });
   }
@@ -352,7 +353,7 @@ export class AiChatService {
     this.eventBus?.emit({
       source: 'service',
       category: 'action',
-      name: 'AI_PROMPT_SENT',
+      name: TelemetryEvents.AI_PROMPT_SENT,
       payload: { prompt, sessionId: targetSessionId },
     });
 
@@ -455,7 +456,7 @@ export class AiChatService {
         this.eventBus?.emit({
           source: 'service',
           category: 'data',
-          name: 'AI_RESPONSE_COMPLETED',
+          name: TelemetryEvents.AI_RESPONSE_COMPLETED,
           payload: { sessionId, messageId: botMessageId, hasWidget: !!widget },
         });
       }

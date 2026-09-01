@@ -2,6 +2,7 @@ import { HttpInterceptorFn, HttpResponse, HttpErrorResponse } from '@angular/com
 import { inject } from '@angular/core';
 import { tap } from 'rxjs/operators';
 import { EventBusService } from '../services/event-bus.service';
+import { TelemetryEvents } from '../models/event-names.constants';
 
 /**
  * Functional HTTP interceptor that emits telemetry events onto the EventBus
@@ -16,7 +17,7 @@ export const eventTrackingInterceptor: HttpInterceptorFn = (req, next) => {
   eventBus.emit({
     source: 'http',
     category: 'data',
-    name: `HTTP_${req.method.toUpperCase()}_START`,
+    name: TelemetryEvents.httpStart(req.method),
     payload: {
       method: req.method,
       url,
@@ -32,7 +33,7 @@ export const eventTrackingInterceptor: HttpInterceptorFn = (req, next) => {
           eventBus.emit({
             source: 'http',
             category: 'data',
-            name: `HTTP_${req.method.toUpperCase()}_SUCCESS`,
+            name: TelemetryEvents.httpSuccess(req.method),
             durationMs: elapsed,
             payload: {
               status: event.status,
@@ -51,7 +52,7 @@ export const eventTrackingInterceptor: HttpInterceptorFn = (req, next) => {
         eventBus.emit({
           source: 'http',
           category: 'error',
-          name: `HTTP_${req.method.toUpperCase()}_ERROR`,
+          name: TelemetryEvents.httpError(req.method),
           durationMs: elapsed,
           payload: {
             status,

@@ -101,6 +101,39 @@ export interface MetricTrend {
         color: #475569;
       }
 
+      :host-context(.dark-theme) & {
+        &.blue {
+          background: rgba(37, 99, 235, 0.18);
+          color: #60a5fa;
+          border: 1px solid rgba(37, 99, 235, 0.3);
+        }
+        &.amber {
+          background: rgba(217, 119, 6, 0.18);
+          color: #fbbf24;
+          border: 1px solid rgba(217, 119, 6, 0.3);
+        }
+        &.purple {
+          background: rgba(124, 58, 237, 0.18);
+          color: #c084fc;
+          border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+        &.emerald {
+          background: rgba(5, 150, 105, 0.18);
+          color: #34d399;
+          border: 1px solid rgba(5, 150, 105, 0.3);
+        }
+        &.rose {
+          background: rgba(225, 29, 72, 0.18);
+          color: #fb7185;
+          border: 1px solid rgba(225, 29, 72, 0.3);
+        }
+        &.slate {
+          background: rgba(100, 116, 139, 0.18);
+          color: #94a3b8;
+          border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+      }
+
       mat-icon {
         font-size: 24px;
         width: 24px;
@@ -154,6 +187,21 @@ export interface MetricTrend {
       &.neutral {
         background: #f1f5f9;
         color: #64748b;
+      }
+
+      :host-context(.dark-theme) & {
+        &.up {
+          background: rgba(16, 185, 129, 0.18);
+          color: #34d399;
+        }
+        &.down {
+          background: rgba(239, 68, 68, 0.18);
+          color: #f87171;
+        }
+        &.neutral {
+          background: rgba(148, 163, 184, 0.18);
+          color: #94a3b8;
+        }
       }
     }
 

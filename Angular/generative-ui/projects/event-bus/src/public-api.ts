@@ -4,6 +4,7 @@
  */
 
 export * from './lib/models/event.models';
+export * from './lib/models/event-names.constants';
 export * from './lib/services/event-bus.service';
 export * from './lib/directives/track-event.directive';
 export * from './lib/interceptors/event-tracking.interceptor';

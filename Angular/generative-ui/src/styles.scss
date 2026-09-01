@@ -7,6 +7,8 @@
 
 html {
   height: 100%;
+  font-size: var(--app-base-font-size, 16px);
+  color-scheme: light;
   @include mat.theme(
     (
       color: (
@@ -18,13 +20,26 @@ html {
       density: 0,
     )
   );
+
+  &.dark-theme {
+    color-scheme: dark;
+    @include mat.theme(
+      (
+        color: (
+          primary: mat.$cyan-palette,
+          tertiary: mat.$orange-palette,
+          theme-type: dark,
+        ),
+        typography: Mulish,
+        density: 0,
+      )
+    );
+  }
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
+  // Color scheme dynamically inherits from html / dark-theme
+  color-scheme: inherit;
 
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
@@ -45,6 +60,41 @@ body {
 *::after {
   box-sizing: border-box;
   font-family: 'Mulish', sans-serif;
+}
+
+// Sleek, Adaptive Custom Scrollbar
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--mat-sys-outline-variant, rgba(148, 163, 184, 0.4)) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mat-sys-outline-variant, rgba(148, 163, 184, 0.35));
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: var(--mat-sys-on-surface-variant, rgba(148, 163, 184, 0.65));
+  }
+
+  &:active {
+    background: var(--mat-sys-primary, #0284c7);
+  }
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .mat-icon {
@@ -104,9 +154,9 @@ pre,
 // Generative UI & AI Chat Global Component Styles
 .widget-card {
   border-radius: 12px;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   max-width: 540px;
 
@@ -115,8 +165,8 @@ pre,
     align-items: center;
     justify-content: space-between;
     padding: 10px 14px;
-    background: #f8fafc;
-    border-bottom: 1px solid #f1f5f9;
+    background: var(--mat-sys-surface-container);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
 
     .widget-title-group {
       display: flex;
@@ -124,7 +174,7 @@ pre,
       gap: 6px;
 
       .widget-icon {
-        color: #0284c7;
+        color: var(--mat-sys-primary);
         font-size: 18px;
         width: 18px;
         height: 18px;
@@ -133,7 +183,7 @@ pre,
       .order-id-label {
         font-weight: 700;
         font-size: 0.88rem;
-        color: #0f172a;
+        color: var(--mat-sys-on-surface);
       }
     }
 
@@ -165,7 +215,7 @@ pre,
 
         .grid-label {
           font-size: 0.68rem;
-          color: #64748b;
+          color: var(--mat-sys-on-surface-variant);
           text-transform: uppercase;
           font-weight: 600;
         }
@@ -173,9 +223,9 @@ pre,
         .grid-value {
           font-size: 0.84rem;
           font-weight: 600;
-          color: #1e293b;
+          color: var(--mat-sys-on-surface);
 
-          &.highlight { color: #0284c7; }
+          &.highlight { color: var(--mat-sys-primary); }
         }
       }
     }
@@ -185,37 +235,38 @@ pre,
       align-items: center;
       gap: 6px;
       padding: 5px 8px;
-      background: #f8fafc;
+      background: var(--mat-sys-surface-container);
+      border: 1px solid var(--mat-sys-outline-variant);
       border-radius: 6px;
       margin-bottom: 8px;
       font-size: 0.78rem;
 
       .tracking-number {
-        color: #0f172a;
+        color: var(--mat-sys-on-surface);
       }
     }
 
     .items-list {
-      border-top: 1px solid #f1f5f9;
+      border-top: 1px solid var(--mat-sys-outline-variant);
       padding-top: 6px;
 
       .item-row {
         display: flex;
         justify-content: space-between;
         font-size: 0.8rem;
-        color: #475569;
+        color: var(--mat-sys-on-surface-variant);
         padding: 2px 0;
 
         .item-price {
           font-weight: 600;
-          color: #0f172a;
+          color: var(--mat-sys-on-surface);
         }
       }
     }
 
     .return-eligible-note {
       font-size: 0.82rem;
-      color: #334155;
+      color: var(--mat-sys-on-surface-variant);
       margin: 0 0 8px;
     }
 
@@ -233,8 +284,8 @@ pre,
           width: 18px;
           height: 18px;
           border-radius: 50%;
-          background: #e0f2fe;
-          color: #0284c7;
+          background: var(--mat-sys-primary-container);
+          color: var(--mat-sys-on-primary-container);
           font-size: 0.68rem;
           font-weight: 700;
           display: flex;
@@ -245,7 +296,7 @@ pre,
 
         .step-desc {
           font-size: 0.8rem;
-          color: #475569;
+          color: var(--mat-sys-on-surface-variant);
         }
       }
     }
@@ -260,8 +311,8 @@ pre,
       }
 
       .metric-pill {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: var(--mat-sys-surface-container);
+        border: 1px solid var(--mat-sys-outline-variant);
         border-radius: 6px;
         padding: 8px;
         text-align: center;
@@ -271,12 +322,12 @@ pre,
         .metric-num {
           font-size: 0.95rem;
           font-weight: 800;
-          color: #0f172a;
+          color: var(--mat-sys-on-surface);
         }
 
         .metric-sub {
           font-size: 0.65rem;
-          color: #64748b;
+          color: var(--mat-sys-on-surface-variant);
         }
       }
     }
@@ -284,8 +335,8 @@ pre,
 
   .widget-footer {
     padding: 8px 14px;
-    background: #f8fafc;
-    border-top: 1px solid #f1f5f9;
+    background: var(--mat-sys-surface-container);
+    border-top: 1px solid var(--mat-sys-outline-variant);
 
     .widget-action-btn {
       border-radius: 6px;

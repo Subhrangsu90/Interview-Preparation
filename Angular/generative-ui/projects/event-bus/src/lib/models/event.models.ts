@@ -1,3 +1,5 @@
+import { TelemetryEventName } from './event-names.constants';
+
 export type UiEventSource = 'component' | 'service' | 'pipe' | 'http' | 'system';
 
 export type UiEventCategory = 'action' | 'navigation' | 'data' | 'error' | 'lifecycle';
@@ -7,7 +9,7 @@ export interface UiEvent<T = unknown> {
   readonly timestamp: Date;
   readonly source: UiEventSource;
   readonly category: UiEventCategory;
-  readonly name: string;
+  readonly name: TelemetryEventName;
   readonly payload?: T;
   readonly durationMs?: number;
   readonly metadata?: Record<string, unknown>;

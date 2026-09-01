@@ -29,8 +29,9 @@ import { UiEmptyState } from '@shared/ui/components/empty-state';
 import { UiCopyToClipboardDirective } from '@shared/ui/directives';
 import { UiCurrencyPipe, UiRelativeTimePipe } from '@shared/ui/pipes';
 
-// Event Bus Directive
+// Event Bus Directive & Telemetry Constants
 import { TrackEventDirective } from '@event-bus/directives';
+import { TelemetryEvents } from '@event-bus/models';
 
 // Core Services & Models
 import { AiChatService } from '@core/services/ai-chat.service';
@@ -74,6 +75,7 @@ interface FormattedPart {
 })
 export class ChatComponent implements AfterViewChecked {
   protected readonly chatService = inject(AiChatService);
+  protected readonly TelemetryEvents = TelemetryEvents;
 
   @ViewChild('messagesContainer') private messagesContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('promptTextarea') private promptTextarea?: ElementRef<HTMLTextAreaElement>;

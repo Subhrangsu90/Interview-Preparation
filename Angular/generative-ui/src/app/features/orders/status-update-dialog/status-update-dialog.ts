@@ -60,7 +60,7 @@ import { Order, OrderStatus } from '@core/models/ecommerce.models';
     .dialog-content {
       padding-top: 8px;
       .order-info {
-        color: #475569;
+        color: var(--mat-sys-on-surface-variant);
         margin-bottom: 16px;
         font-size: 0.95rem;
       }

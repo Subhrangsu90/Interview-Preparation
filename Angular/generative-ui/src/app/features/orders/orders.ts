@@ -19,6 +19,7 @@ import { UiPagination } from '@shared/ui/components/pagination';
 import { UiConfirmService } from '@shared/ui/components/confirm-dialog';
 import { UiCopyToClipboardDirective } from '@shared/ui/directives';
 import { TrackEventDirective } from '@event-bus/directives';
+import { TelemetryEvents } from '@event-bus/models';
 import { OrderService } from '@core/services/order.service';
 import { Order, OrderStatus } from '@core/models/ecommerce.models';
 import { CreateOrderDialog } from './create-order-dialog/create-order-dialog';
@@ -57,6 +58,7 @@ interface StatusFilterTab {
   styleUrl: './orders.scss',
 })
 export class OrdersComponent implements OnInit {
+  protected readonly TelemetryEvents = TelemetryEvents;
   private readonly orderService = inject(OrderService);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);

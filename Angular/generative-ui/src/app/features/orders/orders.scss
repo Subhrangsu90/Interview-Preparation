@@ -116,7 +116,7 @@
 
       .customer-name {
         font-weight: 600;
-        color: #0f172a;
+        color: var(--mat-sys-on-surface);
       }
 
       .customer-email {
@@ -149,7 +149,7 @@
       .order-total {
         font-weight: 700;
         font-size: 0.92rem;
-        color: #0f172a;
+        color: var(--mat-sys-on-surface);
       }
 
       .carrier-label {

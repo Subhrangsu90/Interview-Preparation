@@ -17,6 +17,15 @@
   <span class="toolbar-spacer"></span>
 
   <div class="header-actions">
+    <button
+      mat-icon-button
+      type="button"
+      [attr.aria-label]="themeService.theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+      (click)="themeService.toggleTheme()"
+      class="action-button"
+    >
+      <mat-icon>{{ themeService.theme() === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
     <button mat-icon-button type="button" aria-label="Notifications" class="action-button">
       <mat-icon>notifications_none</mat-icon>
     </button>

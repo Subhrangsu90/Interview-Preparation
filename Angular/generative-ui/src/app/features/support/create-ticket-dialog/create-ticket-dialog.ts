@@ -117,9 +117,9 @@ import { CreateTicketDto, TicketType } from '@core/models/ecommerce.models';
       gap: 8px;
       font-size: 1.3rem;
       font-weight: 700;
-      color: #0f172a;
+      color: var(--mat-sys-on-surface);
       .dialog-icon {
-        color: #2563eb;
+        color: var(--mat-sys-primary);
       }
     }
     .dialog-content {

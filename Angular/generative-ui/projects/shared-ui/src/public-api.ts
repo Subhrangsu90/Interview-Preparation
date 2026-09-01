@@ -14,6 +14,7 @@ export * from './lib/components/confirm-dialog/confirm-dialog.service';
 export * from './lib/components/loading-spinner/loading-spinner.component';
 export * from './lib/components/pagination/pagination.component';
 export * from './lib/services/loading.service';
+export * from './lib/services/theme.service';
 
 // Directives
 export * from './lib/directives/copy-to-clipboard.directive';

@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { catchError, map, Observable, throwError, tap } from 'rxjs';
 import { ApiService, ApiError } from '@core/api';
 import { EventBusService } from '@event-bus/services';
+import { TelemetryEvents } from '@event-bus/models';
 import { environment } from '@env';
 import {
   Order,
@@ -58,7 +59,7 @@ export class OrderService {
           this.eventBus?.emit({
             source: 'service',
             category: 'data',
-            name: 'ORDERS_STATE_UPDATED',
+            name: TelemetryEvents.ORDERS_STATE_UPDATED,
             payload: { count: data.length, filters },
           });
         },

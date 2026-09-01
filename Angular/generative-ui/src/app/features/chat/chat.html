@@ -10,7 +10,7 @@
       <button
         mat-stroked-button
         [matMenuTriggerFor]="modelMenu"
-        [trackEvent]="'AI_MODEL_MENU_OPEN'"
+        [trackEvent]="TelemetryEvents.AI_MODEL_MENU_OPEN"
       >
         <mat-icon>{{ activeModelDetails().icon }}</mat-icon>
         {{ activeModelDetails().name }}
@@ -24,7 +24,7 @@
             class="model-menu-item"
             [class.selected]="m.id === selectedModel()"
             (click)="onModelSelect(m.id)"
-            [trackEvent]="'AI_MODEL_SELECT'"
+            [trackEvent]="TelemetryEvents.AI_MODEL_SELECT"
             [eventPayload]="{ modelId: m.id }"
           >
             <mat-icon>{{ m.icon }}</mat-icon>
@@ -44,7 +44,7 @@
         mat-flat-button
         color="primary"
         (click)="createNewChat()"
-        [trackEvent]="'AI_NEW_CHAT_CLICK'"
+        [trackEvent]="TelemetryEvents.AI_NEW_CHAT_CLICK"
       >
         <mat-icon>add</mat-icon>
         New Chat
@@ -55,7 +55,7 @@
         mat-stroked-button
         (click)="exportChat()"
         [disabled]="(activeSession()?.messages?.length ?? 0) === 0"
-        [trackEvent]="'AI_EXPORT_CHAT_CLICK'"
+        [trackEvent]="TelemetryEvents.AI_EXPORT_CHAT_CLICK"
         matTooltip="Export as Markdown"
       >
         <mat-icon>file_download</mat-icon>
@@ -192,7 +192,7 @@
                     tabindex="0"
                     role="button"
                     (keydown.enter)="applyQuickPrompt(item)"
-                    [trackEvent]="'AI_QUICK_PROMPT_CLICK'"
+                    [trackEvent]="TelemetryEvents.AI_QUICK_PROMPT_CLICK"
                     [eventPayload]="{ promptTitle: item.title }"
                   >
                     <mat-card-header>
@@ -328,7 +328,7 @@
                                 color="primary"
                                 class="widget-action-btn"
                                 [routerLink]="['/orders', msg.generativeWidget.data.orderNumber]"
-                                [trackEvent]="'AI_VIEW_ORDER_CLICK'"
+                                [trackEvent]="TelemetryEvents.AI_VIEW_ORDER_CLICK"
                                 [eventPayload]="{ orderNumber: msg.generativeWidget.data.orderNumber }"
                               >
                                 <mat-icon>open_in_new</mat-icon>
@@ -372,7 +372,7 @@
                                 color="primary"
                                 class="widget-action-btn"
                                 [routerLink]="msg.generativeWidget.data.supportDeskRoute"
-                                [trackEvent]="'AI_OPEN_SUPPORT_CLICK'"
+                                [trackEvent]="TelemetryEvents.AI_OPEN_SUPPORT_CLICK"
                               >
                                 <mat-icon>support_agent</mat-icon>
                                 Open Support & Returns Desk
@@ -422,7 +422,7 @@
                           mat-icon-button
                           matTooltip="Copy message"
                           [uiCopyToClipboard]="msg.content"
-                          [trackEvent]="'AI_COPY_MESSAGE_CLICK'"
+                          [trackEvent]="TelemetryEvents.AI_COPY_MESSAGE_CLICK"
                         >
                           <mat-icon>content_copy</mat-icon>
                         </button>
@@ -449,7 +449,7 @@
                           mat-icon-button
                           matTooltip="Regenerate response"
                           (click)="regenerate()"
-                          [trackEvent]="'AI_REGENERATE_CLICK'"
+                          [trackEvent]="TelemetryEvents.AI_REGENERATE_CLICK"
                         >
                           <mat-icon>refresh</mat-icon>
                         </button>
@@ -468,21 +468,21 @@
           <mat-chip-set class="followup-chips" aria-label="Suggested prompts">
             <mat-chip
               (click)="applyQuickPrompt(quickPrompts[0])"
-              [trackEvent]="'AI_CHIP_TRACK_CLICK'"
+              [trackEvent]="TelemetryEvents.AI_CHIP_TRACK_CLICK"
             >
               <mat-icon matChipAvatar>search</mat-icon>
               Track ORD-7821
             </mat-chip>
             <mat-chip
               (click)="applyQuickPrompt(quickPrompts[1])"
-              [trackEvent]="'AI_CHIP_RETURN_CLICK'"
+              [trackEvent]="TelemetryEvents.AI_CHIP_RETURN_CLICK"
             >
               <mat-icon matChipAvatar>assignment_return</mat-icon>
               Return Policy
             </mat-chip>
             <mat-chip
               (click)="applyQuickPrompt(quickPrompts[2])"
-              [trackEvent]="'AI_CHIP_SPEND_CLICK'"
+              [trackEvent]="TelemetryEvents.AI_CHIP_SPEND_CLICK"
             >
               <mat-icon matChipAvatar>pie_chart</mat-icon>
               Monthly Spend
@@ -512,7 +512,7 @@
                   class="composer-fab-btn"
                   matTooltip="Stop generation"
                   (click)="stopGeneration()"
-                  [trackEvent]="'AI_STOP_GENERATION_CLICK'"
+                  [trackEvent]="TelemetryEvents.AI_STOP_GENERATION_CLICK"
                 >
                   <mat-icon>stop</mat-icon>
                 </button>
@@ -525,7 +525,7 @@
                   [disabled]="!promptInput().trim()"
                   matTooltip="Send prompt"
                   (click)="sendMessage()"
-                  [trackEvent]="'AI_SEND_PROMPT_CLICK'"
+                  [trackEvent]="TelemetryEvents.AI_SEND_PROMPT_CLICK"
                 >
                   <mat-icon>send</mat-icon>
                 </button>

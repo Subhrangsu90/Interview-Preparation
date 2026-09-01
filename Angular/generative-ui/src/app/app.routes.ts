@@ -27,6 +27,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/chat/chat').then((m) => m.ChatComponent),
   },
   {
+    path: 'settings',
+    loadComponent: () =>
+      import('./features/settings/settings').then((m) => m.SettingsComponent),
+  },
+  {
     path: '',
     redirectTo: 'orders',
     pathMatch: 'full',

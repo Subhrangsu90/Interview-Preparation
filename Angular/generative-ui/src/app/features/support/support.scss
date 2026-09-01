@@ -135,7 +135,7 @@
 
           .subject-title {
             font-weight: 600;
-            color: #0f172a;
+            color: var(--mat-sys-on-surface);
             max-width: 320px;
             overflow: hidden;
             text-overflow: ellipsis;
