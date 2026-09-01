@@ -23,6 +23,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/events/events').then((m) => m.EventsComponent),
   },
   {
+    path: 'chat',
+    loadComponent: () => import('./features/chat/chat').then((m) => m.ChatComponent),
+  },
+  {
     path: '',
     redirectTo: 'orders',
     pathMatch: 'full',
