@@ -9,6 +9,8 @@ html {
   height: 100%;
   font-size: var(--app-base-font-size, 16px);
   color-scheme: light;
+
+  // 1. Default Theme: Cyan Tech (Cyan & Orange)
   @include mat.theme(
     (
       color: (
@@ -30,10 +32,133 @@ html {
           tertiary: mat.$orange-palette,
           theme-type: dark,
         ),
-        typography: Mulish,
-        density: 0,
       )
     );
+  }
+
+  // 2. Azure Ocean (Azure & Rose)
+  &.theme-azure {
+    @include mat.theme(
+      (
+        color: (
+          primary: mat.$azure-palette,
+          tertiary: mat.$rose-palette,
+          theme-type: light,
+        ),
+      )
+    );
+
+    &.dark-theme {
+      @include mat.theme(
+        (
+          color: (
+            primary: mat.$azure-palette,
+            tertiary: mat.$rose-palette,
+            theme-type: dark,
+          ),
+        )
+      );
+    }
+  }
+
+  // 3. Royal Violet (Violet & Orange)
+  &.theme-violet {
+    @include mat.theme(
+      (
+        color: (
+          primary: mat.$violet-palette,
+          tertiary: mat.$orange-palette,
+          theme-type: light,
+        ),
+      )
+    );
+
+    &.dark-theme {
+      @include mat.theme(
+        (
+          color: (
+            primary: mat.$violet-palette,
+            tertiary: mat.$orange-palette,
+            theme-type: dark,
+          ),
+        )
+      );
+    }
+  }
+
+  // 4. Emerald Forest (Green & Chartreuse)
+  &.theme-green {
+    @include mat.theme(
+      (
+        color: (
+          primary: mat.$green-palette,
+          tertiary: mat.$chartreuse-palette,
+          theme-type: light,
+        ),
+      )
+    );
+
+    &.dark-theme {
+      @include mat.theme(
+        (
+          color: (
+            primary: mat.$green-palette,
+            tertiary: mat.$chartreuse-palette,
+            theme-type: dark,
+          ),
+        )
+      );
+    }
+  }
+
+  // 5. Sunset Rose (Rose & Magenta)
+  &.theme-rose {
+    @include mat.theme(
+      (
+        color: (
+          primary: mat.$rose-palette,
+          tertiary: mat.$magenta-palette,
+          theme-type: light,
+        ),
+      )
+    );
+
+    &.dark-theme {
+      @include mat.theme(
+        (
+          color: (
+            primary: mat.$rose-palette,
+            tertiary: mat.$magenta-palette,
+            theme-type: dark,
+          ),
+        )
+      );
+    }
+  }
+
+  // 6. Cobalt Sky (Blue & Yellow)
+  &.theme-blue {
+    @include mat.theme(
+      (
+        color: (
+          primary: mat.$blue-palette,
+          tertiary: mat.$yellow-palette,
+          theme-type: light,
+        ),
+      )
+    );
+
+    &.dark-theme {
+      @include mat.theme(
+        (
+          color: (
+            primary: mat.$blue-palette,
+            tertiary: mat.$yellow-palette,
+            theme-type: dark,
+          ),
+        )
+      );
+    }
   }
 }
 

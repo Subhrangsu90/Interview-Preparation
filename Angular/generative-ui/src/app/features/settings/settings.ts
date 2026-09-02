@@ -8,7 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { UiPageHeader } from '@shared/ui/components/page-header';
 import { EventBusService } from '@event-bus/services';
 import { TelemetryEvents } from '@event-bus/models';
-import { ThemeService, ThemeMode, BaseFontSize } from '@shared/ui/services/theme.service';
+import { ThemeService, ThemeMode, BaseFontSize, ColorPaletteId } from '@shared/ui/services/theme.service';
 
 @Component({
   selector: 'app-settings',
@@ -36,6 +36,16 @@ export class SettingsComponent {
     { label: 'Comfortable', size: 18, hint: '18px - Larger text and touch targets' },
   ];
 
+  selectPalette(palette: ColorPaletteId): void {
+    this.themeService.setPalette(palette);
+    this.eventBus?.emit({
+      source: 'component',
+      category: 'action',
+      name: TelemetryEvents.COLOR_PALETTE_CHANGED,
+      payload: { palette },
+    });
+  }
+
   selectTheme(mode: ThemeMode): void {
     this.themeService.setTheme(mode);
     this.eventBus?.emit({
@@ -57,6 +67,7 @@ export class SettingsComponent {
   }
 
   resetToDefaults(): void {
+    this.selectPalette('cyan');
     this.selectTheme('light');
     this.selectBaseSize(16);
   }

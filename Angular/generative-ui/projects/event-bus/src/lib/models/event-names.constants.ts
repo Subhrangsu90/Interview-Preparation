@@ -54,6 +54,7 @@ export const TelemetryEvents = {
 
   // --- Settings & Appearance ---
   THEME_CHANGED: 'THEME_CHANGED',
+  COLOR_PALETTE_CHANGED: 'COLOR_PALETTE_CHANGED',
   BASE_FONT_SIZE_CHANGED: 'BASE_FONT_SIZE_CHANGED',
 
   // --- Global Telemetry & System ---

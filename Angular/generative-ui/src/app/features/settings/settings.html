@@ -2,7 +2,7 @@
   <!-- Page Header -->
   <ui-page-header
     title="Settings"
-    subtitle="Personalize your workspace appearance, theme modes, and system preferences"
+    subtitle="Personalize your workspace appearance, Material 3 color themes, and system preferences"
     icon="settings"
   >
     <div actions class="header-actions">
@@ -24,21 +24,79 @@
         </ng-template>
 
         <div class="tab-content">
-          <!-- Color Theme Selection -->
-          <section class="settings-section" aria-labelledby="theme-heading">
+          <!-- Material 3 Palette Selection -->
+          <section class="settings-section" aria-labelledby="palette-heading">
+            <div class="section-header">
+              <div class="section-title-box">
+                <mat-icon class="section-icon">color_lens</mat-icon>
+                <div>
+                  <h2 id="palette-heading" class="section-title">Theme Palette</h2>
+                  <p class="section-subtitle">
+                    Select an Angular Material 3 color theme with balanced primary and tertiary tonal pairings.
+                  </p>
+                </div>
+              </div>
+              <span class="current-palette-badge">
+                {{ (themeService.colorPalette() | titlecase) }}
+              </span>
+            </div>
+
+            <div class="palette-options-grid" role="radiogroup" aria-labelledby="palette-heading">
+              @for (palette of themeService.paletteOptions; track palette.id) {
+                <div
+                  class="palette-card"
+                  [class.selected]="themeService.colorPalette() === palette.id"
+                  (click)="selectPalette(palette.id)"
+                  (keydown.enter)="selectPalette(palette.id)"
+                  tabindex="0"
+                  role="radio"
+                  [attr.aria-checked]="themeService.colorPalette() === palette.id"
+                >
+                  <!-- Dual-color Swatch Preview -->
+                  <div class="palette-swatch-wrapper">
+                    <div
+                      class="palette-swatch primary-swatch"
+                      [style.background-color]="palette.primaryColor"
+                      title="Primary tonal palette"
+                    ></div>
+                    <div
+                      class="palette-swatch tertiary-swatch"
+                      [style.background-color]="palette.tertiaryColor"
+                      title="Tertiary accent palette"
+                    ></div>
+                  </div>
+
+                  <div class="palette-card-content">
+                    <div class="palette-card-header">
+                      <span class="palette-name">{{ palette.name }}</span>
+                      <mat-icon class="check-icon">
+                        {{ themeService.colorPalette() === palette.id ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                      </mat-icon>
+                    </div>
+                    <p class="palette-desc">{{ palette.description }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+
+          <mat-divider class="section-divider" />
+
+          <!-- Appearance Mode Selection (Light / Dark) -->
+          <section class="settings-section" aria-labelledby="mode-heading">
             <div class="section-header">
               <div class="section-title-box">
                 <mat-icon class="section-icon">dark_mode</mat-icon>
                 <div>
-                  <h2 id="theme-heading" class="section-title">Color Scheme</h2>
+                  <h2 id="mode-heading" class="section-title">Appearance Mode</h2>
                   <p class="section-subtitle">
-                    Select your preferred interface theme with Angular Material 3 color palettes.
+                    Toggle between Daylight high-contrast and Nighttime deep surface modes.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div class="theme-options-grid">
+            <div class="theme-options-grid" role="radiogroup" aria-labelledby="mode-heading">
               <!-- Light Theme Card -->
               <div
                 class="theme-card"
@@ -70,7 +128,7 @@
                     </mat-icon>
                   </div>
                   <p class="theme-desc">
-                    Vibrant, high-contrast daylight theme with Mulish typography.
+                    Crisp, vibrant daylight theme with high contrast and Mulish typography.
                   </p>
                 </div>
               </div>
@@ -106,7 +164,7 @@
                     </mat-icon>
                   </div>
                   <p class="theme-desc">
-                    Deep surface tones with glowing cyan accents, easy on the eyes.
+                    Deep surface tones with glowing palette accents, optimized for low-light focus.
                   </p>
                 </div>
               </div>
@@ -130,7 +188,7 @@
               <span class="current-size-badge">{{ themeService.baseSize() }}px</span>
             </div>
 
-            <div class="size-options-grid">
+            <div class="size-options-grid" role="radiogroup" aria-labelledby="size-heading">
               @for (opt of fontSizeOptions; track opt.size) {
                 <div
                   class="size-card"
@@ -138,7 +196,8 @@
                   (click)="selectBaseSize(opt.size)"
                   (keydown.enter)="selectBaseSize(opt.size)"
                   tabindex="0"
-                  role="button"
+                  role="radio"
+                  [attr.aria-checked]="themeService.baseSize() === opt.size"
                 >
                   <div class="size-header">
                     <span class="size-label">{{ opt.label }}</span>
@@ -172,7 +231,11 @@
               </div>
               <div class="info-tile">
                 <span class="info-tile-label">Design System</span>
-                <span class="info-tile-value">Angular Material 3 (Cyan & Orange)</span>
+                <span class="info-tile-value">Angular Material 3 (Multi-Theme Support)</span>
+              </div>
+              <div class="info-tile">
+                <span class="info-tile-label">Active Palette</span>
+                <span class="info-tile-value">{{ (themeService.colorPalette() | titlecase) }} & {{ (themeService.theme() | titlecase) }} Mode</span>
               </div>
               <div class="info-tile">
                 <span class="info-tile-label">State Management</span>

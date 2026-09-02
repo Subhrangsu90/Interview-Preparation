@@ -88,6 +88,127 @@
   border-top-color: var(--mat-sys-outline-variant) !important;
 }
 
+// Active Palette Badge
+.current-palette-badge {
+  padding: 4px 14px;
+  border-radius: 12px;
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+// Palette Options Grid (6 Curated M3 Palettes)
+.palette-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.palette-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  border-radius: 14px;
+  border: 2px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-lowest);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+
+  &:hover {
+    border-color: var(--mat-sys-primary);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+
+  &.selected {
+    border-color: var(--mat-sys-primary);
+    background: var(--mat-sys-surface-container-low);
+    box-shadow: 0 0 0 1px var(--mat-sys-primary);
+
+    .check-icon {
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  // Dual-color circular swatch preview
+  .palette-swatch-wrapper {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+
+    .palette-swatch {
+      position: absolute;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+      transition: transform 0.2s ease;
+    }
+
+    .primary-swatch {
+      top: 0;
+      left: 0;
+      width: 32px;
+      height: 32px;
+      z-index: 1;
+      border: 2px solid var(--mat-sys-surface);
+    }
+
+    .tertiary-swatch {
+      bottom: 0;
+      right: 0;
+      width: 24px;
+      height: 24px;
+      z-index: 2;
+      border: 2px solid var(--mat-sys-surface);
+    }
+  }
+
+  &:hover .palette-swatch-wrapper {
+    .primary-swatch {
+      transform: scale(1.05);
+    }
+    .tertiary-swatch {
+      transform: scale(1.1);
+    }
+  }
+
+  .palette-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .palette-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .palette-name {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--mat-sys-on-surface);
+    }
+
+    .check-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--mat-sys-outline);
+    }
+  }
+
+  .palette-desc {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--mat-sys-on-surface-variant);
+    line-height: 1.35;
+  }
+}
+
 // Theme Options Cards
 .theme-options-grid {
   display: grid;
@@ -134,6 +255,7 @@
     .mock-header {
       height: 22px;
       width: 100%;
+      background: var(--mat-sys-primary);
     }
 
     .mock-body {
@@ -170,16 +292,13 @@
           height: 10px;
           border-radius: 5px;
           margin-top: 4px;
+          background: var(--mat-sys-tertiary, var(--mat-sys-primary));
         }
       }
     }
 
     &.light-preview {
       background: #f8fafc;
-
-      .mock-header {
-        background: #0284c7;
-      }
 
       .mock-sidebar {
         background: #f1f5f9;
@@ -189,18 +308,10 @@
       .mock-line {
         background: #cbd5e1;
       }
-
-      .mock-chip {
-        background: #38bdf8;
-      }
     }
 
     &.dark-preview {
       background: #0f172a;
-
-      .mock-header {
-        background: #0369a1;
-      }
 
       .mock-sidebar {
         background: #1e293b;
@@ -209,10 +320,6 @@
 
       .mock-line {
         background: #475569;
-      }
-
-      .mock-chip {
-        background: #38bdf8;
       }
     }
   }
