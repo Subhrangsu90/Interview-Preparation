@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,6 +17,7 @@ interface NavItem {
   styleUrl: './sidenav.scss',
 })
 export class Sidenav {
+  readonly itemClick = output<void>();
   protected readonly mainNavItems: readonly NavItem[] = [
     { label: 'Dashboard', route: '/home', icon: 'dashboard' },
     { label: 'AI Chat', route: '/chat', icon: 'auto_awesome' },

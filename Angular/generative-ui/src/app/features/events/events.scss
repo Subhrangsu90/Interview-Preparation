@@ -27,6 +27,17 @@
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px 8px;
+    gap: 12px;
+  }
 }
 
 .header-actions {
@@ -38,8 +49,13 @@
 /* Metrics Grid */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: 16px;
+
+  @media (max-width: 520px) {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }
 
 /* Table Card & Toolbar */
@@ -53,12 +69,23 @@
     padding: 16px 20px;
     border-bottom: 1px solid var(--mat-sys-outline-variant);
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
+
+    @media (max-width: 640px) {
+      padding: 12px 14px;
+      flex-direction: column;
+      align-items: stretch;
+    }
 
     .search-wrapper {
-      min-width: 280px;
+      min-width: 240px;
       flex-grow: 1;
       max-width: 400px;
+
+      @media (max-width: 640px) {
+        max-width: 100%;
+        min-width: 100%;
+      }
     }
 
     .source-filters {
@@ -252,6 +279,12 @@
   box-shadow: -2px 0 12px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 600px) {
+    width: 100vw;
+    max-width: 100vw;
+    border-left: none;
+  }
 
   .drawer-header {
     display: flex;

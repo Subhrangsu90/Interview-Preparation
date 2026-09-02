@@ -7,6 +7,7 @@
         [routerLink]="item.route"
         routerLinkActive="active-item"
         [routerLinkActiveOptions]="{ exact: true }"
+        (click)="itemClick.emit()"
         class="nav-item"
       >
         <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
@@ -25,6 +26,7 @@
         [routerLink]="item.route"
         routerLinkActive="active-item"
         [routerLinkActiveOptions]="{ exact: true }"
+        (click)="itemClick.emit()"
         class="nav-item"
       >
         <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>

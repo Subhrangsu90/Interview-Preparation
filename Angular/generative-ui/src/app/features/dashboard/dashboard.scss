@@ -9,6 +9,11 @@
   align-items: flex-start;
   padding: 40px 16px;
   width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 600px) {
+    padding: 16px 10px;
+  }
 }
 
 .welcome-frame {
@@ -22,6 +27,11 @@
   display: flex;
   align-items: center;
   gap: 16px;
+
+  @media (max-width: 480px) {
+    padding: 14px 16px;
+    gap: 12px;
+  }
 }
 
 .welcome-avatar {
@@ -55,6 +65,10 @@
   letter-spacing: -0.01em;
   color: var(--mat-sys-on-surface);
   margin-bottom: 4px;
+
+  @media (max-width: 480px) {
+    font-size: 1.15rem;
+  }
 }
 
 .welcome-subtitle {
@@ -74,6 +88,10 @@
 
 .welcome-content {
   padding: 24px 28px;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
 }
 
 .welcome-description {
@@ -81,12 +99,22 @@
   font-size: 0.95rem;
   line-height: 1.6;
   color: var(--mat-sys-on-surface-variant);
+
+  @media (max-width: 480px) {
+    font-size: 0.88rem;
+    margin-bottom: 16px;
+  }
 }
 
 .quick-nav-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
   gap: 16px;
+
+  @media (max-width: 540px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 .nav-card {
