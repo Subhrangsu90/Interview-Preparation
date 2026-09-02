@@ -1,15 +1,15 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "{JavaScript/**,TypeScripts/**,web-viewer/server.js,web-viewer/public/**}"
-    }
-  },
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+	"$schema": "https://openapi.vercel.sh/vercel.json",
+	"version": 2,
+	"buildCommand": "npm run build",
+	"outputDirectory": "dist",
+	"functions": {
+		"api/index.js": {
+			"includeFiles": "{JavaScript/**,TypeScripts/**,web-viewer/server.js,web-viewer/public/**,Angular/**}"
+		}
+	},
+	"rewrites": [
+		{ "source": "/api/(.*)", "destination": "/api/index.js" },
+		{ "source": "/(.*)", "destination": "/index.html" }
+	]
 }
