@@ -60,9 +60,9 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #fef2f2;
-    color: #b91c1c;
-    border-bottom: 1px solid #fecaca;
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
     padding: 12px 20px;
     font-size: 0.9rem;
     font-weight: 500;
@@ -117,9 +117,18 @@
       vertical-align: middle;
 
       .order-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         text-decoration: none;
-        color: var(--mat-sys-primary, #4338ca);
+        color: var(--mat-sys-primary);
         font-weight: 600;
+
+        .inline-order-icon {
+          font-size: 1.15rem;
+          width: 1.15rem;
+          height: 1.15rem;
+        }
 
         &:hover {
           text-decoration: underline;
@@ -157,7 +166,7 @@
         .items-count-badge {
           font-size: 0.74rem;
           font-weight: 700;
-          color: var(--mat-sys-primary, #4338ca);
+          color: var(--mat-sys-primary);
         }
 
         .primary-item-name {
@@ -188,7 +197,7 @@
         gap: 4px;
         font-family: 'JetBrains Mono', monospace;
         font-size: 0.76rem;
-        color: var(--mat-sys-primary, #4338ca);
+        color: var(--mat-sys-primary);
         margin-top: 2px;
         transition: opacity 0.15s ease;
 

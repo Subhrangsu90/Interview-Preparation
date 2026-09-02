@@ -61,9 +61,9 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: #fef2f2;
-    color: #b91c1c;
-    border-bottom: 1px solid #fecaca;
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
     padding: 12px 20px;
     font-size: 0.9rem;
     font-weight: 500;
@@ -74,8 +74,8 @@
 
     button {
       margin-left: auto;
-      border-color: #fca5a5;
-      color: #b91c1c;
+      border-color: var(--mat-sys-outline-variant);
+      color: var(--mat-sys-on-error-container);
     }
   }
 
@@ -132,7 +132,7 @@
             font-family: 'JetBrains Mono', 'Fira Code', monospace;
             font-size: 0.88rem;
             font-weight: 700;
-            color: var(--mat-sys-primary, #4338ca);
+            color: var(--mat-sys-primary);
             cursor: pointer;
 
             &:hover {
@@ -226,7 +226,7 @@
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          color: var(--mat-sys-primary, #4338ca);
+          color: var(--mat-sys-primary);
           text-decoration: none;
           font-weight: 600;
           font-family: 'JetBrains Mono', 'Fira Code', monospace;
@@ -245,7 +245,7 @@
 
           &:hover {
             text-decoration: underline;
-            color: var(--mat-sys-primary, #4338ca);
+            color: var(--mat-sys-primary);
           }
         }
 

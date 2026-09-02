@@ -166,43 +166,49 @@
       }
 
       &.active {
-        background-color: rgba(2, 132, 199, 0.12);
-        color: #0284c7;
+        background-color: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
 
         .session-icon {
-          color: #0284c7;
+          color: var(--mat-sys-on-primary-container);
         }
 
         .session-meta {
           .session-title {
-            color: #0284c7;
+            color: var(--mat-sys-on-primary-container);
           }
           .session-date {
-            color: #0369a1;
+            color: var(--mat-sys-on-primary-container);
+            opacity: 0.8;
           }
         }
 
         .session-delete-btn {
-          opacity: 0.75;
-          color: #0284c7;
+          opacity: 0.85;
+          color: var(--mat-sys-on-primary-container);
+        }
+
+        &:hover {
+          background-color: var(--mat-sys-primary-container);
         }
 
         :host-context(.dark-theme) & {
-          background-color: rgba(14, 165, 233, 0.18);
-          color: #38bdf8;
-          border: 1px solid rgba(14, 165, 233, 0.25);
+          background-color: var(--mat-sys-primary-container);
+          color: var(--mat-sys-on-primary-container);
+          border: 1px solid var(--mat-sys-outline-variant);
 
           .session-icon,
           .session-delete-btn {
-            color: #38bdf8;
+            color: var(--mat-sys-on-primary-container);
           }
 
           .session-meta {
             .session-title {
-              color: #38bdf8;
+              color: var(--mat-sys-on-primary-container);
             }
             .session-date {
-              color: #7dd3fc;
+              color: var(--mat-sys-on-primary-container);
+              opacity: 0.8;
             }
           }
         }
@@ -372,15 +378,15 @@
 
     &:hover,
     &:focus-visible {
-      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.12);
+      box-shadow: 0 4px 14px var(--mat-sys-outline-variant);
     }
 
     .card-icon-box {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: var(--mat-sys-primary-container, #e0f2fe);
-      color: var(--mat-sys-on-primary-container, #0284c7);
+      background: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
       border-radius: 8px;
 
       mat-icon {

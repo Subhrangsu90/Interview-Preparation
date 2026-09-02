@@ -33,11 +33,11 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'orders',
+    redirectTo: 'home',
     pathMatch: 'full',
   },
   {
     path: '**',
-    redirectTo: 'orders',
+    redirectTo: 'home',
   },
 ];

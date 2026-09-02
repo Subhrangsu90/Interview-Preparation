@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 
-export type StatusBadgeVariant = 'auto' | 'success' | 'warning' | 'info' | 'danger' | 'neutral';
+export type StatusBadgeVariant = 'auto' | 'primary' | 'tertiary' | 'success' | 'warning' | 'info' | 'danger' | 'neutral';
 
 export type StatusBadgeSize = 'sm' | 'md';
 
@@ -59,6 +59,19 @@ export type StatusBadgeSize = 'sm' | 'md';
         flex-shrink: 0;
       }
 
+      &.primary,
+      &.info {
+        background-color: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
+        border: 1px solid transparent;
+      }
+
+      &.tertiary {
+        background-color: var(--mat-sys-tertiary-container);
+        color: var(--mat-sys-on-tertiary-container);
+        border: 1px solid transparent;
+      }
+
       &.success {
         background-color: #ecfdf5;
         color: #059669;
@@ -71,12 +84,6 @@ export type StatusBadgeSize = 'sm' | 'md';
         border: 1px solid transparent;
       }
 
-      &.info {
-        background-color: #eff6ff;
-        color: #2563eb;
-        border: 1px solid transparent;
-      }
-
       &.danger {
         background-color: #fef2f2;
         color: #dc2626;
@@ -84,12 +91,25 @@ export type StatusBadgeSize = 'sm' | 'md';
       }
 
       &.neutral {
-        background-color: #f1f5f9;
-        color: #64748b;
+        background-color: var(--mat-sys-surface-container);
+        color: var(--mat-sys-on-surface-variant);
         border: 1px solid transparent;
       }
 
       :host-context(.dark-theme) & {
+        &.primary,
+        &.info {
+          background-color: var(--mat-sys-primary-container);
+          color: var(--mat-sys-on-primary-container);
+          border-color: var(--mat-sys-outline-variant);
+        }
+
+        &.tertiary {
+          background-color: var(--mat-sys-tertiary-container);
+          color: var(--mat-sys-on-tertiary-container);
+          border-color: var(--mat-sys-outline-variant);
+        }
+
         &.success {
           background-color: rgba(16, 185, 129, 0.16);
           color: #34d399;
@@ -102,12 +122,6 @@ export type StatusBadgeSize = 'sm' | 'md';
           border-color: rgba(245, 158, 11, 0.3);
         }
 
-        &.info {
-          background-color: rgba(14, 165, 233, 0.16);
-          color: #38bdf8;
-          border-color: rgba(14, 165, 233, 0.3);
-        }
-
         &.danger {
           background-color: rgba(239, 68, 68, 0.16);
           color: #f87171;
@@ -115,9 +129,9 @@ export type StatusBadgeSize = 'sm' | 'md';
         }
 
         &.neutral {
-          background-color: rgba(148, 163, 184, 0.16);
-          color: #94a3b8;
-          border-color: rgba(148, 163, 184, 0.3);
+          background-color: var(--mat-sys-surface-container);
+          color: var(--mat-sys-on-surface-variant);
+          border-color: var(--mat-sys-outline-variant);
         }
       }
     }

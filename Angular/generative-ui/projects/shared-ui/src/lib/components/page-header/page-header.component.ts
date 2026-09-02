@@ -53,7 +53,7 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .ui-title-icon {
-      color: var(--mat-sys-primary, #0284c7);
+      color: var(--mat-sys-primary);
       font-size: 2rem;
       width: 2rem;
       height: 2rem;

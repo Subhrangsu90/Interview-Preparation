@@ -280,10 +280,17 @@
                         @if (msg.generativeWidget.type === 'order_status') {
                           <div class="widget-card order-widget">
                             <div class="widget-header">
-                              <div class="widget-title-group">
+                              <a
+                                class="widget-title-group widget-title-link"
+                                [routerLink]="['/orders', msg.generativeWidget.data.orderNumber]"
+                                matTooltip="View order details for {{ msg.generativeWidget.data.orderNumber }}"
+                                [trackEvent]="TelemetryEvents.AI_VIEW_ORDER_CLICK"
+                                [eventPayload]="{ orderNumber: msg.generativeWidget.data.orderNumber }"
+                              >
                                 <mat-icon class="widget-icon">inventory_2</mat-icon>
                                 <span class="order-id-label font-mono">{{ msg.generativeWidget.data.orderNumber }}</span>
-                              </div>
+                                <mat-icon class="widget-external-icon">open_in_new</mat-icon>
+                              </a>
                               <ui-status-badge [status]="msg.generativeWidget.data.status" />
                             </div>
 

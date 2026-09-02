@@ -40,26 +40,30 @@
   }
 
   &.active-item {
-    background-color: rgba(2, 132, 199, 0.12);
-    color: #0284c7;
+    background-color: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
 
     .nav-icon {
-      color: #0284c7;
+      color: var(--mat-sys-on-primary-container);
     }
 
     .nav-label {
       font-weight: 700;
-      color: #0284c7;
+      color: var(--mat-sys-on-primary-container);
+    }
+
+    &:hover {
+      background-color: var(--mat-sys-primary-container);
     }
 
     :host-context(.dark-theme) & {
-      background-color: rgba(14, 165, 233, 0.18);
-      color: #38bdf8;
-      border: 1px solid rgba(14, 165, 233, 0.25);
+      background-color: var(--mat-sys-primary-container);
+      color: var(--mat-sys-on-primary-container);
+      border: 1px solid var(--mat-sys-outline-variant);
 
       .nav-icon,
       .nav-label {
-        color: #38bdf8;
+        color: var(--mat-sys-on-primary-container);
       }
     }
   }

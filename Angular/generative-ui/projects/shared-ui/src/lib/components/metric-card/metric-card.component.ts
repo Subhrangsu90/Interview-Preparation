@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
-export type MetricCardVariant = 'blue' | 'amber' | 'purple' | 'emerald' | 'rose' | 'slate';
+export type MetricCardVariant = 'primary' | 'tertiary' | 'blue' | 'amber' | 'purple' | 'emerald' | 'rose' | 'slate';
 
 export interface MetricTrend {
   value: string;
@@ -63,6 +63,7 @@ export interface MetricTrend {
         cursor: pointer;
         &:hover {
           transform: translateY(-2px);
+          border-color: var(--mat-sys-primary);
         }
       }
     }
@@ -76,13 +77,15 @@ export interface MetricTrend {
       justify-content: center;
       flex-shrink: 0;
 
+      &.primary,
       &.blue {
-        background: #eff6ff;
-        color: #2563eb;
+        background: var(--mat-sys-primary-container);
+        color: var(--mat-sys-on-primary-container);
       }
+      &.tertiary,
       &.amber {
-        background: #fef3c7;
-        color: #d97706;
+        background: var(--mat-sys-tertiary-container);
+        color: var(--mat-sys-on-tertiary-container);
       }
       &.purple {
         background: #ede9fe;
@@ -97,20 +100,22 @@ export interface MetricTrend {
         color: #e11d48;
       }
       &.slate {
-        background: #f1f5f9;
-        color: #475569;
+        background: var(--mat-sys-surface-container);
+        color: var(--mat-sys-on-surface-variant);
       }
 
       :host-context(.dark-theme) & {
+        &.primary,
         &.blue {
-          background: rgba(37, 99, 235, 0.18);
-          color: #60a5fa;
-          border: 1px solid rgba(37, 99, 235, 0.3);
+          background: var(--mat-sys-primary-container);
+          color: var(--mat-sys-on-primary-container);
+          border: 1px solid var(--mat-sys-outline-variant);
         }
+        &.tertiary,
         &.amber {
-          background: rgba(217, 119, 6, 0.18);
-          color: #fbbf24;
-          border: 1px solid rgba(217, 119, 6, 0.3);
+          background: var(--mat-sys-tertiary-container);
+          color: var(--mat-sys-on-tertiary-container);
+          border: 1px solid var(--mat-sys-outline-variant);
         }
         &.purple {
           background: rgba(124, 58, 237, 0.18);
@@ -128,9 +133,9 @@ export interface MetricTrend {
           border: 1px solid rgba(225, 29, 72, 0.3);
         }
         &.slate {
-          background: rgba(100, 116, 139, 0.18);
-          color: #94a3b8;
-          border: 1px solid rgba(100, 116, 139, 0.3);
+          background: var(--mat-sys-surface-container);
+          color: var(--mat-sys-on-surface-variant);
+          border: 1px solid var(--mat-sys-outline-variant);
         }
       }
 
@@ -185,8 +190,8 @@ export interface MetricTrend {
         color: #dc2626;
       }
       &.neutral {
-        background: #f1f5f9;
-        color: #64748b;
+        background: var(--mat-sys-surface-container);
+        color: var(--mat-sys-on-surface-variant);
       }
 
       :host-context(.dark-theme) & {
@@ -199,8 +204,8 @@ export interface MetricTrend {
           color: #f87171;
         }
         &.neutral {
-          background: rgba(148, 163, 184, 0.18);
-          color: #94a3b8;
+          background: var(--mat-sys-surface-container);
+          color: var(--mat-sys-on-surface-variant);
         }
       }
     }
@@ -219,7 +224,7 @@ export class UiMetricCard {
   readonly label = input.required<string>();
   readonly value = input.required<string | number>();
   readonly icon = input.required<string>();
-  readonly variant = input<MetricCardVariant>('blue');
+  readonly variant = input<MetricCardVariant>('primary');
   readonly clickable = input<boolean>(false);
   readonly trend = input<MetricTrend | null>(null);
 }
