@@ -6,69 +6,17 @@
   overflow: hidden;
 }
 
-.spacer {
-  flex: 1 1 auto;
-}
-
-.toolbar-title {
-  margin-left: 8px;
-  font-weight: 500;
-  color: var(--mat-sys-on-primary);
-}
-
-// In Material 3, apply primary theme tokens to toolbar and its nested action buttons
-mat-toolbar[color='primary'] {
-  background-color: var(--mat-sys-primary);
-  color: var(--mat-sys-on-primary);
-
-  .mat-mdc-icon-button {
-    --mat-icon-button-icon-color: var(--mat-sys-on-primary);
-    --mat-icon-button-state-layer-color: var(--mat-sys-on-primary);
-    color: var(--mat-sys-on-primary);
-
-    mat-icon {
-      color: var(--mat-sys-on-primary);
-    }
-  }
-}
-
-// Ensure the sidenav container fills the remaining viewport height
 .app-container {
   flex: 1;
   height: calc(100vh - 64px);
   min-height: 0;
 }
 
-// Sidenav stretches full height down to the bottom with container background and border
 mat-sidenav {
   width: 240px;
   height: 100%;
   background-color: var(--mat-sys-surface-container-low);
   border-right: 1px solid var(--mat-sys-outline-variant);
-
-  mat-nav-list {
-    padding: 12px;
-
-    a.mat-mdc-list-item {
-      border-radius: 28px;
-      margin-bottom: 4px;
-
-      // Active / selected route styling
-      &.active-nav-item,
-      &.mdc-list-item--activated {
-        background-color: var(--mat-sys-secondary-container);
-        color: var(--mat-sys-on-secondary-container);
-
-        mat-icon {
-          color: var(--mat-sys-on-secondary-container);
-        }
-
-        .mdc-list-item__primary-text {
-          color: var(--mat-sys-on-secondary-container);
-        }
-      }
-    }
-  }
 }
 
 mat-sidenav-content {

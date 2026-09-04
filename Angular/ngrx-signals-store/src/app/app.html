@@ -1,30 +1,11 @@
-<!-- Header Toolbar -->
-<mat-toolbar color="primary">
-  <button mat-icon-button (click)="toggleSidenav()" aria-label="Toggle navigation drawer">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <span class="toolbar-title">{{ title() }}</span>
-  <span class="spacer"></span>
-  <button mat-icon-button aria-label="3 new notifications">
-    <mat-icon matBadge="3" matBadgeColor="warn" matBadgeSize="small" aria-hidden="false">notifications</mat-icon>
-  </button>
-  <button mat-icon-button aria-label="User account">
-    <mat-icon>account_circle</mat-icon>
-  </button>
-</mat-toolbar>
+<!-- Reusable Header Component -->
+<app-header [title]="title()" (toggleMenu)="toggleSidenav()" />
 
-<!-- Sidenav Container -->
+<!-- Sidenav Layout Container -->
 <mat-sidenav-container class="app-container">
   <mat-sidenav #sidenav mode="side" [opened]="isSidenavOpened()">
-    <mat-nav-list>
-      @for (item of navItems(); track item.label) {
-      <a mat-list-item [routerLink]="item.route" routerLinkActive="active-nav-item"
-        [routerLinkActiveOptions]="{ exact: true }">
-        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-        <span matListItemTitle>{{ item.label }}</span>
-      </a>
-      }
-    </mat-nav-list>
+    <!-- Reusable Sidenav Component -->
+    <app-sidenav [navItems]="navItems()" />
   </mat-sidenav>
 
   <mat-sidenav-content>

@@ -1,32 +1,12 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatListModule } from '@angular/material/list';
-import { MatBadgeModule } from '@angular/material/badge';
-
-export interface NavItem {
-  label: string;
-  icon: string;
-  route: string;
-  badge?: string;
-}
+import { Header } from './layout/header/header';
+import { Sidenav, NavItem } from './layout/sidenav/sidenav';
 
 @Component({
   selector: 'app-root',
-  imports: [
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatListModule,
-    MatBadgeModule,
-  ],
+  imports: [RouterOutlet, MatSidenavModule, Header, Sidenav],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+mat-nav-list {
+  padding: 12px;
+
+  a.mat-mdc-list-item {
+    border-radius: 28px;
+    margin-bottom: 4px;
+
+    &.active-nav-item,
+    &.mdc-list-item--activated {
+      background-color: var(--mat-sys-secondary-container);
+      color: var(--mat-sys-on-secondary-container);
+
+      mat-icon {
+        color: var(--mat-sys-on-secondary-container);
+      }
+
+      .mdc-list-item__primary-text {
+        color: var(--mat-sys-on-secondary-container);
+      }
+    }
+  }
+}

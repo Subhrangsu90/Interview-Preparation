@@ -1,0 +1,23 @@
+<mat-toolbar color="primary">
+  <button
+    mat-icon-button
+    (click)="toggleMenu.emit()"
+    aria-label="Toggle navigation drawer"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="toolbar-title">{{ title() }}</span>
+  <span class="spacer"></span>
+  <button
+    mat-icon-button
+    aria-label="3 new notifications"
+  >
+    <mat-icon matBadge="3" matBadgeColor="warn" matBadgeSize="small" aria-hidden="false">notifications</mat-icon>
+  </button>
+  <button
+    mat-icon-button
+    aria-label="User account"
+  >
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>
