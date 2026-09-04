@@ -7,6 +7,8 @@ import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { eventTrackingInterceptor } from '@event-bus/interceptors';
 import { environment } from '@env';
 import { provideApiBaseUrl } from '@core/api';
+import { provideCopilotKit } from "@copilotkit/angular";
+import { HttpAgent } from '@ag-ui/client';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +16,15 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withViewTransitions(), withComponentInputBinding()),
     provideClientHydration(),
     provideHttpClient(withInterceptors([loadingInterceptor, eventTrackingInterceptor])),
-    provideApiBaseUrl(environment.apiBaseUrl)
+    provideApiBaseUrl(environment.apiBaseUrl),
+
+    provideCopilotKit({
+      defaultToolRendering: true,
+      agents: {
+        orderAgent: new HttpAgent({
+          url: '/api/agent/run',
+        }),
+      },
+    })
   ],
 };

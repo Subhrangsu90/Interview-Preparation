@@ -37,6 +37,8 @@ import { TelemetryEvents } from '@event-bus/models';
 import { AiChatService } from '@core/services/ai-chat.service';
 import { ModelId, QuickPrompt } from '@core/models/chat.models';
 import { AgAgentService } from '@app/core/services/ag-agent.service';
+import { CopilotKit, RenderToolCalls } from '@copilotkit/angular';
+import { injectOrderAgentStore, sendAgentMessage, ORDER_AGENT_ID } from '@core/util-copilotkit/agent-store.helper';
 
 interface FormattedPart {
   type: 'text' | 'code' | 'bullet' | 'header';
@@ -70,6 +72,7 @@ interface FormattedPart {
     UiCurrencyPipe,
     UiRelativeTimePipe,
     TrackEventDirective,
+    RenderToolCalls
   ],
   templateUrl: './chat.html',
   styleUrl: './chat.scss',
@@ -93,6 +96,13 @@ export class ChatComponent implements AfterViewChecked {
   readonly isGenerating = this.chatService.isGenerating;
   readonly selectedModel = this.chatService.selectedModel;
   protected readonly agAgentService = inject(AgAgentService);
+  private readonly copilotKit = inject(CopilotKit);
+  protected readonly orderStore = injectOrderAgentStore();
+
+  // Signals from CopilotKit store:
+  protected readonly copilotMessages = computed(() => this.orderStore().messages());
+  protected readonly isAgentRunning = computed(() => this.orderStore().isRunning());
+  protected readonly orderAgentId = ORDER_AGENT_ID;
 
   readonly filteredSessions = computed(() => {
     const query = this.sessionSearchQuery().toLowerCase().trim();
@@ -100,6 +110,14 @@ export class ChatComponent implements AfterViewChecked {
     if (!query) return list;
     return list.filter((s) => s.title.toLowerCase().includes(query));
   });
+
+  endMessage(): void {
+    const text = this.promptInput().trim();
+    if (!text || this.isAgentRunning()) return;
+    void sendAgentMessage(this.copilotKit, this.orderStore, text);
+    this.promptInput.set('');
+  }
+
 
   readonly activeModelDetails = computed(() => {
     const currentId = this.selectedModel();
@@ -155,19 +173,19 @@ export class ChatComponent implements AfterViewChecked {
     }
   }
 
+  // In src/app/features/chat/chat.ts:
+
   sendMessage(): void {
     const text = this.promptInput().trim();
-    if (!text || this.isGenerating()) return;
+    if (!text || this.isAgentRunning()) return;
 
-    this.agAgentService.sendMessage(text);
+    // Send through CopilotKit headless agent store:
+    void sendAgentMessage(this.copilotKit, this.orderStore, text);
 
     this.promptInput.set('');
     this.shouldAutoScroll = true;
-
-    if (this.promptTextarea?.nativeElement) {
-      this.promptTextarea.nativeElement.style.height = 'auto';
-    }
   }
+
 
   stopGeneration(): void {
     this.chatService.stopGeneration();

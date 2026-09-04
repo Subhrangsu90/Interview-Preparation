@@ -124,8 +124,7 @@
 
         <!-- Messages Thread -->
         <div class="messages-container" #messagesContainer>
-          @if ((!activeSession() || (activeSession()?.messages?.length ?? 0) === 0) && agAgentService.messages().length
-          === 0) {
+          @if ((!activeSession() || (activeSession()?.messages?.length ?? 0) === 0) && copilotMessages().length === 0) {
           <!-- Empty State from Shared UI -->
           <div class="chat-empty-container">
             <ui-empty-state icon="auto_awesome" title="How can I assist you today?"
@@ -379,7 +378,7 @@
               </div>
             </div>
             }
-            @for (agMsg of agAgentService.messages(); track agMsg.id) {
+            <!-- @for (agMsg of agAgentService.messages(); track agMsg.id) {
             <div [class]="'message-row ' + (agMsg.role === 'user' ? 'user-row' : 'bot-row')">
               <div class="avatar-cell">
                 <div [class]="agMsg.role === 'user' ? 'user-avatar' : 'bot-avatar'">
@@ -387,13 +386,13 @@
                 </div>
               </div>
               <div class="message-bubble">
-                <!-- Text message -->
+                
                 @if (agMsg.content) {
                 <div class="message-content">
                   <p class="formatted-p">{{ agMsg.content }}</p>
                 </div>
                 }
-                <!-- Generative Order Card Widget (Tool Call) -->
+              
                 @if (agMsg.widget?.type === 'order_card') {
                 <div class="widget-card order-widget" style="margin-top: 8px;">
                   <div class="widget-header">
@@ -411,8 +410,32 @@
                 }
               </div>
             </div>
-            }
+            } -->
             <!-- 3. Streaming Indicator for AG-UI -->
+            @for (message of copilotMessages(); track message.id) {
+            <div [class]="'message-row ' + (message.role === 'user' ? 'user-row' : 'bot-row')">
+              <div class="avatar-cell">
+                <div [class]="message.role === 'user' ? 'user-avatar' : 'bot-avatar'">
+                  <mat-icon>{{ message.role === 'user' ? 'person' : 'auto_awesome' }}</mat-icon>
+                </div>
+              </div>
+
+              <div class="message-bubble">
+                @if (message.content) {
+                <div class="message-content">
+                  <p class="formatted-p">{{ message.content }}</p>
+                </div>
+                }
+
+                <!-- Render Generative UI Widget via CopilotKit -->
+                @if (message.role === 'assistant' && message.toolCalls?.length) {
+                <copilot-render-tool-calls [message]="message" [messages]="copilotMessages()"
+                  [agentId]="orderAgentId" />
+                }
+              </div>
+            </div>
+            }
+
             @if (agAgentService.isStreaming() && agAgentService.currentStreamText()) {
             <div class="message-row bot-row">
               <div class="avatar-cell">
@@ -430,6 +453,8 @@
               </div>
             </div>
             }
+
+
           </div>
           }
         </div>
