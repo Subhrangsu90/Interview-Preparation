@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { orderRouter } from './order.route.js';
 import { supportTicketRouter } from './support-ticket.route.js';
+import { agAgentRouter } from './ag-agent.route.js';
 import { testDatabaseConnection } from '../db/index.js';
 
 const apiRouter = Router();
@@ -23,5 +24,6 @@ apiRouter.get('/health', async (_req, res) => {
 
 apiRouter.use('/orders', orderRouter);
 apiRouter.use('/support-tickets', supportTicketRouter);
+apiRouter.use('/agent', agAgentRouter);
 
 export default apiRouter;

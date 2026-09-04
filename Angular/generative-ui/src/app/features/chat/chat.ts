@@ -36,6 +36,7 @@ import { TelemetryEvents } from '@event-bus/models';
 // Core Services & Models
 import { AiChatService } from '@core/services/ai-chat.service';
 import { ModelId, QuickPrompt } from '@core/models/chat.models';
+import { AgAgentService } from '@app/core/services/ag-agent.service';
 
 interface FormattedPart {
   type: 'text' | 'code' | 'bullet' | 'header';
@@ -91,6 +92,7 @@ export class ChatComponent implements AfterViewChecked {
   readonly quickPrompts = this.chatService.quickPrompts;
   readonly isGenerating = this.chatService.isGenerating;
   readonly selectedModel = this.chatService.selectedModel;
+  protected readonly agAgentService = inject(AgAgentService);
 
   readonly filteredSessions = computed(() => {
     const query = this.sessionSearchQuery().toLowerCase().trim();
@@ -157,7 +159,8 @@ export class ChatComponent implements AfterViewChecked {
     const text = this.promptInput().trim();
     if (!text || this.isGenerating()) return;
 
-    this.chatService.sendMessage(text);
+    this.agAgentService.sendMessage(text);
+
     this.promptInput.set('');
     this.shouldAutoScroll = true;
 
