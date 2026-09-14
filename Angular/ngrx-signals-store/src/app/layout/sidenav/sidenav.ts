@@ -18,4 +18,5 @@ export interface NavItem {
 })
 export class Sidenav {
   readonly navItems = input<NavItem[]>([]);
+
 }

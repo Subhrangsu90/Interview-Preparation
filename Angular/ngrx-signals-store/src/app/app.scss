@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 :host {
   display: flex;
   flex-direction: column;
@@ -17,6 +18,7 @@ mat-sidenav {
   height: 100%;
   background-color: var(--mat-sys-surface-container-low);
   border-right: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 0px;
 }
 
 mat-sidenav-content {
@@ -27,3 +29,4 @@ mat-sidenav-content {
 .main-content {
   padding: 24px;
 }
+

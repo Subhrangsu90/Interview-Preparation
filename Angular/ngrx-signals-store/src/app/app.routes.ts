@@ -11,4 +11,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
+  {
+    path: 'signal-stores',
+    loadComponent: () =>
+      import('./features/signal-state-demo/signal-state-demo').then(
+        (m) => m.SignalStateDemo
+      ),
+  },
 ];
