@@ -3,7 +3,8 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "ee758bc2-8182-45a5-a65a-759484a79b87"
+    "analytics": "ee758bc2-8182-45a5-a65a-759484a79b87",
+    "schematicCollections": ["@ngrx/schematics"]
   },
   "newProjectRoot": "projects",
   "projects": {
