@@ -1,9 +1,91 @@
-<mat-nav-list>
-  @for (item of navItems(); track item.label) {
-  <a mat-list-item [routerLink]="item.route" routerLinkActive="active-nav-item" #rla="routerLinkActive"
-    [activated]="rla.isActive" [routerLinkActiveOptions]="{ exact: true }">
-    <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-    <span matListItemTitle>{{ item.label }}</span>
-  </a>
-  }
-</mat-nav-list>
+<nav class="sidenav-nav" aria-label="Main navigation">
+  <ul class="nav-list">
+    @for (item of navItems(); track item.label) {
+      @if (item.children && item.children.length > 0) {
+        <!-- Parent with Sub-Sidenav (Collapsible Group) -->
+        <li class="nav-group-item" [class.is-expanded]="isGroupExpanded(item.label)">
+          <div
+            class="parent-pill-row"
+            [class.active-parent]="parentRla.isActive"
+          >
+            <a
+              class="parent-nav-link"
+              [routerLink]="item.route"
+              routerLinkActive="active-parent-link"
+              #parentRla="routerLinkActive"
+              [routerLinkActiveOptions]="{ exact: false }"
+              matRipple
+            >
+              @if (item.icon) {
+                <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+              }
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+
+            <!-- Dedicated Chevron Toggle Button -->
+            <button
+              type="button"
+              class="group-chevron-btn"
+              (click)="toggleGroup(item.label)"
+              [attr.aria-expanded]="isGroupExpanded(item.label)"
+              [attr.aria-label]="'Toggle ' + item.label + ' sub-menu'"
+              matRipple
+            >
+              <mat-icon class="chevron-icon">
+                {{ isGroupExpanded(item.label) ? 'expand_more' : 'chevron_right' }}
+              </mat-icon>
+            </button>
+          </div>
+
+          <!-- Sub-Sidenav Nested List -->
+          @if (isGroupExpanded(item.label)) {
+            <ul class="sub-nav-list" role="menu">
+              @for (child of item.children; track child.label) {
+                <li class="sub-nav-item" role="none">
+                  <a
+                    class="sub-nav-link"
+                    [routerLink]="child.route"
+                    routerLinkActive="active-sub-item"
+                    #childRla="routerLinkActive"
+                    [class.active]="childRla.isActive"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    matRipple
+                  >
+                    @if (child.icon) {
+                      <mat-icon class="sub-nav-icon">{{ child.icon }}</mat-icon>
+                    }
+                    <span class="sub-nav-label">{{ child.label }}</span>
+                    @if (child.badge) {
+                      <span class="sub-nav-badge">{{ child.badge }}</span>
+                    }
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </li>
+      } @else {
+        <!-- Single Root Nav Item -->
+        <li class="nav-single-item">
+          <a
+            class="nav-link"
+            [routerLink]="item.route"
+            routerLinkActive="active-nav-item"
+            #rla="routerLinkActive"
+            [class.active]="rla.isActive"
+            [routerLinkActiveOptions]="{ exact: true }"
+            matRipple
+          >
+            @if (item.icon) {
+              <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+            }
+            <span class="nav-label">{{ item.label }}</span>
+            @if (item.badge) {
+              <span class="nav-badge">{{ item.badge }}</span>
+            }
+          </a>
+        </li>
+      }
+    }
+  </ul>
+</nav>

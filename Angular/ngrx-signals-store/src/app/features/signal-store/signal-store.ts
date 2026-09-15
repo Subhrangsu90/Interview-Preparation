@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  imports: [],
   selector: 'app-signal-store',
-  styleUrl: './signal-store.scss',
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatButtonModule, MatIconModule],
   templateUrl: './signal-store.html',
+  styleUrl: './signal-store.scss',
 })
 export class SignalStore {}

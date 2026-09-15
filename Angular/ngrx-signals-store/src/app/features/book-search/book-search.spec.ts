@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { SignalStore } from './signal-store';
+import { BookSearch } from './book-search';
 
-describe('SignalStore', () => {
-  let component: SignalStore;
-  let fixture: ComponentFixture<SignalStore>;
+describe('BookSearch', () => {
+  let component: BookSearch;
+  let fixture: ComponentFixture<BookSearch>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SignalStore],
+      imports: [BookSearch],
       providers: [provideRouter([])],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SignalStore);
+    fixture = TestBed.createComponent(BookSearch);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

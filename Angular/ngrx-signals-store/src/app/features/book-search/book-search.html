@@ -1,0 +1,24 @@
+<div class="book-search-container">
+  <div class="book-search-header">
+    <div class="title-wrap">
+      <mat-icon class="search-badge-icon">menu_book</mat-icon>
+      <div>
+        <h3>Book Search</h3>
+        <span class="outlet-badge">Secondary Outlet Active</span>
+      </div>
+    </div>
+    <a
+      mat-icon-button
+      [routerLink]="[
+        '/signal-store',
+        { outlets: { 'signal-store': ['overview'] } }
+      ]"
+      aria-label="Close book search and return to overview"
+      title="Close book search and return to overview"
+    >
+      <mat-icon>close</mat-icon>
+    </a>
+  </div>
+  <p class="search-desc">Search and manage books using NgRx SignalStore in this secondary view panel.</p>
+</div>
+

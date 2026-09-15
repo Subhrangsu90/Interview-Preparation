@@ -2,25 +2,178 @@
   display: block;
 }
 
-mat-nav-list {
-  padding: 12px;
+.sidenav-nav {
+  padding: 12px 8px;
 
-  a.mat-mdc-list-item {
-    border-radius: 28px;
-    margin-bottom: 4px;
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 
-    &.active-nav-item,
-    &.mdc-list-item--activated {
-      background-color: var(--mat-sys-secondary-container);
-      color: var(--mat-sys-on-secondary-container);
+    // Single item and parent row common pill styling
+    .nav-link,
+    .parent-pill-row {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      border-radius: 28px;
+      text-decoration: none;
+      color: var(--mat-sys-on-surface-variant, #49454f);
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.15s ease, color 0.15s ease;
+      position: relative;
+      overflow: hidden;
 
-      mat-icon {
-        color: var(--mat-sys-on-secondary-container);
+      &:hover {
+        background-color: var(--mat-sys-surface-container-high, rgba(0, 0, 0, 0.04));
       }
 
-      .mdc-list-item__primary-text {
-        color: var(--mat-sys-on-secondary-container);
+      &.active-nav-item,
+      &.active-parent {
+        background-color: var(--mat-sys-secondary-container, #e8def8);
+        color: var(--mat-sys-on-secondary-container, #1d192b);
+        font-weight: 600;
+
+        .nav-icon {
+          color: var(--mat-sys-on-secondary-container, #1d192b);
+        }
+      }
+    }
+
+    // Top-level single item
+    .nav-single-item {
+      .nav-link {
+        padding: 0 16px;
+        gap: 12px;
+
+        .nav-icon {
+          font-size: 22px;
+          width: 22px;
+          height: 22px;
+          color: var(--mat-sys-on-surface-variant, #49454f);
+        }
+
+        .nav-label {
+          flex: 1;
+        }
+
+        .nav-badge {
+          font-size: 0.75rem;
+          padding: 2px 8px;
+          border-radius: 10px;
+          background: var(--mat-sys-primary, #6750a4);
+          color: var(--mat-sys-on-primary, #ffffff);
+        }
+      }
+    }
+
+    // Expandable Group Parent Item
+    .nav-group-item {
+      .parent-pill-row {
+        padding: 0 6px 0 16px;
+        justify-content: space-between;
+
+        .parent-nav-link {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          height: 100%;
+          text-decoration: none;
+          color: inherit;
+
+          .nav-icon {
+            font-size: 22px;
+            width: 22px;
+            height: 22px;
+          }
+
+          .nav-label {
+            font-weight: inherit;
+          }
+        }
+
+        .group-chevron-btn {
+          width: 36px;
+          height: 36px;
+          border: none;
+          background: transparent;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          color: inherit;
+          transition: background-color 0.15s ease;
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+          }
+
+          .chevron-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+
+      // Sub-Sidenav Nested List
+      .sub-nav-list {
+        list-style: none;
+        margin: 4px 0 6px 20px;
+        padding: 4px 0 4px 12px;
+        border-left: 2px solid var(--mat-sys-outline-variant, #e0e0e0);
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+
+        .sub-nav-item {
+          .sub-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 40px;
+            padding: 0 14px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--mat-sys-on-surface-variant, #49454f);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.15s ease;
+
+            &:hover {
+              background-color: var(--mat-sys-surface-container-high, rgba(0, 0, 0, 0.04));
+              color: var(--mat-sys-primary, #6750a4);
+            }
+
+            &.active-sub-item {
+              background-color: var(--mat-sys-primary-container, #eaddff);
+              color: var(--mat-sys-on-primary-container, #21005d);
+              font-weight: 600;
+
+              .sub-nav-icon {
+                color: var(--mat-sys-primary, #6750a4);
+              }
+            }
+
+            .sub-nav-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+
+            .sub-nav-label {
+              flex: 1;
+            }
+          }
+        }
       }
     }
   }
 }
+

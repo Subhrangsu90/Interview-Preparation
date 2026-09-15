@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { SignalStore } from './signal-store';
+import { SignalStoreOverview } from './signal-store-overview';
 
-describe('SignalStore', () => {
-  let component: SignalStore;
-  let fixture: ComponentFixture<SignalStore>;
+describe('SignalStoreOverview', () => {
+  let component: SignalStoreOverview;
+  let fixture: ComponentFixture<SignalStoreOverview>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SignalStore],
+      imports: [SignalStoreOverview],
       providers: [provideRouter([])],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SignalStore);
+    fixture = TestBed.createComponent(SignalStoreOverview);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

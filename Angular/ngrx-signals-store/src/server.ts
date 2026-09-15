@@ -38,13 +38,32 @@ app.use(
 /**
  * Handle all other requests by rendering the Angular application.
  */
-app.use((req, res, next) => {
-  angularApp
-    .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
-    .catch(next);
+app.use(async (req, res, next) => {
+  try {
+    let response = await angularApp.handle(req);
+
+    // If SSR could not match the route (e.g. secondary outlets like (overview:overview) or client-only routes),
+    // serve the SPA shell so the browser-side router can handle the URL.
+    if (!response) {
+      const fallbackReq = new Proxy(req, {
+        get(target, prop, receiver) {
+          if (prop === 'url' || prop === 'originalUrl') {
+            return '/dashboard';
+          }
+          return Reflect.get(target, prop, receiver);
+        },
+      });
+      response = await angularApp.handle(fallbackReq);
+    }
+
+    if (response) {
+      writeResponseToNodeResponse(response, res);
+    } else {
+      next();
+    }
+  } catch (err) {
+    next(err);
+  }
 });
 
 /**

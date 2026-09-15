@@ -1,0 +1,104 @@
+<div class="overview-container">
+  <!-- Hero Feature Card -->
+  <mat-card class="hero-card">
+    <mat-card-content>
+      <div class="hero-content">
+        <div class="hero-text">
+          <div class="hero-badge">Core Concept</div>
+          <h2>What is NgRx SignalStore?</h2>
+          <p>
+            The <code>signalStore()</code> is a composable, standalone-first state management API for Angular.
+            It provides a native Signals experience with built-in immutability, computed derivations, and side-effect management.
+          </p>
+          <div class="hero-actions">
+            <a
+              mat-flat-button
+              [routerLink]="[
+                '/signal-store',
+                { outlets: { 'book-search': ['book-search'], overview: null } }
+              ]"
+              class="cta-btn"
+            >
+              <mat-icon>search</mat-icon>
+              Open Book Search
+            </a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="code-preview">
+            <div class="code-header">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="code-filename">book-search.store.ts</span>
+            </div>
+            <pre><code><span class="kw">export const</span> BooksStore = <span class="fn">signalStore</span>(
+  <span class="fn">withState</span>(&#123; books: [], query: <span class="str">''</span> &#125;),
+  <span class="fn">withComputed</span>((&#123; books, query &#125;) => (&#123;
+    filtered: <span class="fn">computed</span>(() => <span class="com">/* signal */</span>)
+  &#125;)),
+  <span class="fn">withMethods</span>((store) => (&#123;
+    <span class="fn">search</span>(q) &#123; <span class="fn">patchState</span>(store, &#123; query: q &#125;); &#125;
+  &#125;))
+);</code></pre>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Features Grid -->
+  <div class="features-grid">
+    <mat-card class="feature-card">
+      <mat-card-header>
+        <div mat-card-avatar class="feature-icon state-icon">
+          <mat-icon>tune</mat-icon>
+        </div>
+        <mat-card-title>withState()</mat-card-title>
+        <mat-card-subtitle>Granular Reactive State</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Defines state slices that automatically become writable signals. Supports deep immutability through <code>patchState()</code>.</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="feature-card">
+      <mat-card-header>
+        <div mat-card-avatar class="feature-icon computed-icon">
+          <mat-icon>calculate</mat-icon>
+        </div>
+        <mat-card-title>withComputed()</mat-card-title>
+        <mat-card-subtitle>Derived Signals</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Adds memoized signals computed from existing state. Only re-evaluates when dependencies change, maximizing rendering performance.</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="feature-card">
+      <mat-card-header>
+        <div mat-card-avatar class="feature-icon methods-icon">
+          <mat-icon>flash_on</mat-icon>
+        </div>
+        <mat-card-title>withMethods()</mat-card-title>
+        <mat-card-subtitle>State Actions & Async</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Exposes functions to patch state and execute asynchronous workflows using promises or <code>rxMethod</code> streams.</p>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="feature-card">
+      <mat-card-header>
+        <div mat-card-avatar class="feature-icon hooks-icon">
+          <mat-icon>anchor</mat-icon>
+        </div>
+        <mat-card-title>withHooks()</mat-card-title>
+        <mat-card-subtitle>Lifecycle Awareness</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Executes lifecycle actions when the store initializes (<code>onInit</code>) or when it is destroyed (<code>onDestroy</code>).</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
