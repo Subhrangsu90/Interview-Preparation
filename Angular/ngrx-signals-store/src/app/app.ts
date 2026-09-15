@@ -16,7 +16,8 @@ export class App {
 
   readonly navItems = signal<NavItem[]>([
     { label: 'Dashboard', icon: 'space_dashboard', route: '/dashboard' },
-    { label: 'Signal Stores', icon: 'storage', route: '/signal-stores' },
+    { label: 'Signal Store', icon: 'storage', route: '/signal-store' },
+    { label: 'Signal State', icon: 'storage', route: '/signal-state' },
     { label: 'State History', icon: 'history', route: '/history' },
     { label: 'Settings', icon: 'settings', route: '/settings' },
   ]);

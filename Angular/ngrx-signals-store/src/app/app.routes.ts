@@ -12,10 +12,15 @@ export const routes: Routes = [
       import('./features/dashboard/dashboard').then((m) => m.Dashboard),
   },
   {
-    path: 'signal-stores',
+    path: 'signal-store',
     loadComponent: () =>
-      import('./features/signal-state-demo/signal-state-demo').then(
-        (m) => m.SignalStateDemo
+      import('./features/signal-store/signal-store').then((m) => m.SignalStore),
+  },
+  {
+    path: 'signal-state',
+    loadComponent: () =>
+      import('./features/signal-state/signal-state').then(
+        (m) => m.SignalState
       ),
   },
 ];
