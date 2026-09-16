@@ -27,21 +27,15 @@
 
     <!-- Parent-Child Sub Navigation Tabs -->
     <nav class="feature-tabs" aria-label="Signal Store sub navigation">
-      <a
-        class="tab-link"
-        [routerLink]="['/signal-store', { outlets: { 'signal-store': ['overview'] } }]"
-        routerLinkActive="active-tab"
-      >
+      <a class="tab-link" [routerLink]="['/signal-store', { outlets: { 'signal-store': ['overview'] } }]"
+        routerLinkActive="active-tab">
         <mat-icon>dashboard_customize</mat-icon>
         <span>Overview</span>
       </a>
-      <a
-        class="tab-link"
-        [routerLink]="['/signal-store', { outlets: { 'signal-store': ['book-search'] } }]"
-        routerLinkActive="active-tab"
-      >
+      <a class="tab-link" [routerLink]="['/signal-store', { outlets: { 'signal-store': ['book-search'] } }]"
+        routerLinkActive="active-tab">
         <mat-icon>menu_book</mat-icon>
-        <span>Book Search</span>
+        <span>Book Search (Core Concepts)</span>
       </a>
     </nav>
   </header>

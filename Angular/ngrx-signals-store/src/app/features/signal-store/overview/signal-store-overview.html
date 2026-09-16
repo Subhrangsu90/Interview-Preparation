@@ -8,17 +8,14 @@
           <h2>What is NgRx SignalStore?</h2>
           <p>
             The <code>signalStore()</code> is a composable, standalone-first state management API for Angular.
-            It provides a native Signals experience with built-in immutability, computed derivations, and side-effect management.
+            It provides a native Signals experience with built-in immutability, computed derivations, and side-effect
+            management.
           </p>
           <div class="hero-actions">
-            <a
-              mat-flat-button
-              [routerLink]="[
+            <a mat-flat-button [routerLink]="[
                 '/signal-store',
-                { outlets: { 'book-search': ['book-search'], overview: null } }
-              ]"
-              class="cta-btn"
-            >
+                { outlets: { 'signal-store': ['book-search'] } }
+              ]" class="cta-btn">
               <mat-icon>search</mat-icon>
               Open Book Search
             </a>
@@ -58,7 +55,9 @@
         <mat-card-subtitle>Granular Reactive State</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p>Defines state slices that automatically become writable signals. Supports deep immutability through <code>patchState()</code>.</p>
+        <p>Defines state slices that automatically become writable signals. Supports deep immutability through
+          <code>patchState()</code>.
+        </p>
       </mat-card-content>
     </mat-card>
 
@@ -71,7 +70,8 @@
         <mat-card-subtitle>Derived Signals</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p>Adds memoized signals computed from existing state. Only re-evaluates when dependencies change, maximizing rendering performance.</p>
+        <p>Adds memoized signals computed from existing state. Only re-evaluates when dependencies change, maximizing
+          rendering performance.</p>
       </mat-card-content>
     </mat-card>
 
@@ -84,7 +84,8 @@
         <mat-card-subtitle>State Actions & Async</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p>Exposes functions to patch state and execute asynchronous workflows using promises or <code>rxMethod</code> streams.</p>
+        <p>Exposes functions to patch state and execute asynchronous workflows using promises or <code>rxMethod</code>
+          streams.</p>
       </mat-card-content>
     </mat-card>
 
@@ -97,7 +98,8 @@
         <mat-card-subtitle>Lifecycle Awareness</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p>Executes lifecycle actions when the store initializes (<code>onInit</code>) or when it is destroyed (<code>onDestroy</code>).</p>
+        <p>Executes lifecycle actions when the store initializes (<code>onInit</code>) or when it is destroyed
+          (<code>onDestroy</code>).</p>
       </mat-card-content>
     </mat-card>
   </div>

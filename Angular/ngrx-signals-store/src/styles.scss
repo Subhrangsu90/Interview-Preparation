@@ -10,7 +10,7 @@ html {
   @include mat.theme(
     (
       color: (
-        theme-type: light,
+        theme-type: dark,
         primary: mat.$magenta-palette,
         tertiary: mat.$violet-palette,
       ),

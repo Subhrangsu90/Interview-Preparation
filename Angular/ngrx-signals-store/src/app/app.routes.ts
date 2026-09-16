@@ -33,7 +33,7 @@ export const routes: Routes = [
         path: 'book-search',
         outlet: 'signal-store',
         loadComponent: () =>
-          import('./features/book-search/book-search').then(
+          import('./features/signal-store/book-search/book-search').then(
             (m) => m.BookSearch
           ),
       },
