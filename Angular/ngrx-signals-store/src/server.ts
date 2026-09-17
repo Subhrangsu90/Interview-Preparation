@@ -12,17 +12,47 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+// Parse JSON request bodies
+app.use(express.json());
+
+const mockBooks = [
+  { id: 1, title: "Clean Architecture: A Craftsman's Guide" },
+  { id: 2, title: "Designing Data-Intensive Applications" },
+  { id: 3, title: "Refactoring: Improving the Design of Existing Code" },
+  { id: 4, title: "The Pragmatic Programmer: Your Journey to Mastery" },
+  { id: 5, title: "Learning TypeScript: Enhance Your Web Development" },
+  { id: 6, title: "Angular Projects: Build Modern Web Applications" },
+  { id: 7, title: "Enterprise Angular: Micro Frontends and Monorepos" },
+  { id: 8, title: "Domain-Driven Design: Tackling Complexity in Software" },
+  { id: 9, title: "Structure and Interpretation of Computer Programs" },
+  { id: 10, title: "Design Patterns: Elements of Reusable Object-Oriented Software" },
+];
+
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * Express REST API for Books
  */
+app.get('/api/books', (req, res) => {
+  const queryParam = req.query['query'] ?? req.query['q'] ?? '';
+  const query = (typeof queryParam === 'string' ? queryParam : '').trim().toLowerCase();
+
+  const filtered = query
+    ? mockBooks.filter((book) => book.title.toLowerCase().includes(query))
+    : mockBooks;
+
+  res.json(filtered);
+});
+
+app.get('/api/books/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const book = mockBooks.find((item) => item.id === id);
+
+  if (!book) {
+    res.status(404).json({ message: 'Book not found' });
+    return;
+  }
+
+  res.json(book);
+});
 
 /**
  * Serve static files from /browser
