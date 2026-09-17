@@ -15,29 +15,10 @@ export const routes: Routes = [
     path: 'signal-store',
     loadComponent: () =>
       import('./features/signal-store/signal-store').then((m) => m.SignalStore),
-    children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: '(signal-store:overview)',
-      },
-      {
-        path: 'overview',
-        outlet: 'signal-store',
-        loadComponent: () =>
-          import(
-            './features/signal-store/overview/signal-store-overview'
-          ).then((m) => m.SignalStoreOverview),
-      },
-      {
-        path: 'book-search',
-        outlet: 'signal-store',
-        loadComponent: () =>
-          import('./features/signal-store/book-search/book-search').then(
-            (m) => m.BookSearch
-          ),
-      },
-    ],
+    loadChildren: () =>
+      import('./features/signal-store/signal-store.routes').then(
+        (m) => m.SIGNAL_STORE_ROUTES
+      ),
   },
   {
     path: 'signal-state',

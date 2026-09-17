@@ -14,11 +14,13 @@
 }
 
 mat-sidenav {
-  width: 240px;
+  width: 280px;
   height: 100%;
   background-color: var(--mat-sys-surface-container-low);
   border-right: 1px solid var(--mat-sys-outline-variant);
   border-radius: 0px;
+  overflow-x: hidden;
+  scrollbar-width: thin;
 }
 
 mat-sidenav-content {

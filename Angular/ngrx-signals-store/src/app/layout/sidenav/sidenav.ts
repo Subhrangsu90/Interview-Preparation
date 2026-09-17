@@ -8,6 +8,8 @@ export interface NavItem {
   icon?: string;
   route?: string | any[];
   badge?: string;
+  badgeType?: 'done' | 'next' | 'soon' | 'default';
+  isSectionHeader?: boolean;
   children?: NavItem[];
 }
 
@@ -20,8 +22,10 @@ export interface NavItem {
 export class Sidenav {
   readonly navItems = input<NavItem[]>([]);
 
-  // Expanded groups: Signal Store open by default
-  readonly expandedGroups = signal<Set<string>>(new Set(['Signal Store']));
+  // Expanded groups: Signals and SignalStore open by default to match docs
+  readonly expandedGroups = signal<Set<string>>(
+    new Set(['Signals', 'Signal Store', 'SignalStore'])
+  );
 
   isGroupExpanded(label: string): boolean {
     return this.expandedGroups().has(label);

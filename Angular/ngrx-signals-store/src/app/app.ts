@@ -11,40 +11,102 @@ import { Sidenav, NavItem } from './layout/sidenav/sidenav';
   styleUrl: './app.scss',
 })
 export class App {
-  readonly title = signal('NgRx SignalStore');
+  readonly title = signal('NgRx SignalStore Guide');
   readonly isSidenavOpened = signal(true);
 
   readonly navItems = signal<NavItem[]>([
     { label: 'Dashboard', icon: 'space_dashboard', route: '/dashboard' },
+    { label: 'GUIDE', isSectionHeader: true },
     {
-      label: 'Signal Store',
-      icon: 'storage',
-      route: [
-        '/signal-store',
-        { outlets: { 'signal-store': ['overview'] } },
+      label: 'Store',
+      children: [
+        { label: 'Overview', route: '/signal-store/overview' },
       ],
+    },
+    {
+      label: 'Effects',
+      children: [
+        { label: 'Overview', route: '/signal-store/overview' },
+      ],
+    },
+    {
+      label: 'Signals',
       children: [
         {
           label: 'Overview',
-          icon: 'dashboard_customize',
-          route: [
-            '/signal-store',
-            { outlets: { 'signal-store': ['overview'] } },
+          route: '/signal-store/overview',
+        },
+        {
+          label: 'SignalStore',
+          children: [
+            {
+              label: 'Core Concepts',
+              badge: 'Done',
+              badgeType: 'done',
+              route: '/signal-store/core-concepts',
+            },
+            {
+              label: 'Lifecycle Hooks',
+              badge: 'Next',
+              badgeType: 'next',
+              route: '/signal-store/lifecycle-hooks',
+            },
+            {
+              label: 'Custom Store Properties',
+              route: '/signal-store/custom-properties',
+            },
+            {
+              label: 'Linked State',
+              route: '/signal-store/linked-state',
+            },
+            {
+              label: 'State Tracking',
+              route: '/signal-store/state-tracking',
+            },
+            {
+              label: 'Private Store Members',
+              route: '/signal-store/private-members',
+            },
+            {
+              label: 'Custom Store Features',
+              route: '/signal-store/custom-features',
+            },
+            {
+              label: 'Entity Management',
+              route: '/signal-store/entity-management',
+            },
+            {
+              label: 'Events',
+              route: '/signal-store/events',
+            },
+            {
+              label: 'Testing',
+              route: '/signal-store/testing',
+            },
           ],
         },
         {
-          label: 'Book Search',
-          icon: 'menu_book',
-          route: [
-            '/signal-store',
-            { outlets: { 'signal-store': ['book-search'] } },
-          ],
+          label: 'SignalState',
+          route: '/signal-state',
+        },
+        {
+          label: 'DeepComputed',
+          route: '/signal-store/deep-computed',
+        },
+        {
+          label: 'SignalMethod',
+          route: '/signal-store/signal-method',
+        },
+        {
+          label: 'RxJS Integration',
+          route: '/signal-store/rxjs-integration',
+        },
+        {
+          label: 'Resource Extensions',
+          route: '/signal-store/resource-extensions',
         },
       ],
     },
-    { label: 'Signal State', icon: 'storage', route: '/signal-state' },
-    { label: 'State History', icon: 'history', route: '/history' },
-    { label: 'Settings', icon: 'settings', route: '/settings' },
   ]);
 
   toggleSidenav(): void {

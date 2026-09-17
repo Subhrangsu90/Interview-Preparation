@@ -1,87 +1,114 @@
 <nav class="sidenav-nav" aria-label="Main navigation">
   <ul class="nav-list">
     @for (item of navItems(); track item.label) {
-      @if (item.children && item.children.length > 0) {
-        <!-- Parent with Sub-Sidenav (Collapsible Group) -->
+      @if (item.isSectionHeader) {
+        <li class="nav-section-header">{{ item.label }}</li>
+      } @else if (item.children && item.children.length > 0) {
+        <!-- Collapsible Group (Level 1) -->
         <li class="nav-group-item" [class.is-expanded]="isGroupExpanded(item.label)">
           <div
-            class="parent-pill-row"
-            [class.active-parent]="parentRla.isActive"
+            class="tree-group-header"
+            (click)="toggleGroup(item.label)"
+            matRipple
           >
-            <a
-              class="parent-nav-link"
-              [routerLink]="item.route"
-              routerLinkActive="active-parent-link"
-              #parentRla="routerLinkActive"
-              [routerLinkActiveOptions]="{ exact: false }"
-              matRipple
-            >
-              @if (item.icon) {
-                <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
-              }
-              <span class="nav-label">{{ item.label }}</span>
-            </a>
-
-            <!-- Dedicated Chevron Toggle Button -->
-            <button
-              type="button"
-              class="group-chevron-btn"
-              (click)="toggleGroup(item.label)"
-              [attr.aria-expanded]="isGroupExpanded(item.label)"
-              [attr.aria-label]="'Toggle ' + item.label + ' sub-menu'"
-              matRipple
-            >
-              <mat-icon class="chevron-icon">
-                {{ isGroupExpanded(item.label) ? 'expand_more' : 'chevron_right' }}
-              </mat-icon>
-            </button>
+            <mat-icon class="tree-chevron">
+              {{ isGroupExpanded(item.label) ? 'expand_more' : 'chevron_right' }}
+            </mat-icon>
+            @if (item.icon) {
+              <mat-icon class="tree-icon">{{ item.icon }}</mat-icon>
+            }
+            <span class="tree-label">{{ item.label }}</span>
+            @if (item.badge) {
+              <span class="tree-badge" [class]="'badge-' + (item.badgeType || 'default')">{{ item.badge }}</span>
+            }
           </div>
 
-          <!-- Sub-Sidenav Nested List -->
+          <!-- Level 2 List -->
           @if (isGroupExpanded(item.label)) {
-            <ul class="sub-nav-list" role="menu">
+            <ul class="tree-sub-list">
               @for (child of item.children; track child.label) {
-                <li class="sub-nav-item" role="none">
-                  <a
-                    class="sub-nav-link"
-                    [routerLink]="child.route"
-                    routerLinkActive="active-sub-item"
-                    #childRla="routerLinkActive"
-                    [class.active]="childRla.isActive"
-                    [routerLinkActiveOptions]="{ exact: true }"
-                    matRipple
-                  >
-                    @if (child.icon) {
-                      <mat-icon class="sub-nav-icon">{{ child.icon }}</mat-icon>
+                @if (child.children && child.children.length > 0) {
+                  <!-- Nested Collapsible Group (Level 2, e.g. SignalStore) -->
+                  <li class="nested-group-item" [class.is-expanded]="isGroupExpanded(child.label)">
+                    <div
+                      class="tree-nested-header"
+                      (click)="toggleGroup(child.label)"
+                      matRipple
+                    >
+                      <mat-icon class="tree-chevron">
+                        {{ isGroupExpanded(child.label) ? 'expand_more' : 'chevron_right' }}
+                      </mat-icon>
+                      <span class="tree-label">{{ child.label }}</span>
+                      @if (child.badge) {
+                        <span class="tree-badge" [class]="'badge-' + (child.badgeType || 'default')">{{ child.badge }}</span>
+                      }
+                    </div>
+
+                    <!-- Level 3 List (e.g. Core Concepts, Lifecycle Hooks) -->
+                    @if (isGroupExpanded(child.label)) {
+                      <ul class="tree-leaf-list">
+                        @for (leaf of child.children; track leaf.label) {
+                          <li class="tree-leaf-item">
+                            <a
+                              class="tree-link"
+                              [routerLink]="leaf.route"
+                              routerLinkActive="active-tree-link"
+                              #leafRla="routerLinkActive"
+                              [class.active]="leafRla.isActive"
+                              [routerLinkActiveOptions]="{ exact: true }"
+                              matRipple
+                            >
+                              <span class="leaf-label">{{ leaf.label }}</span>
+                              @if (leaf.badge) {
+                                <span class="tree-badge" [class]="'badge-' + (leaf.badgeType || 'default')">{{ leaf.badge }}</span>
+                              }
+                            </a>
+                          </li>
+                        }
+                      </ul>
                     }
-                    <span class="sub-nav-label">{{ child.label }}</span>
-                    @if (child.badge) {
-                      <span class="sub-nav-badge">{{ child.badge }}</span>
-                    }
-                  </a>
-                </li>
+                  </li>
+                } @else {
+                  <!-- Level 2 Direct Link (e.g. Overview, SignalState) -->
+                  <li class="tree-child-item">
+                    <a
+                      class="tree-link level-2-link"
+                      [routerLink]="child.route"
+                      routerLinkActive="active-tree-link"
+                      #childRla="routerLinkActive"
+                      [class.active]="childRla.isActive"
+                      [routerLinkActiveOptions]="{ exact: true }"
+                      matRipple
+                    >
+                      <span class="leaf-label">{{ child.label }}</span>
+                      @if (child.badge) {
+                        <span class="tree-badge" [class]="'badge-' + (child.badgeType || 'default')">{{ child.badge }}</span>
+                      }
+                    </a>
+                  </li>
+                }
               }
             </ul>
           }
         </li>
       } @else {
-        <!-- Single Root Nav Item -->
+        <!-- Single Root Item (e.g. Dashboard) -->
         <li class="nav-single-item">
           <a
-            class="nav-link"
+            class="tree-root-link"
             [routerLink]="item.route"
-            routerLinkActive="active-nav-item"
+            routerLinkActive="active-tree-link"
             #rla="routerLinkActive"
             [class.active]="rla.isActive"
             [routerLinkActiveOptions]="{ exact: true }"
             matRipple
           >
             @if (item.icon) {
-              <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+              <mat-icon class="tree-icon">{{ item.icon }}</mat-icon>
             }
-            <span class="nav-label">{{ item.label }}</span>
+            <span class="tree-label">{{ item.label }}</span>
             @if (item.badge) {
-              <span class="nav-badge">{{ item.badge }}</span>
+              <span class="tree-badge" [class]="'badge-' + (item.badgeType || 'default')">{{ item.badge }}</span>
             }
           </a>
         </li>
