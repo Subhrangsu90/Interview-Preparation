@@ -26,18 +26,23 @@ const initialState: BookSearchState = {
 
 export const BookSearchStore = signalStore(
   withState(initialState),
+  // 👇 Accessing previously defined state signals and properties.
   withComputed(({ books, filter }) => ({
     booksCount: computed(() => books().length),
-    sortedBooks: computed(() => {
+    // 👇 Adds computed automatically
+    sortedBooks: () => {
       const direction = filter.order() === 'asc' ? 1 : -1;
 
       return books().toSorted(
         (a, b) => direction * a.title.localeCompare(b.title)
       );
-    }),
+    },
   })),
+  // 👇 Accessing a store instance with previously defined state signals,
+  // properties, and methods.
   withMethods((store, booksService = inject(BooksService)) => ({
     updateQuery(query: string): void {
+      // 👇 Updating state using the `patchState` function.
       patchState(store, (state) => ({
         filter: { ...state.filter, query },
       }));
@@ -47,6 +52,14 @@ export const BookSearchStore = signalStore(
         filter: { ...state.filter, order },
       }));
     },
+    // 👇 Defining a method to load all books.
+    async loadAll(): Promise<void> {
+      patchState(store, { isLoading: true });
+
+      const books = await booksService.getAll();
+      patchState(store, { books, isLoading: false });
+    },
+    // 👇 Defining a method to load books by query.
     loadByQuery: rxMethod<string>(
       pipe(
         debounceTime(300),
@@ -55,9 +68,12 @@ export const BookSearchStore = signalStore(
         switchMap((query) => {
           return booksService.getByQuery(query).pipe(
             tapResponse({
-              next: (books) => patchState(store, { books }),
-              error: console.error,
-              finalize: () => patchState(store, { isLoading: false }),
+              next: (books) =>
+                patchState(store, { books, isLoading: false }),
+              error: (err) => {
+                patchState(store, { isLoading: false });
+                console.error(err);
+              },
             })
           );
         })
@@ -65,4 +81,4 @@ export const BookSearchStore = signalStore(
     ),
   }))
 );
-
+
