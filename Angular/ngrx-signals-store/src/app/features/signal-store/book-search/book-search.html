@@ -3,22 +3,85 @@
     <div class="title-wrap">
       <mat-icon class="search-badge-icon">menu_book</mat-icon>
       <div>
-        <h3>Book Search</h3>
-        <span class="outlet-badge">Secondary Outlet Active</span>
+        <h3>Book Search Store</h3>
+        <span class="outlet-badge">NgRx SignalStore Example</span>
       </div>
     </div>
-    <a
-      mat-icon-button
-      [routerLink]="[
-        '/signal-store',
-        { outlets: { 'signal-store': ['overview'] } }
-      ]"
-      aria-label="Close book search and return to overview"
-      title="Close book search and return to overview"
-    >
-      <mat-icon>close</mat-icon>
-    </a>
+    <div class="count-chip">
+      <mat-chip-set>
+        <mat-chip highlighted color="primary">
+          <mat-icon matChipAvatar>auto_stories</mat-icon>
+          Total Books: {{ store.booksCount() }}
+        </mat-chip>
+      </mat-chip-set>
+    </div>
   </div>
-  <p class="search-desc">Search and manage books using NgRx SignalStore in this secondary view panel.</p>
-</div>
 
+  <p class="search-desc">
+    Demonstrates NgRx SignalStore core features: <code>withState</code>, <code>withComputed</code>,
+    <code>withMethods</code>, and reactive search using <code>rxMethod</code>.
+  </p>
+
+  <!-- Interactive Components: BookFilter & BookList from Docs -->
+  <div class="controls-card">
+    <ngrx-book-filter
+      [query]="store.filter.query()"
+      [order]="store.filter.order()"
+      (queryChange)="store.updateQuery($event)"
+      (orderChange)="store.updateOrder($event)"
+    />
+  </div>
+
+  <!-- Content Grid: Books Display & State Inspector -->
+  <div class="content-grid">
+    <!-- Books Results Section -->
+    <div class="books-section">
+      <div class="section-title">
+        <mat-icon>library_books</mat-icon>
+        <h4>Filtered & Sorted Books ({{ store.sortedBooks().length }})</h4>
+      </div>
+
+      <ngrx-book-list
+        [books]="store.sortedBooks()"
+        [isLoading]="store.isLoading()"
+      />
+    </div>
+
+    <!-- Official DeepSignal Reading State Inspector -->
+    <div class="inspector-section">
+      <div class="section-title">
+        <mat-icon>data_object</mat-icon>
+        <h4>Reading State (from Official Docs)</h4>
+      </div>
+
+      <div class="inspector-card">
+        <div class="inspector-row">
+          <span class="inspector-label">store.isLoading():</span>
+          <span class="inspector-value badge" [class.active]="store.isLoading()">
+            {{ store.isLoading() }}
+          </span>
+        </div>
+
+        <div class="inspector-row">
+          <span class="inspector-label">store.filter.query():</span>
+          <code class="inspector-code">"{{ store.filter.query() }}"</code>
+        </div>
+
+        <div class="inspector-row">
+          <span class="inspector-label">store.filter.order():</span>
+          <code class="inspector-code">"{{ store.filter.order() }}"</code>
+        </div>
+
+        <div class="inspector-row">
+          <span class="inspector-label">store.filter() (DeepSignal):</span>
+          <pre class="inspector-pre">{{ store.filter() | json }}</pre>
+        </div>
+
+        <div class="inspector-row">
+          <span class="inspector-label">store.books() (length: {{ store.books().length }}):</span>
+          <pre class="inspector-pre scrollable">{{ store.books() | json }}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
