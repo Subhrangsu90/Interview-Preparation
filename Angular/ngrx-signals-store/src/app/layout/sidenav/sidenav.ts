@@ -1,7 +1,9 @@
 import { Component, input, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
+import { MatDividerModule } from '@angular/material/divider';
 
 export interface NavItem {
   label: string;
@@ -15,7 +17,14 @@ export interface NavItem {
 
 @Component({
   selector: 'app-sidenav',
-  imports: [RouterLink, RouterLinkActive, MatIconModule, MatRippleModule],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    MatListModule,
+    MatIconModule,
+    MatRippleModule,
+    MatDividerModule,
+  ],
   templateUrl: './sidenav.html',
   styleUrl: './sidenav.scss',
 })

@@ -1,8 +1,244 @@
-<section class="dashboard-container">
-  <!-- Header -->
-  <div class="dashboard-header">
+<section class="dashboard-page">
+  <!-- Hero Section -->
+  <mat-card class="m3-hero-card">
+    <mat-card-content class="hero-content">
+      <div class="hero-text-block">
+        <div class="hero-tag">
+          <mat-icon class="hero-tag-icon">auto_awesome</mat-icon>
+          <span>Modern Angular State Architecture</span>
+        </div>
+        <h1 class="hero-title">NgRx SignalStore & Signals Guide</h1>
+        <p class="hero-description">
+          Master enterprise-grade reactive state management with Angular Signals. 
+          Build fine-grained, composable, and tree-shakable stores with zero RxJS boilerplate 
+          while retaining total immutability and seamless reactivity.
+        </p>
+
+        <div class="hero-actions">
+          <a mat-flat-button routerLink="/signal-store/core-concepts" class="primary-btn">
+            <mat-icon>search</mat-icon>
+            <span>Core Concepts (Book Search)</span>
+          </a>
+          <a mat-stroked-button routerLink="/signal-store/overview" class="secondary-btn">
+            <mat-icon>architecture</mat-icon>
+            <span>Architecture Overview</span>
+          </a>
+          <a mat-stroked-button routerLink="/signal-state" class="ghost-btn">
+            <mat-icon>account_tree</mat-icon>
+            <span>SignalState Demo</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-terminal">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="terminal-title">quick-start.ts</span>
+        </div>
+        <div class="terminal-body">
+          <pre><code><span class="c-keyword">import</span> &#123; <span class="c-func">signalStore</span>, <span class="c-func">withState</span>, <span class="c-func">withComputed</span>, <span class="c-func">withMethods</span> &#125; <span class="c-keyword">from</span> <span class="c-str">'@ngrx/signals'</span>;
+
+<span class="c-keyword">export const</span> BooksStore = <span class="c-func">signalStore</span>(
+  &#123; <span class="c-prop">providedIn</span>: <span class="c-str">'root'</span> &#125;,
+  <span class="c-func">withState</span>(&#123; <span class="c-prop">books</span>: [], <span class="c-prop">query</span>: <span class="c-str">''</span>, <span class="c-prop">loading</span>: <span class="c-bool">false</span> &#125;),
+  <span class="c-func">withComputed</span>((&#123; <span class="c-prop">books</span> &#125;) => (&#123;
+    <span class="c-prop">count</span>: <span class="c-func">computed</span>(() => <span class="c-prop">books</span>().length),
+  &#125;)),
+  <span class="c-func">withMethods</span>((<span class="c-prop">store</span>) => (&#123;
+    <span class="c-func">updateQuery</span>(<span class="c-param">query</span>: <span class="c-type">string</span>) &#123;
+      <span class="c-func">patchState</span>(<span class="c-prop">store</span>, &#123; query &#125;);
+    &#125;
+  &#125;))
+);</code></pre>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Quick Metrics Grid -->
+  <div class="metrics-grid">
+    @for (stat of stats; track stat.label) {
+      <mat-card class="metric-card" [class]="'accent-' + stat.accent">
+        <mat-card-content>
+          <div class="metric-header">
+            <span class="metric-label">{{ stat.label }}</span>
+            <div class="metric-icon-wrapper">
+              <mat-icon>{{ stat.icon }}</mat-icon>
+            </div>
+          </div>
+          <div class="metric-value">{{ stat.value }}</div>
+          <div class="metric-footer">
+            <mat-icon class="footer-icon">verified</mat-icon>
+            <span>{{ stat.change }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Interactive Signals Lab -->
+  <mat-card class="interactive-lab-card">
+    <mat-card-header>
+      <div mat-card-avatar class="lab-avatar">
+        <mat-icon>science</mat-icon>
+      </div>
+      <mat-card-title>Live Signal Reactivity Lab</mat-card-title>
+      <mat-card-subtitle>
+        Experience fine-grained computed reactivity directly in the browser
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="lab-content">
+      <div class="signal-flow-container">
+        <!-- Signal 1: Counter -->
+        <div class="signal-node primary-node">
+          <div class="node-badge">Writable Signal</div>
+          <div class="node-title">counter()</div>
+          <div class="node-value">{{ counter() }}</div>
+          <div class="node-controls">
+            <button mat-icon-button (click)="decrement()" [disabled]="counter() <= 0" aria-label="Decrement counter">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <button mat-icon-button (click)="increment()" aria-label="Increment counter">
+              <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button (click)="reset()" aria-label="Reset counter" matTooltip="Reset to 0">
+              <mat-icon>restart_alt</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Operator Icon -->
+        <div class="signal-operator">
+          <mat-icon>close</mat-icon>
+        </div>
+
+        <!-- Signal 2: Multiplier -->
+        <div class="signal-node secondary-node">
+          <div class="node-badge">Multiplier Signal</div>
+          <div class="node-title">multiplier()</div>
+          <div class="node-value">{{ multiplier() }}x</div>
+          <div class="multiplier-chips">
+            <button
+              mat-stroked-button
+              class="chip-btn"
+              [class.active-chip]="multiplier() === 2"
+              (click)="setMultiplier(2)"
+            >
+              2x
+            </button>
+            <button
+              mat-stroked-button
+              class="chip-btn"
+              [class.active-chip]="multiplier() === 3"
+              (click)="setMultiplier(3)"
+            >
+              3x
+            </button>
+            <button
+              mat-stroked-button
+              class="chip-btn"
+              [class.active-chip]="multiplier() === 5"
+              (click)="setMultiplier(5)"
+            >
+              5x
+            </button>
+          </div>
+        </div>
+
+        <!-- Equals Operator -->
+        <div class="signal-operator">
+          <mat-icon>drag_handle</mat-icon>
+        </div>
+
+        <!-- Signal 3: Computed Result -->
+        <div class="signal-node computed-node">
+          <div class="node-badge computed-badge">Computed Derivation</div>
+          <div class="node-title">multiplied()</div>
+          <div class="node-value result-val">{{ multiplied() }}</div>
+          <div class="node-meta">
+            <mat-icon class="meta-icon">memory</mat-icon>
+            <span>Memoized automatically</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lab-status-bar">
+        <span class="status-indicator"></span>
+        <span class="status-label">Last signal mutation:</span>
+        <code class="status-action">{{ lastAction() }}</code>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Learning Path Modules Grid -->
+  <div class="section-title-row">
     <div>
-      <h1>Dashboard</h1>
+      <h2 class="section-title">Core Learning Modules</h2>
+      <p class="section-subtitle">Comprehensive step-by-step guides and interactive references</p>
     </div>
+  </div>
+
+  <div class="modules-grid">
+    @for (module of modules; track module.title) {
+      <mat-card class="module-card">
+        <mat-card-header>
+          <div mat-card-avatar class="module-icon-avatar">
+            <mat-icon>{{ module.icon }}</mat-icon>
+          </div>
+          <mat-card-title class="module-title">{{ module.title }}</mat-card-title>
+          <mat-card-subtitle>
+            <span class="module-tag">{{ module.tag }}</span>
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content class="module-body">
+          <p>{{ module.description }}</p>
+        </mat-card-content>
+
+        <mat-divider></mat-divider>
+
+        <mat-card-actions class="module-actions">
+          <span class="status-chip" [class]="'chip-' + module.status.toLowerCase()">
+            {{ module.status }}
+          </span>
+          <a mat-button [routerLink]="module.route" class="explore-btn">
+            <span>Explore</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
+
+  <!-- Best Practices & Pro Tips -->
+  <div class="section-title-row">
+    <div>
+      <h2 class="section-title">Signals & SignalStore Best Practices</h2>
+      <p class="section-subtitle">Architectural design patterns recommended by the NgRx core team</p>
+    </div>
+  </div>
+
+  <div class="tips-grid">
+    @for (tip of proTips; track tip.title) {
+      <mat-card class="tip-card">
+        <mat-card-header>
+          <div mat-card-avatar class="tip-icon-avatar">
+            <mat-icon>lightbulb</mat-icon>
+          </div>
+          <mat-card-title class="tip-title">{{ tip.title }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="tip-body">
+          <p>{{ tip.text }}</p>
+          <div class="tip-code-box">
+            <code>{{ tip.code }}</code>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
   </div>
 </section>

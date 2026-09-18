@@ -168,11 +168,6 @@
           border: 1px solid var(--mat-sys-outline-variant, #ece6f0);
           transition: transform 0.15s ease, box-shadow 0.15s ease;
 
-          &:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-          }
-
           .book-id-badge {
             font-size: 0.8rem;
             font-weight: 700;

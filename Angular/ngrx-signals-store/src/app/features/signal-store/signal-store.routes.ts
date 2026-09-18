@@ -21,5 +21,10 @@ export const SIGNAL_STORE_ROUTES: Routes = [
     redirectTo: 'core-concepts',
     pathMatch: 'full',
   },
+  {
+    path: '**',
+    redirectTo: 'overview',
+  },
 ];
+
 
