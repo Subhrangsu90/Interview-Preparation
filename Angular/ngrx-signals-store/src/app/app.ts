@@ -18,18 +18,6 @@ export class App {
     { label: 'Dashboard', icon: 'space_dashboard', route: '/dashboard' },
     { label: 'GUIDE', isSectionHeader: true },
     {
-      label: 'Store',
-      children: [
-        { label: 'Overview', route: '/signal-store/overview' },
-      ],
-    },
-    {
-      label: 'Effects',
-      children: [
-        { label: 'Overview', route: '/signal-store/overview' },
-      ],
-    },
-    {
       label: 'Signals',
       children: [
         {

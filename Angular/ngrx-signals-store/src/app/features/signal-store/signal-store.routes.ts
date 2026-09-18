@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { SIGNAL_STORE_TOPICS } from './signal-store.config';
 
 export const SIGNAL_STORE_ROUTES: Routes = [
   {
@@ -22,12 +21,5 @@ export const SIGNAL_STORE_ROUTES: Routes = [
     redirectTo: 'core-concepts',
     pathMatch: 'full',
   },
-  ...SIGNAL_STORE_TOPICS.map((topic) => ({
-    path: topic.slug,
-    loadComponent: () =>
-      import('./components/topic-placeholder/topic-placeholder').then(
-        (m) => m.TopicPlaceholder
-      ),
-    data: topic,
-  })),
 ];
+
